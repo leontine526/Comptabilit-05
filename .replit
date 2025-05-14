@@ -10,6 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
+runButton = "Run SmartOHADA"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
