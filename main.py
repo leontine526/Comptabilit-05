@@ -58,8 +58,9 @@ except Exception as e:
     logger.error(f"Erreur lors du chargement des gestionnaires Socket.IO: {str(e)}")
 
 # Importer toutes les routes nécessaires
-from routes import *
+from routes import routes
 from routes_social import *
+app.register_blueprint(routes)
 logger.info("Routes chargées avec succès")
 
 # Importe les gestionnaires d'erreurs
