@@ -1,0 +1,39 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Erreur de base de données{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-database mr-2"></i> Erreur de connexion à la base de données</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    <h5 class="text-center mb-4">Impossible de se connecter à la base de données</h5>
+                    <p>
+                        Nous rencontrons actuellement des difficultés pour accéder à notre base de données. 
+                        Cette erreur a été enregistrée et notre équipe technique a été informée du problème.
+                    </p>
+                    <p>
+                        Veuillez réessayer dans quelques instants. Si le problème persiste, n'hésitez pas à contacter notre support technique.
+                    </p>
+                    <div class="mt-4 text-center">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-primary mr-2">
+                            <i class="fas fa-home mr-1"></i> Retour à l'accueil
+                        </a>
+                        <button class="btn btn-primary" onclick="window.location.reload();">
+                            <i class="fas fa-sync-alt mr-1"></i> Actualiser la page
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

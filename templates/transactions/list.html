@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">Journal comptable</h1>
+        <p class="text-muted">Exercice : {{ exercise.name }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('transaction_new', exercise_id=exercise.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nouvelle écriture
+        </a>
+        <a href="{{ url_for('journal_export', exercise_id=exercise.id) }}" class="btn btn-success">
+            <i class="fas fa-file-excel me-2"></i>Exporter Excel
+        </a>
+    </div>
+</div>
+
+{% if transactions %}
+    <div class="card bg-dark border-secondary mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover journal-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="operation-number">N° Opération</th>
+                            <th class="operation-date">Date</th>
+                            <th class="account-number">N° Compte</th>
+                            <th class="description">Libellé</th>
+                            <th class="debit">Débit</th>
+                            <th class="credit">Crédit</th>
+                            <th class="actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                            {% set first_item = true %}
+                            {% for item in transaction.items %}
+                                <tr>
+                                    {% if first_item %}
+                                        <td class="operation-number" rowspan="{{ transaction.items.count() }}">{{ transaction.reference }}</td>
+                                        <td class="operation-date" rowspan="{{ transaction.items.count() }}">{{ transaction.transaction_date.strftime('%d/%m/%Y') }}</td>
+                                        {% set first_item = false %}
+                                    {% endif %}
+                                    <td class="account-number">{{ item.account.account_number }}</td>
+                                    <td class="description">{{ item.description or transaction.description }}</td>
+                                    <td class="debit">{{ item.debit_amount|float|round(2, 'common') if item.debit_amount > 0 else '' }}</td>
+                                    <td class="credit">{{ item.credit_amount|float|round(2, 'common') if item.credit_amount > 0 else '' }}</td>
+                                    
+                                    {% if loop.first %}
+                                        <td class="actions" rowspan="{{ transaction.items.count() }}">
+                                            <div class="btn-group">
+                                                <a href="{{ url_for('transaction_view', transaction_id=transaction.id) }}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if not transaction.is_posted and not exercise.is_closed %}
+                                                    <a href="{{ url_for('transaction_edit', transaction_id=transaction.id) }}" class="btn btn-sm btn-warning">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            
+                            <!-- Total row for each transaction -->
+                            <tr class="total-row">
+                                <td colspan="4" class="text-end">Total</td>
+                                <td class="debit">{{ transaction.total_debit|float|round(2, 'common') }}</td>
+                                <td class="credit">{{ transaction.total_credit|float|round(2, 'common') }}</td>
+                                <td></td>
+                            </tr>
+                            
+                            <!-- Spacer row -->
+                            <tr class="spacer">
+                                <td colspan="7" style="height: 10px; padding: 0; border: none;"></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info text-center">
+        <p class="mb-3">Aucune transaction pour cet exercice.</p>
+        <a href="{{ url_for('transaction_new', exercise_id=exercise.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Créer votre première écriture
+        </a>
+    </div>
+{% endif %}
+
+<div class="card bg-dark border-secondary">
+    <div class="card-header">
+        <h5 class="mb-0">Légende</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-circle text-success me-2"></i>Écriture comptabilisée</li>
+                    <li><i class="fas fa-circle text-warning me-2"></i>Écriture en brouillon</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-eye me-2"></i>Voir les détails</li>
+                    <li><i class="fas fa-edit me-2"></i>Modifier l'écriture (brouillons uniquement)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

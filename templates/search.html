@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Recherche</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
+        </a>
+    </div>
+
+    <div class="dashboard-card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-search me-2"></i>Rechercher</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('search') }}">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-8 mb-3 mb-md-0">
+                        <div class="input-group">
+                            {{ form.query(class="form-control", placeholder="Rechercher...", value=query) }}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Rechercher
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.search_type(class="form-select") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if results %}
+        <div class="row">
+            <!-- Users Results -->
+            {% if search_type == 'all' or search_type == 'users' %}
+                <div class="col-lg-4 mb-4">
+                    <div class="dashboard-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-users me-2"></i>Utilisateurs</h5>
+                            <span class="badge bg-primary rounded-pill">{{ results.users|length }}</span>
+                        </div>
+                        <div class="card-body">
+                            {% if results.users %}
+                                <div class="dashboard-list-group">
+                                    {% for user in results.users %}
+                                        <div class="list-group-item dashboard-list-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6>{{ user.username }}</h6>
+                                                    <small class="text-muted">{{ user.full_name }}</small>
+                                                </div>
+                                                {% if user.id != current_user.id %}
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="showInviteModal('{{ user.id }}', '{{ user.username }}')">
+                                                                    <i class="fas fa-user-plus me-2"></i>Inviter à un groupe
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-users empty-state-icon"></i>
+                                    <p>Aucun utilisateur trouvé.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Workgroups Results -->
+            {% if search_type == 'all' or search_type == 'workgroups' %}
+                <div class="col-lg-4 mb-4">
+                    <div class="dashboard-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-user-friends me-2"></i>Groupes</h5>
+                            <span class="badge bg-primary rounded-pill">{{ results.workgroups|length }}</span>
+                        </div>
+                        <div class="card-body">
+                            {% if results.workgroups %}
+                                <div class="dashboard-list-group">
+                                    {% for workgroup in results.workgroups %}
+                                        <a href="{{ url_for('workgroup_view', workgroup_id=workgroup.id) }}" class="list-group-item dashboard-list-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6>{{ workgroup.name }}</h6>
+                                                <small>
+                                                    <i class="fas fa-users me-1"></i>{{ workgroup.members|length }}
+                                                    {% if workgroup.is_private %}
+                                                        <span class="ms-1 badge bg-secondary">Privé</span>
+                                                    {% else %}
+                                                        <span class="ms-1 badge bg-success">Public</span>
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <small class="text-secondary">
+                                                <i class="fas fa-crown me-1 text-warning"></i>{{ workgroup.owner.username }}
+                                                <span class="mx-2">•</span>
+                                                {{ workgroup.description[:80] + '...' if workgroup.description and workgroup.description|length > 80 else workgroup.description }}
+                                            </small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-user-friends empty-state-icon"></i>
+                                    <p>Aucun groupe trouvé.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Exercises Results -->
+            {% if search_type == 'all' or search_type == 'exercises' %}
+                <div class="col-lg-4 mb-4">
+                    <div class="dashboard-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-book me-2"></i>Exercices</h5>
+                            <span class="badge bg-primary rounded-pill">{{ results.exercises|length }}</span>
+                        </div>
+                        <div class="card-body">
+                            {% if results.exercises %}
+                                <div class="dashboard-list-group">
+                                    {% for exercise in results.exercises %}
+                                        <a href="{{ url_for('transactions_list', exercise_id=exercise.id) }}" class="list-group-item dashboard-list-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6>{{ exercise.name }}</h6>
+                                                <small>
+                                                    {{ exercise.start_date.strftime('%d/%m/%Y') }} - {{ exercise.end_date.strftime('%d/%m/%Y') }}
+                                                </small>
+                                            </div>
+                                            <small class="text-secondary">
+                                                {% if exercise.user_id == current_user.id %}
+                                                    <span class="badge bg-primary me-1">Votre exercice</span>
+                                                {% else %}
+                                                    <span class="badge bg-info me-1">Partagé</span>
+                                                {% endif %}
+                                                {{ exercise.description[:80] + '...' if exercise.description and exercise.description|length > 80 else exercise.description }}
+                                            </small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-book empty-state-icon"></i>
+                                    <p>Aucun exercice trouvé.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Invite User to Workgroup Modal -->
+<div class="modal fade" id="inviteUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Inviter <span id="inviteUsername"></span> à un groupe</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="inviteUserForm" method="get">
+                    <div class="mb-3">
+                        <label for="workgroupSelect" class="form-label">Sélectionnez un groupe</label>
+                        <select class="form-select" id="workgroupSelect" required>
+                            <option value="" selected disabled>Choisir un groupe</option>
+                            {% for workgroup in current_user.owned_workgroups %}
+                                <option value="{{ workgroup.id }}">{{ workgroup.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="inviteUserBtn">Inviter</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Setup selected search type
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchTypeSelect = document.getElementById('search_type');
+        if (searchTypeSelect) {
+            searchTypeSelect.value = "{{ search_type }}";
+        }
+    });
+    
+    // Setup invite user modal
+    function showInviteModal(userId, username) {
+        document.getElementById('inviteUsername').textContent = username;
+        
+        const inviteUserBtn = document.getElementById('inviteUserBtn');
+        inviteUserBtn.onclick = function() {
+            const workgroupId = document.getElementById('workgroupSelect').value;
+            if (workgroupId) {
+                window.location.href = `/workgroups/${workgroupId}/invite?username=${username}`;
+            }
+        };
+        
+        new bootstrap.Modal(document.getElementById('inviteUserModal')).show();
+    }
+</script>
+{% endblock %}

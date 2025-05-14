@@ -1,0 +1,57 @@
+/* Journal styling */
+.journal-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.journal-table th, 
+.journal-table td {
+    border: 1px solid #444;
+    padding: 8px;
+    text-align: left;
+}
+
+.journal-table th {
+    background-color: #272b30;
+    font-weight: bold;
+    text-align: center;
+}
+
+.journal-table .operation-date {
+    font-weight: bold;
+    border-bottom: 1px solid #444;
+    background-color: #3a3f44;
+}
+
+.journal-table .total-row {
+    font-weight: bold;
+    background-color: #272b30;
+}
+
+.journal-table .account-number {
+    width: 10%;
+}
+
+.journal-table .description {
+    width: 50%;
+}
+
+.journal-table .debit, 
+.journal-table .credit {
+    width: 15%;
+    text-align: right;
+}
+
+.journal-table .operation-number {
+    width: 10%;
+    text-align: center;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .journal-table {
+        display: block;
+        overflow-x: auto;
+    }
+}

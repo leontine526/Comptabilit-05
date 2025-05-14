@@ -1,0 +1,97 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Résolution complète d'exercice</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        Cet outil va résoudre votre exercice et générer automatiquement:
+                    </p>
+                    <ul class="list-group mb-4">
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-book mr-3 text-primary"></i>
+                            <strong>Journal comptable</strong>: Toutes les écritures comptables de l'exercice
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-list-alt mr-3 text-success"></i>
+                            <strong>Grand livre</strong>: Les mouvements par compte avec les soldes
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-balance-scale mr-3 text-danger"></i>
+                            <strong>Bilan</strong>: Le bilan comptable à la fin de l'exercice
+                        </li>
+                    </ul>
+
+                    <form method="POST" class="mt-4">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group">
+                            {{ form.exercise_id.label(class="form-control-label font-weight-bold") }}
+                            {% if form.exercise_id.errors %}
+                                {{ form.exercise_id(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.exercise_id.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.exercise_id(class="form-control") }}
+                            {% endif %}
+                            <small class="form-text text-muted">Sélectionnez l'exercice sur lequel vous souhaitez travailler</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.title.label(class="form-control-label font-weight-bold") }}
+                            {% if form.title.errors %}
+                                {{ form.title(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.title(class="form-control") }}
+                            {% endif %}
+                            <small class="form-text text-muted">Donnez un titre à cet exercice</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.problem_text.label(class="form-control-label font-weight-bold") }}
+                            {% if form.problem_text.errors %}
+                                {{ form.problem_text(class="form-control is-invalid", rows=10) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.problem_text.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.problem_text(class="form-control", rows=10) }}
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Entrez l'énoncé complet de l'exercice. Plus vous donnez de détails, meilleure sera la résolution.
+                            </small>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Cette fonctionnalité utilise l'intelligence artificielle pour analyser votre exercice et générer les documents comptables. 
+                        La qualité des résultats dépend de la clarté et de la précision de l'énoncé.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

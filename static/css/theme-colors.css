@@ -1,0 +1,148 @@
+/* Palette de couleurs "Bleu nuit & Or professionnel" */
+:root {
+    /* Couleurs principales */
+    --primary: #1E2A38;           /* Bleu nuit (professionnel, sérieux, élégant) */
+    --secondary: #F4B400;         /* Or chaud (pour les boutons, icônes ou surlignages importants) */
+    --background: #F9FAFB;        /* Blanc-gris très clair (propre, minimaliste) */
+    --text-primary: #1A1A1A;      /* Noir doux (lisible, contrasté) */
+    --text-secondary: #6B7280;    /* Gris froid (pour les textes moins importants) */
+    --success: #10B981;           /* Vert émeraude (pour les statuts valides ou réussis) */
+    --error: #EF4444;             /* Rouge doux (pour les messages d'erreur ou d'alerte) */
+    
+    /* Variations et nuances */
+    --primary-light: #2A3A4E;     /* Version plus claire de la couleur primaire */
+    --primary-dark: #15202D;      /* Version plus foncée de la couleur primaire */
+    --secondary-light: #FFCC33;   /* Version plus claire de la couleur secondaire */
+    --secondary-dark: #D39E00;    /* Version plus foncée de la couleur secondaire */
+    
+    /* Couleurs de bordure */
+    --border-light: #E5E7EB;      /* Bordure légère */
+    --border-medium: #D1D5DB;     /* Bordure standard */
+    --border-dark: #9CA3AF;       /* Bordure foncée */
+    
+    /* Couleurs d'état */
+    --info: #3B82F6;              /* Bleu informatif */
+    --warning: #F59E0B;           /* Orange avertissement */
+    
+    /* Surcharger les variables bootstrap */
+    --bs-primary: var(--primary);
+    --bs-secondary: var(--secondary);
+    --bs-success: var(--success);
+    --bs-info: var(--info);
+    --bs-warning: var(--warning);
+    --bs-danger: var(--error);
+    --bs-light: var(--background);
+    --bs-dark: var(--primary);
+}
+
+/* Appliquer les couleurs de fond et de texte de base */
+body {
+    background-color: var(--background);
+    color: var(--text-primary);
+}
+
+/* Styles pour les liens */
+a {
+    color: var(--primary);
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--primary-light);
+}
+
+/* Styles pour les boutons */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    color: var(--primary-dark);
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+    background-color: var(--secondary-light);
+    border-color: var(--secondary-light);
+    color: var(--primary-dark);
+}
+
+.btn-outline-primary {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.btn-outline-secondary:hover, .btn-outline-secondary:focus {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    color: var(--primary-dark);
+}
+
+/* Styles pour les badges */
+.badge.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--secondary) !important;
+    color: var(--primary-dark);
+}
+
+.badge.bg-success {
+    background-color: var(--success) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--error) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning) !important;
+    color: var(--primary-dark);
+}
+
+.badge.bg-info {
+    background-color: var(--info) !important;
+}
+
+/* Styles pour les tableaux */
+.table {
+    color: var(--text-primary);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(30, 42, 56, 0.05);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(30, 42, 56, 0.075);
+}
+
+/* Styles pour les cards */
+.card {
+    border-color: var(--border-light);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: rgba(30, 42, 56, 0.03);
+    border-bottom-color: var(--border-light);
+}

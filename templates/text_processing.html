@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <h2 class="mb-4"><i class="fas fa-file-alt me-2"></i>Traitement de texte</h2>
+            <p class="text-muted">
+                Cet outil vous permet de traiter un texte en français pour le résumer, le diviser en paragraphes
+                et analyser sa complexité.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Entrez votre texte</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('text_processing') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.text.label(class="form-label") }}
+                            {{ form.text(class="form-control" + (" is-invalid" if form.text.errors else ""), rows=10, placeholder="Entrez ici le texte que vous souhaitez traiter...") }}
+                            {% for error in form.text.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Options de traitement</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3 form-check">
+                                            {{ form.summarize(class="form-check-input") }}
+                                            {{ form.summarize.label(class="form-check-label") }}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            {{ form.compression_rate.label(class="form-label") }}
+                                            {{ form.compression_rate(class="form-select") }}
+                                            <div class="form-text">Détermine la longueur du résumé par rapport au texte original.</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3 form-check">
+                                            {{ form.split_paragraphs(class="form-check-input") }}
+                                            {{ form.split_paragraphs.label(class="form-check-label") }}
+                                        </div>
+                                        
+                                        <div class="mb-3 form-check">
+                                            {{ form.analyze(class="form-check-input") }}
+                                            {{ form.analyze.label(class="form-check-label") }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-cogs me-2"></i>Traiter le texte
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            {% if result %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-gradient-success text-white">
+                        <h4 class="mb-0"><i class="fas fa-file-alt me-2"></i>Résultat</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if result.summary %}
+                            <div class="mb-4">
+                                <h5><i class="fas fa-compress-alt me-2"></i>Résumé</h5>
+                                <div class="card bg-light p-3">
+                                    {{ result.summary }}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if result.paragraphs %}
+                            <div class="mb-4">
+                                <h5><i class="fas fa-paragraph me-2"></i>Paragraphes</h5>
+                                <div class="card bg-light p-3">
+                                    {% for paragraph in result.paragraphs %}
+                                        <p>{{ paragraph }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if result.complexity %}
+                            <div class="mb-4">
+                                <h5><i class="fas fa-chart-line me-2"></i>Analyse de complexité</h5>
+                                <div class="card bg-light p-3">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Nombre de phrases
+                                            <span class="badge bg-primary rounded-pill">{{ result.complexity.sentence_count }}</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Nombre de mots
+                                            <span class="badge bg-primary rounded-pill">{{ result.complexity.word_count }}</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Longueur moyenne des phrases
+                                            <span class="badge bg-primary rounded-pill">{{ result.complexity.average_sentence_length }}</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Mots uniques
+                                            <span class="badge bg-primary rounded-pill">{{ result.complexity.unique_words }}</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Diversité lexicale
+                                            <span class="badge bg-primary rounded-pill">{{ result.complexity.lexical_diversity }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0 text-muted"><i class="fas fa-info-circle me-2"></i>Instructions</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Cette fonctionnalité vous permet de traiter un texte en français de plusieurs façons :</p>
+                        
+                        <div class="mb-3">
+                            <h5><i class="fas fa-compress-alt me-2"></i>Résumer le texte</h5>
+                            <p>Obtenir un résumé concis qui conserve les informations essentielles du texte original.</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5><i class="fas fa-paragraph me-2"></i>Répartir en paragraphes</h5>
+                            <p>Restructurer le texte en paragraphes cohérents pour améliorer sa lisibilité.</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5><i class="fas fa-chart-line me-2"></i>Analyser la complexité</h5>
+                            <p>Obtenir des statistiques sur la complexité du texte (nombre de phrases, diversité lexicale, etc.).</p>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Conseil :</strong> Utilisez cette fonctionnalité pour améliorer la lisibilité de vos rapports comptables et de vos documents professionnels.
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

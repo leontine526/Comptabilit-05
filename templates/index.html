@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/3d-effects.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/3d-animation.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <div class="hero-logo-container mb-4">
+                    <img src="{{ url_for('static', filename='images/smartohada-logo.svg') }}" alt="SmartOHADA Logo" class="hero-logo">
+                </div>
+                <h1 class="hero-title"><span class="text-primary">Smart</span><span class="accent-text">OHADA</span></h1>
+                <p class="hero-subtitle">
+                    Une solution complète de gestion comptable basée sur le référentiel OHADA, avec traitement automatisé des documents et analyse intelligente.
+                </p>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-module-comptabilite btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                        </a>
+                        <a href="{{ url_for('about') }}" class="btn btn-outline-module-comptabilite btn-lg">
+                            <i class="fas fa-info-circle me-2"></i>À propos
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-module-comptabilite btn-lg shadow">
+                            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+                        </a>
+                        <a href="{{ url_for('register') }}" class="btn btn-outline-module-comptabilite btn-lg shadow">
+                            <i class="fas fa-user-plus me-2"></i>Créer un compte
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row mb-5 text-center" id="ai-section">
+        <div class="col-md-12">
+            <h2 class="display-5 mb-4">Simplifiez votre comptabilité avec la puissance de l'Intelligence Artificielle</h2>
+            <p class="lead text-muted">Notre solution combine le référentiel OHADA avec des technologies de pointe pour automatiser et optimiser vos processus comptables.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100" style="background: linear-gradient(to bottom, #F8FAFF 0%, #EEF2F7 100%); border-left: 4px solid #0B4471; box-shadow: 0 15px 30px rgba(11, 68, 113, 0.15);">
+                <div class="card-body text-center">
+                    <div class="feature-icon plan-comptable-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <h3 class="card-title mb-3" style="color: #0B4471; font-weight: 700; text-shadow: 0 1px 2px rgba(11, 68, 113, 0.1);">Plan comptable OHADA</h3>
+                    <p class="card-text" style="color: #334155; line-height: 1.6;">
+                        Accédez au plan comptable OHADA complet et gérez facilement vos comptes selon les normes en vigueur dans les pays membres de l'OHADA.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100" style="background: linear-gradient(135deg, #F0F7FF 0%, #E6F0FF 100%); border-left: 4px solid #0C4DA2; box-shadow: 0 15px 30px rgba(12, 77, 162, 0.15);">
+                <div class="card-body text-center">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #0C4DA2 0%, #0A3B7D 100%); box-shadow: 0 10px 20px rgba(12, 77, 162, 0.3);">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="card-title mb-3" style="color: #0C4DA2; font-weight: 700; text-shadow: 0 1px 2px rgba(12, 77, 162, 0.1);">Traitement automatisé</h3>
+                    <p class="card-text" style="color: #334155; line-height: 1.6;">
+                        Téléchargez vos factures et documents comptables pour qu'ils soient traités automatiquement par OCR et NLP, réduisant ainsi les erreurs et le temps de saisie.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100" style="background: linear-gradient(135deg, #F0FFF4 0%, #DCFCE7 100%); border-left: 4px solid #166534; box-shadow: 0 15px 30px rgba(22, 101, 52, 0.15);">
+                <div class="card-body text-center">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #166534 0%, #14532D 100%); box-shadow: 0 10px 20px rgba(22, 101, 52, 0.3);">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3 class="card-title mb-3" style="color: #166534; font-weight: 700; text-shadow: 0 1px 2px rgba(22, 101, 52, 0.1);">Analyse intelligente</h3>
+                    <p class="card-text" style="color: #334155; line-height: 1.6;">
+                        Obtenez des analyses détaillées de vos exercices comptables avec des recommandations personnalisées pour optimiser votre gestion financière.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="mb-3"><i class="fas fa-check-circle me-2 text-success"></i>Avantages clés</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-angle-right me-2 text-primary"></i> Conformité totale avec les normes OHADA</li>
+                        <li class="mb-2"><i class="fas fa-angle-right me-2 text-primary"></i> Reconnaissance automatique des documents (OCR)</li>
+                        <li class="mb-2"><i class="fas fa-angle-right me-2 text-primary"></i> Extraction intelligente des données comptables</li>
+                        <li class="mb-2"><i class="fas fa-angle-right me-2 text-primary"></i> Journal comptable avec visualisation claire</li>
+                        <li class="mb-2"><i class="fas fa-angle-right me-2 text-primary"></i> Gestion des exercices et rapports financiers</li>
+                        <li class="mb-2"><i class="fas fa-angle-right me-2 text-primary"></i> Interface utilisateur intuitive et professionnelle</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="mb-3"><i class="fas fa-lightbulb me-2 text-warning"></i>Pourquoi choisir notre solution</h3>
+                    <p>Notre application offre une expérience utilisateur optimale, même pour ceux qui n'ont pas de connaissances comptables approfondies. Grâce à l'automatisation des processus, vous pouvez :</p>
+                    <ul>
+                        <li>Réduire le temps consacré à la saisie manuelle</li>
+                        <li>Minimiser les erreurs comptables courantes</li>
+                        <li>Générer des rapports financiers précis et conformes</li>
+                        <li>Prendre de meilleures décisions basées sur des analyses détaillées</li>
+                        <li>Sécuriser et centraliser toutes vos données comptables</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section des fonctionnalités sociales -->
+    <div class="social-features-section my-5">
+        <div class="container py-4">
+            <div class="row mb-5 text-center">
+                <div class="col-md-12">
+                    <h2 class="display-5 mb-4">Collaboration et Réseau Social Intégrés</h2>
+                    <p class="lead text-muted">Découvrez nos nouvelles fonctionnalités sociales qui transforment la comptabilité en une expérience collaborative et interactive.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="card-body text-center">
+                            <div class="social-icon" style="background: linear-gradient(135deg, #3E54AC 0%, #072541 100%);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="card-title mb-3" style="color: #E2E8F0; font-weight: 600;">Groupes de Travail</h3>
+                            <p class="card-text" style="color: #CBD5E1;">
+                                Créez et rejoignez des groupes de travail pour collaborer en temps réel sur vos projets comptables. Partagez des exercices, échangez des conseils et travaillez ensemble efficacement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="card-body text-center">
+                            <div class="social-icon notification-pulse" style="background: linear-gradient(135deg, #16213E 0%, #0F3460 100%);">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3 class="card-title mb-3" style="color: #E2E8F0; font-weight: 600;">Messagerie en Temps Réel</h3>
+                            <p class="card-text" style="color: #CBD5E1;">
+                                Communiquez instantanément avec vos collègues et collaborateurs grâce à notre système de messagerie. Statuts en ligne, indicateurs de frappe et notifications sonores pour une expérience interactive.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="card-body text-center">
+                            <div class="social-icon" style="background: linear-gradient(135deg, #533483 0%, #0F3460 100%);">
+                                <i class="fas fa-share-alt"></i>
+                            </div>
+                            <h3 class="card-title mb-3" style="color: #E2E8F0; font-weight: 600;">Partage Social</h3>
+                            <p class="card-text" style="color: #CBD5E1;">
+                                Publiez des actualités, partagez des conseils comptables et restez connecté avec votre réseau professionnel. Réagissez avec des likes, commentaires et réactions personnalisées.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100" style="background: linear-gradient(135deg, #F0F7FF 0%, #E6F0FF 100%); border-left: 4px solid #2563EB; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.15); border-radius: 12px; overflow: hidden;">
+                        <div class="card-body position-relative">
+                            <div class="position-absolute top-0 end-0 mt-2 me-2">
+                                <span class="badge rounded-pill" style="background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%); box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25); padding: 6px 12px; font-weight: 600; font-size: 10px;">
+                                    <i class="fas fa-bolt me-1"></i> Temps réel
+                                </span>
+                            </div>
+                            <h3 class="mb-4" style="color: #1E40AF; font-weight: 700; padding-bottom: 10px; border-bottom: 2px solid rgba(37, 99, 235, 0.1);">
+                                <i class="fas fa-bolt me-2" style="color: #2563EB;"></i>Fonctionnalités en temps réel
+                            </h3>
+                            <ul class="list-unstyled">
+                                <li class="mb-3 d-flex align-items-center">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                        <i class="fas fa-comments" style="color: #2563EB;"></i>
+                                    </div>
+                                    <span style="color: #1E293B; font-weight: 500;">Chat instantané avec indicateurs de frappe</span>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                        <i class="fas fa-user-check" style="color: #2563EB;"></i>
+                                    </div>
+                                    <span style="color: #1E293B; font-weight: 500;">Statut de présence (en ligne, absent, occupé)</span>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                        <i class="fas fa-bell" style="color: #2563EB;"></i>
+                                    </div>
+                                    <span style="color: #1E293B; font-weight: 500;">Notifications sonores pour les messages et événements</span>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                        <i class="fas fa-file-upload" style="color: #2563EB;"></i>
+                                    </div>
+                                    <span style="color: #1E293B; font-weight: 500;">Partage de fichiers et documents en direct</span>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                        <i class="fas fa-clock" style="color: #2563EB;"></i>
+                                    </div>
+                                    <span style="color: #1E293B; font-weight: 500;">Stories éphémères pour les annonces importantes</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100" style="background: linear-gradient(to bottom right, #F0FDF9 0%, #ECFDF5 100%); border-left: 4px solid #0B4619; box-shadow: 0 10px 30px rgba(11, 70, 25, 0.1);">
+                        <div class="card-body">
+                            <h3 class="mb-3" style="color: #0B4619; font-weight: 600;"><i class="fas fa-shield-alt me-2"></i>Sécurité et confidentialité</h3>
+                            <p>Notre plateforme sociale est conçue avec une priorité absolue pour la confidentialité de vos données comptables :</p>
+                            <ul style="color: #1F2937;">
+                                <li class="mb-2"><i class="fas fa-lock me-2" style="color: #16A34A;"></i> Contrôle précis sur le partage de vos exercices</li>
+                                <li class="mb-2"><i class="fas fa-users-cog me-2" style="color: #16A34A;"></i> Groupes de travail privés avec gestion des membres</li>
+                                <li class="mb-2"><i class="fas fa-key me-2" style="color: #16A34A;"></i> Chiffrement des messages et des fichiers partagés</li>
+                                <li class="mb-2"><i class="fas fa-database me-2" style="color: #16A34A;"></i> Séparation claire entre données comptables et sociales</li>
+                                <li class="mb-2"><i class="fas fa-clock me-2" style="color: #16A34A;"></i> Option de partage temporaire avec expiration automatique</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Témoignages -->
+    <div class="testimonials-section my-5">
+        <div class="container py-4">
+            <div class="row mb-5 text-center">
+                <div class="col-md-12">
+                    <h2 class="display-5 mb-4">Ce que disent nos utilisateurs</h2>
+                    <p class="lead text-muted">Découvrez pourquoi les professionnels de la comptabilité font confiance à SmartOHADA</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="testimonial-content">
+                            <p>"SmartOHADA a complètement transformé ma façon de gérer la comptabilité. L'automatisation des saisies m'a fait gagner un temps précieux et les analyses fournies sont d'une précision remarquable."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">
+                                <span>MA</span>
+                            </div>
+                            <div class="testimonial-info">
+                                <h5>Moussa Aboubacar</h5>
+                                <p>Comptable Principal, Société Générale Sénégal</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="testimonial-content">
+                            <p>"En tant que cabinet comptable, SmartOHADA nous a permis de standardiser nos processus selon les normes OHADA tout en offrant une plateforme collaborative pour notre équipe. Les fonctionnalités sociales sont particulièrement utiles."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">
+                                <span>CF</span>
+                            </div>
+                            <div class="testimonial-info">
+                                <h5>Claire Fofana</h5>
+                                <p>Directrice, Cabinet F&A Associés</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="testimonial-content">
+                            <p>"L'intégration de l'IA dans le traitement des documents est révolutionnaire. J'ai pu réduire mes erreurs de saisie de 95% et la génération automatique de rapports me permet de me concentrer sur l'analyse stratégique plutôt que sur la compilation de données."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">
+                                <span>PK</span>
+                            </div>
+                            <div class="testimonial-info">
+                                <h5>Paul Kouassi</h5>
+                                <p>Consultant Financier, KPMG Côte d'Ivoire</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section FAQ -->
+    <div class="faq-section my-5">
+        <div class="container py-4">
+            <div class="row mb-5 text-center">
+                <div class="col-md-12">
+                    <h2 class="display-5 mb-4">Questions Fréquemment Posées</h2>
+                    <p class="lead text-muted">Tout ce que vous devez savoir sur l'utilisation de SmartOHADA</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <div class="accordion" id="faqAccordion">
+                        <!-- Question 1 -->
+                        <div class="accordion-item faq-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Qu'est-ce que le référentiel OHADA et pourquoi est-il important?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Le référentiel OHADA (Organisation pour l'Harmonisation en Afrique du Droit des Affaires) est un ensemble de règles comptables harmonisées pour 17 pays africains. Il est essentiel car il standardise les pratiques comptables dans ces pays, facilitant les échanges commerciaux, les investissements et la comparabilité des états financiers. SmartOHADA intègre l'ensemble de ces règles pour assurer une conformité totale de votre comptabilité.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 2 -->
+                        <div class="accordion-item faq-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Comment fonctionne la reconnaissance automatique des documents?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>SmartOHADA utilise des technologies avancées d'OCR (Reconnaissance Optique de Caractères) et de NLP (Traitement du Langage Naturel) pour analyser vos documents. Lorsque vous téléchargez une facture ou un document comptable, le système identifie automatiquement les informations clés comme les montants, les dates, les numéros de compte et les parties concernées. Ces données sont ensuite structurées et intégrées dans votre comptabilité avec un minimum d'intervention manuelle.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 3 -->
+                        <div class="accordion-item faq-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Mes données sont-elles sécurisées sur SmartOHADA?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Absolument. La sécurité est notre priorité absolue. SmartOHADA utilise un chiffrement de bout en bout pour toutes les données stockées et transmises. Nos serveurs sont hébergés dans des centres de données certifiés avec des protocoles de sécurité stricts. Nous effectuons des sauvegardes régulières et respectons les normes internationales de protection des données. De plus, vous gardez un contrôle total sur qui peut accéder à vos informations grâce à notre système d'autorisations granulaires.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 4 -->
+                        <div class="accordion-item faq-item">
+                            <h2 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    Comment les fonctionnalités sociales améliorent-elles la gestion comptable?
+                                </button>
+                            </h2>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Les fonctionnalités sociales de SmartOHADA transforment la comptabilité d'une activité isolée en un processus collaboratif. Elles permettent aux équipes de travailler ensemble en temps réel, de partager des informations importantes, et de communiquer efficacement sur des problèmes spécifiques. Par exemple, un comptable peut partager un exercice difficile avec un collègue pour obtenir son avis, ou un gestionnaire peut suivre l'avancement des tâches comptables de son équipe. Ces fonctionnalités augmentent la productivité et réduisent les délais de traitement des opérations comptables.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 5 -->
+                        <div class="accordion-item faq-item">
+                            <h2 class="accordion-header" id="headingFive">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                    SmartOHADA convient-il aux petites entreprises ou seulement aux grandes organisations?
+                                </button>
+                            </h2>
+                            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>SmartOHADA est conçu pour s'adapter à toutes les tailles d'entreprises. Notre système offre différents niveaux d'accès avec des tarifications adaptées aux besoins spécifiques. Pour les petites entreprises, SmartOHADA simplifie la comptabilité en automatisant les tâches répétitives et en réduisant le besoin d'expertise comptable coûteuse. Pour les grandes organisations, notre plateforme offre des capacités avancées de reporting, d'analyse et de collaboration qui peuvent s'intégrer à leurs systèmes existants. Quelle que soit la taille de votre entreprise, SmartOHADA peut vous aider à optimiser votre gestion comptable selon les normes OHADA.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5 text-center">
+        <div class="col-md-12">
+            <div class="card cta-section shadow p-4">
+                <h2 class="text-white mb-4">Prêt à révolutionner votre gestion comptable ?</h2>
+                <p class="text-light mb-4">Créez votre compte dès aujourd'hui et découvrez comment SmartOHADA peut transformer vos processus comptables.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg shadow">
+                            <i class="fas fa-tachometer-alt me-2"></i>Accéder à mon tableau de bord
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg shadow">
+                            <i class="fas fa-user-plus me-2"></i>Créer un compte gratuitement
+                        </a>
+                        <a href="{{ url_for('about') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-info-circle me-2"></i>En savoir plus
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

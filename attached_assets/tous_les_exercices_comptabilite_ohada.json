@@ -1,0 +1,3332 @@
+[
+  {
+    "id": 1,
+    "exercice": "Énoncé de l'exercice 1.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 2,
+    "exercice": "Énoncé de l'exercice 2.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 3,
+    "exercice": "Énoncé de l'exercice 3.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 4,
+    "exercice": "Énoncé de l'exercice 4.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 5,
+    "exercice": "Énoncé de l'exercice 5.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 6,
+    "exercice": "Énoncé de l'exercice 6.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 7,
+    "exercice": "Énoncé de l'exercice 7.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 8,
+    "exercice": "Énoncé de l'exercice 8.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 9,
+    "exercice": "Énoncé de l'exercice 9.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 10,
+    "exercice": "Énoncé de l'exercice 10.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 11,
+    "exercice": "Énoncé de l'exercice 11.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 12,
+    "exercice": "Énoncé de l'exercice 12.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 13,
+    "exercice": "Énoncé de l'exercice 13.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 14,
+    "exercice": "Énoncé de l'exercice 14.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 15,
+    "exercice": "Énoncé de l'exercice 15.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 16,
+    "exercice": "Énoncé de l'exercice 16.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 17,
+    "exercice": "Énoncé de l'exercice 17.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 18,
+    "exercice": "Énoncé de l'exercice 18.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 19,
+    "exercice": "Énoncé de l'exercice 19.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 20,
+    "exercice": "Énoncé de l'exercice 20.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 21,
+    "exercice": "Énoncé de l'exercice 21.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 22,
+    "exercice": "Énoncé de l'exercice 22.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 23,
+    "exercice": "Énoncé de l'exercice 23.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 24,
+    "exercice": "Énoncé de l'exercice 24.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 25,
+    "exercice": "Énoncé de l'exercice 25.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 26,
+    "exercice": "Énoncé de l'exercice 26.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 27,
+    "exercice": "Énoncé de l'exercice 27.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 28,
+    "exercice": "Énoncé de l'exercice 28.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 29,
+    "exercice": "Énoncé de l'exercice 29.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 30,
+    "exercice": "Énoncé de l'exercice 30.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 31,
+    "exercice": "Énoncé de l'exercice 31.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 32,
+    "exercice": "Énoncé de l'exercice 32.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 33,
+    "exercice": "Énoncé de l'exercice 33.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 34,
+    "exercice": "Énoncé de l'exercice 34.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 35,
+    "exercice": "Énoncé de l'exercice 35.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 36,
+    "exercice": "Énoncé de l'exercice 36.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 37,
+    "exercice": "Énoncé de l'exercice 37.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 38,
+    "exercice": "Énoncé de l'exercice 38.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 39,
+    "exercice": "Énoncé de l'exercice 39.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 40,
+    "exercice": "Énoncé de l'exercice 40.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 41,
+    "exercice": "Énoncé de l'exercice 41.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 42,
+    "exercice": "Énoncé de l'exercice 42.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 43,
+    "exercice": "Énoncé de l'exercice 43.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 44,
+    "exercice": "Énoncé de l'exercice 44.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 45,
+    "exercice": "Énoncé de l'exercice 45.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 46,
+    "exercice": "Énoncé de l'exercice 46.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 47,
+    "exercice": "Énoncé de l'exercice 47.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 48,
+    "exercice": "Énoncé de l'exercice 48.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 49,
+    "exercice": "Énoncé de l'exercice 49.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 50,
+    "exercice": "Énoncé de l'exercice 50.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 51,
+    "exercice": "Énoncé de l'exercice 51.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 52,
+    "exercice": "Énoncé de l'exercice 52.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 53,
+    "exercice": "Énoncé de l'exercice 53.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 54,
+    "exercice": "Énoncé de l'exercice 54.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 55,
+    "exercice": "Énoncé de l'exercice 55.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 56,
+    "exercice": "Énoncé de l'exercice 56.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 57,
+    "exercice": "Énoncé de l'exercice 57.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 58,
+    "exercice": "Énoncé de l'exercice 58.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 59,
+    "exercice": "Énoncé de l'exercice 59.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 60,
+    "exercice": "Énoncé de l'exercice 60.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 61,
+    "exercice": "Énoncé de l'exercice 61.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 62,
+    "exercice": "Énoncé de l'exercice 62.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 63,
+    "exercice": "Énoncé de l'exercice 63.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 64,
+    "exercice": "Énoncé de l'exercice 64.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 65,
+    "exercice": "Énoncé de l'exercice 65.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 66,
+    "exercice": "Énoncé de l'exercice 66.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 67,
+    "exercice": "Énoncé de l'exercice 67.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 68,
+    "exercice": "Énoncé de l'exercice 68.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 69,
+    "exercice": "Énoncé de l'exercice 69.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 70,
+    "exercice": "Énoncé de l'exercice 70.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 71,
+    "exercice": "Énoncé de l'exercice 71.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 72,
+    "exercice": "Énoncé de l'exercice 72.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 73,
+    "exercice": "Énoncé de l'exercice 73.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 74,
+    "exercice": "Énoncé de l'exercice 74.",
+    "resolution": {
+      "journal": [
+        {
+          "date": "01/01/N",
+          "compte_debit": "512",
+          "libelle": "Banque",
+          "montant_debit": 5000,
+          "compte_credit": "101",
+          "libelle_credit": "Capital",
+          "montant_credit": 5000
+        }
+      ],
+      "grand_livre": {
+        "512": {
+          "debit": [
+            5000
+          ],
+          "credit": []
+        },
+        "101": {
+          "debit": [],
+          "credit": [
+            5000
+          ]
+        }
+      },
+      "bilan": {
+        "actif": {
+          "512": {
+            "libelle": "Banque",
+            "montant": 5000
+          }
+        },
+        "passif": {
+          "101": {
+            "libelle": "Capital",
+            "montant": 5000
+          }
+        }
+      }
+    }
+  }
+]

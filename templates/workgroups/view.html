@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <!-- Workgroup Header -->
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>
+                        <i class="fas fa-users me-2"></i>{{ workgroup.name }}
+                        {% if workgroup.is_private %}
+                            <span class="ms-2 badge bg-secondary">Privé</span>
+                        {% else %}
+                            <span class="ms-2 badge bg-success">Public</span>
+                        {% endif %}
+                    </h5>
+                    <div>
+                        {% if workgroup.owner_id == current_user.id %}
+                            <a href="{{ url_for('workgroup_edit', workgroup_id=workgroup.id) }}" class="btn btn-sm btn-primary me-2">
+                                <i class="fas fa-edit me-1"></i>Modifier
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWorkgroupModal">
+                                <i class="fas fa-trash-alt me-1"></i>Supprimer
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#leaveWorkgroupModal">
+                                <i class="fas fa-sign-out-alt me-1"></i>Quitter le groupe
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p class="text-muted">
+                                {{ workgroup.description or "Aucune description" }}
+                            </p>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-crown me-1 text-warning"></i>Créé par {{ workgroup.owner.username }}
+                                    <span class="mx-2">•</span>
+                                    <i class="fas fa-calendar-alt me-1"></i>{{ workgroup.created_at.strftime('%d/%m/%Y') }}
+                                    <span class="mx-2">•</span>
+                                    <i class="fas fa-users me-1"></i>{{ workgroup.members|length }} membres
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-end">
+                                <a href="{{ url_for('workgroup_notes', workgroup_id=workgroup.id) }}" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-sticky-note me-1"></i>Notes
+                                </a>
+                                {% if is_admin %}
+                                    <a href="{{ url_for('workgroup_invite', workgroup_id=workgroup.id) }}" class="btn btn-outline-success">
+                                        <i class="fas fa-user-plus me-1"></i>Inviter
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Message Board -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-comments me-2"></i>Messages</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Message Form -->
+                    <form method="post" action="{{ url_for('workgroup_post_message', workgroup_id=workgroup.id) }}">
+                        {{ message_form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ message_form.content(class="form-control", rows=3, placeholder="Écrire un message au groupe...") }}
+                            {% for error in message_form.content.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Envoyer
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Messages -->
+                    <hr class="my-4">
+                    
+                    {% if messages %}
+                        <div class="message-list">
+                            {% for message in messages %}
+                                <div class="message-item p-3 border rounded mb-3 {% if message.sender_id == current_user.id %}border-primary bg-opacity-10 bg-primary{% else %}border-secondary{% endif %}" id="message-{{ message.id }}">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="message-sender fw-bold {% if message.sender_id == current_user.id %}text-primary{% endif %}">
+                                                {{ message.sender.username }}
+                                            </div>
+                                            <div class="message-time ms-2 text-muted small">
+                                                {{ message.sent_at.strftime('%d/%m/%Y %H:%M') }}
+                                                {% if message.edited_at %}
+                                                    <span class="fst-italic">(édité)</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% if message.sender_id == current_user.id or is_admin %}
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-link text-muted dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <a class="dropdown-item" href="#">
+                                                            <i class="fas fa-edit me-2"></i>Modifier
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#">
+                                                            <i class="fas fa-trash-alt me-2"></i>Supprimer
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="message-content mb-2">
+                                        {{ message.content|nl2br }}
+                                    </div>
+                                    
+                                    <div class="message-actions d-flex">
+                                        <button class="btn btn-sm btn-link text-muted reply-btn" data-message-id="{{ message.id }}">
+                                            <i class="fas fa-reply me-1"></i>Répondre
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Replies -->
+                                    {% if message.replies.count() > 0 %}
+                                        <div class="message-replies mt-3 ms-4 border-start ps-3">
+                                            {% for reply in message.replies %}
+                                                <div class="reply-item mb-2">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="reply-sender fw-bold {% if reply.sender_id == current_user.id %}text-primary{% endif %}">
+                                                                {{ reply.sender.username }}
+                                                            </div>
+                                                            <div class="reply-time ms-2 text-muted small">
+                                                                {{ reply.sent_at.strftime('%d/%m/%Y %H:%M') }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="reply-content">
+                                                        {{ reply.content|nl2br }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Reply Form (hidden by default) -->
+                                    <div id="reply-form-{{ message.id }}" class="reply-form mt-3 d-none">
+                                        <form method="post" action="{{ url_for('workgroup_post_message', workgroup_id=workgroup.id) }}">
+                                            {{ message_form.hidden_tag() }}
+                                            {{ message_form.parent_id(value=message.id) }}
+                                            <div class="input-group">
+                                                {{ message_form.content(class="form-control", rows=1, placeholder="Répondre à ce message...") }}
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-comments empty-state-icon"></i>
+                            <p>Aucun message dans ce groupe pour l'instant.</p>
+                            <p class="text-muted">Soyez le premier à débuter une conversation!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Members -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-users me-2"></i>Membres</h5>
+                    <span class="badge bg-primary rounded-pill">{{ members|length }}</span>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <!-- Owner -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-light border-secondary">
+                            <div>
+                                <span class="badge bg-warning text-dark me-2">
+                                    <i class="fas fa-crown"></i>
+                                </span>
+                                {{ workgroup.owner.username }}
+                                {% if workgroup.owner_id == current_user.id %}
+                                    <span class="ms-2 badge bg-primary">Vous</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                        
+                        <!-- Members -->
+                        {% for member in members %}
+                            {% if member.id != workgroup.owner_id %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-light border-secondary">
+                                    <div>
+                                        <span class="badge bg-info text-dark me-2">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                        {{ member.username }}
+                                        {% if member.id == current_user.id %}
+                                            <span class="ms-2 badge bg-primary">Vous</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if is_admin and member.id != current_user.id %}
+                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#removeMemberModal{{ member.id }}">
+                                            <i class="fas fa-user-minus"></i>
+                                        </button>
+                                        
+                                        <!-- Remove Member Modal -->
+                                        <div class="modal fade" id="removeMemberModal{{ member.id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content bg-dark text-light">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Retirer {{ member.username }}</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Êtes-vous sûr de vouloir retirer {{ member.username }} du groupe ?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                        <form action="{{ url_for('workgroup_remove_member', workgroup_id=workgroup.id, user_id=member.id) }}" method="post">
+                                                            <button type="submit" class="btn btn-danger">Retirer</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Shared Exercises -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-book me-2"></i>Exercices partagés</h5>
+                    <a href="{{ url_for('workgroup_share_exercise', workgroup_id=workgroup.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-share-alt"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if shared_exercises %}
+                        <div class="dashboard-list-group">
+                            {% for exercise in shared_exercises %}
+                                <div class="list-group-item dashboard-list-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="{{ url_for('transactions_list', exercise_id=exercise.id) }}" class="text-decoration-none">
+                                            {{ exercise.name }}
+                                        </a>
+                                        
+                                        <div class="d-flex align-items-center">
+                                            <small class="text-muted me-2">
+                                                {{ exercise.user.username }}
+                                            </small>
+                                            
+                                            {% if exercise.user_id == current_user.id or is_admin %}
+                                                <form action="{{ url_for('workgroup_unshare_exercise', workgroup_id=workgroup.id, exercise_id=exercise.id) }}" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Ne plus partager">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <small class="text-secondary">
+                                        {{ exercise.start_date.strftime('%d/%m/%Y') }} - {{ exercise.end_date.strftime('%d/%m/%Y') }}
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-share-alt empty-state-icon"></i>
+                            <p>Aucun exercice partagé</p>
+                            <a href="{{ url_for('workgroup_share_exercise', workgroup_id=workgroup.id) }}" class="btn btn-primary">
+                                <i class="fas fa-share-alt me-2"></i>Partager un exercice
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Workgroup Modal -->
+<div class="modal fade" id="deleteWorkgroupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Supprimer le groupe</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce groupe de travail ?</p>
+                <p class="text-danger">Cette action est définitive et supprimera tous les messages et notes.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('workgroup_delete', workgroup_id=workgroup.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leave Workgroup Modal -->
+<div class="modal fade" id="leaveWorkgroupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Quitter le groupe</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir quitter ce groupe de travail ?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('workgroup_leave', workgroup_id=workgroup.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Quitter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Reply button functionality
+        const replyButtons = document.querySelectorAll('.reply-btn');
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const messageId = this.getAttribute('data-message-id');
+                const replyForm = document.getElementById(`reply-form-${messageId}`);
+                
+                // Toggle reply form visibility
+                if (replyForm.classList.contains('d-none')) {
+                    replyForm.classList.remove('d-none');
+                    // Focus on textarea
+                    replyForm.querySelector('textarea').focus();
+                } else {
+                    replyForm.classList.add('d-none');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

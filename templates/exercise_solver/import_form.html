@@ -1,0 +1,89 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('exercise_examples_list') }}">Exemples d'exercices</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Importer des exercices</li>
+        </ol>
+    </nav>
+    
+    <h1 class="h2 mb-4">Importer des exercices depuis JSON</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.json_file.label(class="form-label") }}
+                            {{ form.json_file(class="form-control" + (" is-invalid" if form.json_file.errors else "")) }}
+                            <div class="form-text">Le fichier JSON doit contenir une liste d'exercices avec leurs solutions.</div>
+                            {% for error in form.json_file.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('exercise_examples_list') }}" class="btn btn-outline-secondary">Annuler</a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header">
+                    Format JSON attendu
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded"><code>[
+    {
+        "title": "Titre de l'exercice",
+        "problem_text": "Texte de l'énoncé...",
+        "solution_text": "Texte de la solution...",
+        "category": "journal",
+        "difficulty": 2
+    },
+    {
+        "title": "Un autre exercice",
+        "problem_text": "Énoncé du deuxième exercice...",
+        "solution_text": "Solution du deuxième exercice...",
+        "category": "bilan",
+        "difficulty": 3
+    }
+]</code></pre>
+                    <p class="text-muted small mt-2">
+                        <strong>Notes :</strong>
+                        <ul class="mb-0">
+                            <li>Les champs <code>title</code>, <code>problem_text</code> et <code>solution_text</code> sont obligatoires.</li>
+                            <li>Les champs <code>category</code> et <code>difficulty</code> sont optionnels (valeurs par défaut: "général" et 3).</li>
+                            <li>Le niveau de difficulté (<code>difficulty</code>) est un nombre entier de 1 à 5.</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    Avantages
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Importation rapide de plusieurs exercices</li>
+                        <li>Amélioration des capacités de résolution</li>
+                        <li>Enrichissement de la base de connaissances</li>
+                        <li>Meilleure adaptation à vos besoins spécifiques</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

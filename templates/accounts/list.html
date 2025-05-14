@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Plan comptable OHADA - Comptabilité OHADA{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('create_account') }}" class="btn btn-primary">
+    <i data-feather="plus"></i> Nouveau compte
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <!-- Search and filters -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="accountSearch" placeholder="Rechercher un compte...">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i data-feather="search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="accountTypeFilter">
+                    <option value="">Tous les types</option>
+                    <option value="asset">Actif</option>
+                    <option value="liability">Passif</option>
+                    <option value="equity">Capitaux propres</option>
+                    <option value="revenue">Produit</option>
+                    <option value="expense">Charge</option>
+                </select>
+            </div>
+        </div>
+        
+        {% if accounts %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle datatable">
+                <thead>
+                    <tr>
+                        <th>N° Compte</th>
+                        <th>Nom</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Statut</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in accounts %}
+                    <tr>
+                        <td class="font-monospace">{{ account.account_number }}</td>
+                        <td>{{ account.name }}</td>
+                        <td>
+                            {% if account.account_type == 'asset' %}
+                            <span class="badge bg-primary">Actif</span>
+                            {% elif account.account_type == 'liability' %}
+                            <span class="badge bg-warning">Passif</span>
+                            {% elif account.account_type == 'equity' %}
+                            <span class="badge bg-info">Capitaux propres</span>
+                            {% elif account.account_type == 'revenue' %}
+                            <span class="badge bg-success">Produit</span>
+                            {% elif account.account_type == 'expense' %}
+                            <span class="badge bg-danger">Charge</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if account.description %}
+                            {{ account.description[:50] + '...' if account.description|length > 50 else account.description }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if account.is_system %}
+                            <span class="badge bg-secondary">Système OHADA</span>
+                            {% else %}
+                            <span class="badge bg-success">Personnalisé</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                {% if not account.is_system %}
+                                <a href="{{ url_for('edit_account', account_id=account.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i data-feather="edit"></i>
+                                </a>
+                                <form action="{{ url_for('deactivate_account', account_id=account.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir désactiver ce compte ?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i data-feather="slash"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+                                    <i data-feather="lock"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center p-5">
+            <div class="mb-4">
+                <i data-feather="list" class="text-muted" style="width: 64px; height: 64px;"></i>
+            </div>
+            <h4>Aucun compte défini</h4>
+            <p class="text-muted mb-4">Le plan comptable OHADA n'a pas encore été initialisé.</p>
+            <a href="{{ url_for('create_account') }}" class="btn btn-primary">
+                <i data-feather="plus"></i> Créer un compte
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- OHADA account information -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i data-feather="info" class="me-2"></i> Le plan comptable OHADA</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="mb-3">Structure du plan comptable OHADA</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Classe</th>
+                                <th>Désignation</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-monospace">Classe 1</td>
+                                <td>Comptes de ressources durables</td>
+                                <td><span class="badge bg-info">Capitaux propres</span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-monospace">Classe 2</td>
+                                <td>Comptes d'actif immobilisé</td>
+                                <td><span class="badge bg-primary">Actif</span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-monospace">Classe 3</td>
+                                <td>Comptes de stocks</td>
+                                <td><span class="badge bg-primary">Actif</span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-monospace">Classe 4</td>
+                                <td>Comptes de tiers</td>
+                                <td><span class="badge bg-primary">Actif</span> / <span class="badge bg-warning">Passif</span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-monospace">Classe 5</td>
+                                <td>Comptes de trésorerie</td>
+                                <td><span class="badge bg-primary">Actif</span> / <span class="badge bg-warning">Passif</span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-monospace">Classe 6</td>
+                                <td>Comptes de charges</td>
+                                <td><span class="badge bg-danger">Charge</span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-monospace">Classe 7</td>
+                                <td>Comptes de produits</td>
+                                <td><span class="badge bg-success">Produit</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h6 class="mb-3">À propos du plan comptable OHADA</h6>
+                <p>Le Système Comptable OHADA (SYSCOHADA) est le référentiel comptable en vigueur dans les 17 pays membres de l'Organisation pour l'Harmonisation en Afrique du Droit des Affaires.</p>
+                
+                <h6 class="mb-2 mt-4">Personnalisation</h6>
+                <p class="mb-0">Vous pouvez créer des comptes personnalisés pour vos besoins spécifiques tout en respectant la structure du SYSCOHADA.</p>
+                
+                <div class="alert alert-info mt-4 mb-0">
+                    <i data-feather="info" class="me-2"></i>
+                    Les comptes système ne peuvent pas être modifiés ou supprimés.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('accountSearch');
+        const table = document.querySelector('.datatable');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            rows.forEach(row => {
+                const accountNumber = row.querySelector('td:first-child').textContent.toLowerCase();
+                const accountName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const description = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                
+                if (accountNumber.includes(searchTerm) || accountName.includes(searchTerm) || description.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Filter by account type
+        const typeFilter = document.getElementById('accountTypeFilter');
+        
+        typeFilter.addEventListener('change', function() {
+            const filterValue = this.value.toLowerCase();
+            
+            if (filterValue === '') {
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+                return;
+            }
+            
+            rows.forEach(row => {
+                const badge = row.querySelector('td:nth-child(3) .badge');
+                const accountType = badge.textContent.toLowerCase();
+                
+                // Map French to English types
+                let type = '';
+                if (accountType === 'actif') type = 'asset';
+                else if (accountType === 'passif') type = 'liability';
+                else if (accountType === 'capitaux propres') type = 'equity';
+                else if (accountType === 'produit') type = 'revenue';
+                else if (accountType === 'charge') type = 'expense';
+                
+                if (type === filterValue) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

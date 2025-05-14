@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Modifier' if is_edit else 'Créer' }} un exercice - Comptabilité OHADA{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('list_exercises') }}">Exercices</a></li>
+        <li class="breadcrumb-item active">{{ 'Modifier' if is_edit else 'Créer' }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST" {% if is_edit %}action="{{ url_for('edit_exercise', exercise_id=exercise.id) }}"{% else %}action="{{ url_for('create_exercise') }}"{% endif %}>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom de l'exercice</label>
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name", placeholder="Ex: Exercice 2025") }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Date de début</label>
+                            {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else ""), id="start_date", type="date") }}
+                            {% if form.start_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.start_date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">Date de fin</label>
+                            {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else ""), id="end_date", type="date") }}
+                            {% if form.end_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.end_date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Description (facultative)</label>
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="description", rows="4", placeholder="Description de l'exercice comptable...") }}
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('list_exercises') }}" class="btn btn-outline-secondary">
+                            <i data-feather="arrow-left"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-feather="{{ 'save' if is_edit else 'plus-circle' }}"></i> 
+                            {{ 'Enregistrer les modifications' if is_edit else 'Créer l\'exercice' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if not is_edit %}
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i data-feather="info" class="me-2"></i> Informations sur les exercices comptables</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Qu'est-ce qu'un exercice comptable ?</h6>
+                    <p class="text-muted">L'exercice comptable est une période, généralement de 12 mois, à la fin de laquelle une entreprise arrête ses comptes pour établir les états financiers de synthèse selon le référentiel OHADA.</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Dates importantes</h6>
+                    <ul class="text-muted">
+                        <li>Dans le système OHADA, l'exercice comptable correspond généralement à l'année civile (du 1er janvier au 31 décembre).</li>
+                        <li>Les entreprises peuvent toutefois choisir d'autres dates si cela correspond mieux à leur cycle d'activité.</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h6>Clôture d'exercice</h6>
+                    <p class="text-muted">À la fin de l'exercice, il faudra procéder à la clôture des comptes et à l'établissement des états financiers conformément au SYSCOHADA.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-populate end date as one year from start date if empty
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        
+        startDateInput.addEventListener('change', function() {
+            if (!endDateInput.value) {
+                const startDate = new Date(this.value);
+                const endDate = new Date(startDate);
+                endDate.setFullYear(startDate.getFullYear() + 1);
+                endDate.setDate(endDate.getDate() - 1); // Subtract one day to make it a year period
+                
+                // Format date as YYYY-MM-DD
+                const year = endDate.getFullYear();
+                const month = String(endDate.getMonth() + 1).padStart(2, '0');
+                const day = String(endDate.getDate()).padStart(2, '0');
+                
+                endDateInput.value = `${year}-${month}-${day}`;
+            }
+        });
+    });
+</script>
+{% endblock %}

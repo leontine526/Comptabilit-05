@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Analyser l'exercice - Comptabilité OHADA{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('list_exercises') }}">Exercices</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('view_exercise', exercise_id=exercise.id) }}">{{ exercise.name }}</a></li>
+        <li class="breadcrumb-item active">Analyser</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h4 class="mb-3">Analyse de l'exercice {{ exercise.name }}</h4>
+                <p class="text-muted mb-4">
+                    Notre intelligence artificielle va analyser vos données comptables et vous fournir des insights pertinents 
+                    sur la santé financière de votre entreprise selon les normes OHADA.
+                </p>
+                
+                <form method="POST" action="{{ url_for('analyze_exercise_route', exercise_id=exercise.id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        <label for="analysis_type" class="form-label">Type d'analyse</label>
+                        {{ form.analysis_type(class="form-control", id="analysis_type") }}
+                        {% if form.analysis_type.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.analysis_type.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Sélectionnez le type d'analyse que vous souhaitez effectuer.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="comments" class="form-label">Commentaires pour l'analyse (facultatif)</label>
+                        {{ form.comments(class="form-control", id="comments", rows="3", placeholder="Ajoutez des commentaires ou des questions spécifiques pour l'analyse...") }}
+                        {% if form.comments.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.comments.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Vous pouvez ajouter des informations spécifiques ou des questions pour obtenir une analyse plus personnalisée.</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('view_exercise', exercise_id=exercise.id) }}" class="btn btn-outline-secondary">
+                            <i data-feather="arrow-left"></i> Retour
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-feather="activity"></i> Lancer l'analyse
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if analysis %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Analyse précédente</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Dernière analyse effectuée le {{ analysis.analysis_date.strftime('%d/%m/%Y à %H:%M') }}</small>
+                </div>
+                
+                <!-- Financial ratios -->
+                <h6 class="mb-3">Ratios financiers principaux</h6>
+                <div class="row mb-4">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body p-3 text-center">
+                                <h5 class="mb-0 {{ 'text-success' if analysis.financial_health_score >= 75 else ('text-warning' if analysis.financial_health_score >= 50 else 'text-danger') }}">
+                                    {{ '%0.1f'|format(analysis.financial_health_score) }}
+                                </h5>
+                                <small class="text-muted">Score global</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body p-3 text-center">
+                                <h5 class="mb-0 {{ 'text-success' if analysis.liquidity_ratio >= 1.5 else ('text-warning' if analysis.liquidity_ratio >= 1 else 'text-danger') }}">
+                                    {{ '%0.2f'|format(analysis.liquidity_ratio) }}
+                                </h5>
+                                <small class="text-muted">Liquidité</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body p-3 text-center">
+                                <h5 class="mb-0 {{ 'text-success' if analysis.solvency_ratio <= 1 else ('text-warning' if analysis.solvency_ratio <= 2 else 'text-danger') }}">
+                                    {{ '%0.2f'|format(analysis.solvency_ratio) }}
+                                </h5>
+                                <small class="text-muted">Solvabilité</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body p-3 text-center">
+                                <h5 class="mb-0 {{ 'text-success' if analysis.profitability_ratio >= 0.1 else ('text-warning' if analysis.profitability_ratio >= 0 else 'text-danger') }}">
+                                    {{ '%0.2f'|format(analysis.profitability_ratio) }}
+                                </h5>
+                                <small class="text-muted">Rentabilité</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analysis preview -->
+                <h6 class="mb-3">Extrait de l'analyse</h6>
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <p class="mb-0">{{ analysis.full_analysis[:300] + '...' if analysis.full_analysis|length > 300 else analysis.full_analysis }}</p>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="{{ url_for('view_exercise', exercise_id=exercise.id) }}#analysis" class="btn btn-outline-primary">
+                        <i data-feather="eye"></i> Voir l'analyse complète
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">À propos de l'analyse IA</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3 text-primary">
+                        <i data-feather="cpu" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Intelligence artificielle</h6>
+                        <p class="text-muted mb-0">Analyse basée sur le modèle Mistral 7B</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6 class="mb-2">Que comprend l'analyse ?</h6>
+                <ul class="text-muted mb-4">
+                    <li>Évaluation de la santé financière globale</li>
+                    <li>Analyse des ratios clés (liquidité, solvabilité, rentabilité)</li>
+                    <li>Identification des forces et faiblesses</li>
+                    <li>Recommandations personnalisées</li>
+                    <li>Conformité avec les normes OHADA</li>
+                    <li>Suggestions d'optimisation fiscale</li>
+                </ul>
+                
+                <h6 class="mb-2">Comment ça marche ?</h6>
+                <p class="text-muted mb-4">
+                    Notre système analyse vos données comptables en utilisant l'intelligence artificielle 
+                    pour générer des insights pertinents et des recommandations adaptées à votre situation 
+                    financière selon le référentiel OHADA.
+                </p>
+                
+                <div class="alert alert-info mb-0">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i data-feather="info" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div>
+                            <h6 class="alert-heading">Information</h6>
+                            <p class="mb-0">L'analyse peut prendre quelques instants à générer, en fonction de la complexité de vos données comptables.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Informations sur l'exercice</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th>Nom</th>
+                        <td>{{ exercise.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Période</th>
+                        <td>{{ exercise.start_date.strftime('%d/%m/%Y') }} - {{ exercise.end_date.strftime('%d/%m/%Y') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Statut</th>
+                        <td>
+                            <span class="badge bg-{{ 'danger' if exercise.is_closed else 'success' }}">
+                                {{ 'Clôturé' if exercise.is_closed else 'En cours' }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Transactions</th>
+                        <td>{{ exercise.transactions.count() }}</td>
+                    </tr>
+                    <tr>
+                        <th>Documents</th>
+                        <td>{{ exercise.documents.count() }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

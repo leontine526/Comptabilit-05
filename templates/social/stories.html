@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+
+{% block title %}Stories{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/social.css') }}">
+<style>
+    .stories-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .story-preview-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        position: relative;
+        height: 400px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .story-preview-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .story-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .story-preview-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+        color: white;
+    }
+    
+    .story-author {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .story-create-card {
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+    }
+    
+    .story-create-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #007bff;
+    }
+    
+    .story-viewer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 9999;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .story-viewer.active {
+        display: flex;
+    }
+    
+    .story-viewer-content {
+        position: relative;
+        max-width: 500px;
+        max-height: 80vh;
+        width: 100%;
+    }
+    
+    .story-viewer-image {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+    
+    .story-viewer-header {
+        position: absolute;
+        top: -50px;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        color: white;
+    }
+    
+    .story-viewer-progress {
+        position: absolute;
+        top: -70px;
+        left: 0;
+        right: 0;
+        display: flex;
+        gap: 5px;
+    }
+    
+    .story-progress-item {
+        height: 4px;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+        flex: 1;
+    }
+    
+    .story-progress-item.active {
+        background-color: white;
+    }
+    
+    .story-viewer-close {
+        position: absolute;
+        top: -70px;
+        right: 0;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .story-viewer-navigation {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 50%;
+        display: flex;
+        align-items: center;
+    }
+    
+    .story-nav-prev {
+        left: 0;
+        justify-content: flex-start;
+        padding-left: 10px;
+    }
+    
+    .story-nav-next {
+        right: 0;
+        justify-content: flex-end;
+        padding-right: 10px;
+    }
+    
+    .story-nav-icon {
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    
+    .story-nav-icon:hover {
+        opacity: 1;
+    }
+    
+    @media (max-width: 767.98px) {
+        .story-viewer-content {
+            max-width: 95%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Stories</h2>
+        <a href="{{ url_for('feed') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour au fil d'actualité
+        </a>
+    </div>
+    
+    <div class="stories-container">
+        <!-- Carte pour créer une story -->
+        <div class="story-preview-card story-create-card" data-bs-toggle="modal" data-bs-target="#create-story-modal">
+            <i class="bi bi-plus-circle-fill story-create-icon"></i>
+            <h4>Créer une story</h4>
+            <p class="text-muted">Partagez un moment avec vos collègues</p>
+        </div>
+        
+        <!-- Exemple de stories (à remplacer par des données réelles) -->
+        {% if stories %}
+            {% for story in stories %}
+                <div class="story-preview-card" onclick="openStory({{ story.id }})">
+                    <img src="{{ story.media_url }}" alt="Story" class="story-preview-img">
+                    <div class="story-preview-overlay">
+                        <div class="story-author">
+                            <div class="avatar me-2">
+                                <span class="avatar-initial rounded-circle bg-primary">
+                                    {{ story.author.username[0]|upper }}
+                                </span>
+                            </div>
+                            <div>
+                                <div class="fw-bold">{{ story.author.username }}</div>
+                                <small class="text-white-50">{{ story.created_at.strftime('%H:%M') }}</small>
+                            </div>
+                        </div>
+                        {% if story.text %}
+                            <p class="mb-0">{{ story.text }}</p>
+                        {% endif %}
+                    </div>
+                    {% if not story.is_viewed and story.author_id != current_user.id %}
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-primary rounded-circle p-2">
+                                <i class="bi bi-circle-fill"></i>
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="py-4">
+                    <i class="bi bi-images display-1 text-muted"></i>
+                    <h3 class="mt-3">Aucune story pour le moment</h3>
+                    <p class="text-muted">Les stories disparaissent après 24 heures</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Visionneuse de stories -->
+<div id="story-viewer" class="story-viewer">
+    <div class="story-viewer-progress" id="story-progress-container">
+        <!-- Éléments de progression générés dynamiquement -->
+    </div>
+    
+    <div class="story-viewer-header">
+        <div class="avatar me-2">
+            <span class="avatar-initial rounded-circle bg-primary" id="story-author-initial"></span>
+        </div>
+        <div>
+            <div class="fw-bold" id="story-author-name"></div>
+            <small class="text-white-50" id="story-time"></small>
+        </div>
+    </div>
+    
+    <div class="story-viewer-close" onclick="closeStoryViewer()">
+        <i class="bi bi-x-lg"></i>
+    </div>
+    
+    <div class="story-viewer-content">
+        <img src="" id="story-image" class="story-viewer-image">
+        <div class="story-viewer-text" id="story-text"></div>
+        
+        <div class="story-viewer-navigation story-nav-prev" onclick="navigateStory(-1)">
+            <i class="bi bi-chevron-left story-nav-icon"></i>
+        </div>
+        <div class="story-viewer-navigation story-nav-next" onclick="navigateStory(1)">
+            <i class="bi bi-chevron-right story-nav-icon"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour créer une story -->
+<div class="modal fade" id="create-story-modal" tabindex="-1" aria-labelledby="create-story-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="create-story-modal-label">Créer une story</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="story-form">
+                    <div class="mb-3">
+                        <label for="story-image-file" class="form-label">Sélectionner une image</label>
+                        <input class="form-control" type="file" id="story-image-file" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="story-text-input" class="form-label">Texte (optionnel)</label>
+                        <textarea class="form-control" id="story-text-input" rows="3" placeholder="Ajoutez un texte à votre story..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div id="story-image-preview" class="mt-3 d-none">
+                            <img src="" class="img-fluid rounded" alt="Prévisualisation de l'image">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submit-story">Créer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Variables
+    let storyModal = null;
+    let storyImageFile = null;
+    let currentStoryIndex = 0;
+    let stories = [];
+    let storyTimers = [];
+    
+    // Initialisation lors du chargement du document
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialise la modal Bootstrap
+        storyModal = new bootstrap.Modal(document.getElementById('create-story-modal'));
+        
+        // Gestionnaire d'événement pour la prévisualisation d'image
+        const imageFileInput = document.getElementById('story-image-file');
+        if (imageFileInput) {
+            imageFileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    storyImageFile = file;
+                    
+                    // Affiche la prévisualisation
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('story-image-preview');
+                        preview.classList.remove('d-none');
+                        preview.querySelector('img').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // Gestionnaire pour la soumission de la story
+        const submitStoryButton = document.getElementById('submit-story');
+        if (submitStoryButton) {
+            submitStoryButton.addEventListener('click', createStory);
+        }
+        
+        // Charge les stories depuis l'API
+        loadStories();
+    });
+    
+    // Fonction pour charger les stories
+    function loadStories() {
+        fetch('/api/stories')
+            .then(response => response.json())
+            .then(data => {
+                stories = data.stories || [];
+            })
+            .catch(error => console.error('Erreur lors du chargement des stories:', error));
+    }
+    
+    // Fonction pour créer une story
+    function createStory() {
+        if (!storyImageFile) {
+            alert('Veuillez sélectionner une image pour votre story');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('file', storyImageFile);
+        
+        const storyText = document.getElementById('story-text-input').value.trim();
+        if (storyText) {
+            formData.append('text', storyText);
+        }
+        
+        fetch('/api/stories/create', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Ferme la modal
+                storyModal.hide();
+                
+                // Réinitialise le formulaire
+                document.getElementById('story-form').reset();
+                document.getElementById('story-image-preview').classList.add('d-none');
+                storyImageFile = null;
+                
+                // Recharge la page pour afficher la nouvelle story
+                window.location.reload();
+            } else {
+                alert('Erreur lors de la création de la story: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Erreur de connexion lors de la création de la story');
+        });
+    }
+    
+    // Fonction pour ouvrir la visionneuse de story
+    function openStory(storyId) {
+        fetch(`/api/stories/${storyId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const story = data.story;
+                    
+                    // Marque la story comme vue
+                    if (story.author_id !== {{ current_user.id }}) {
+                        fetch(`/api/stories/${storyId}/view`, { method: 'POST' });
+                    }
+                    
+                    // Affiche la story dans la visionneuse
+                    displayStory(story);
+                    
+                    // Ouvre la visionneuse
+                    document.getElementById('story-viewer').classList.add('active');
+                    
+                    // Lance le timer pour fermer automatiquement
+                    startStoryTimer();
+                } else {
+                    alert('Erreur lors du chargement de la story: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur de connexion lors du chargement de la story');
+            });
+    }
+    
+    // Fonction pour afficher une story dans la visionneuse
+    function displayStory(story) {
+        // Met à jour l'image
+        const storyImage = document.getElementById('story-image');
+        storyImage.src = story.media_url;
+        
+        // Met à jour les informations de l'auteur
+        document.getElementById('story-author-initial').textContent = story.author.username.charAt(0).toUpperCase();
+        document.getElementById('story-author-name').textContent = story.author.username;
+        document.getElementById('story-time').textContent = new Date(story.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        // Met à jour le texte
+        const storyText = document.getElementById('story-text');
+        if (story.text) {
+            storyText.textContent = story.text;
+            storyText.style.display = 'block';
+        } else {
+            storyText.style.display = 'none';
+        }
+        
+        // Met à jour la barre de progression
+        updateStoryProgress();
+    }
+    
+    // Fonction pour fermer la visionneuse de story
+    function closeStoryViewer() {
+        document.getElementById('story-viewer').classList.remove('active');
+        clearStoryTimers();
+    }
+    
+    // Fonction pour naviguer entre les stories
+    function navigateStory(direction) {
+        currentStoryIndex += direction;
+        
+        // Vérifie les limites
+        if (currentStoryIndex < 0) {
+            currentStoryIndex = 0;
+        } else if (currentStoryIndex >= stories.length) {
+            currentStoryIndex = stories.length - 1;
+        }
+        
+        // Affiche la story courante
+        displayStory(stories[currentStoryIndex]);
+        
+        // Réinitialise le timer
+        clearStoryTimers();
+        startStoryTimer();
+    }
+    
+    // Fonction pour démarrer le timer de story
+    function startStoryTimer() {
+        const timer = setTimeout(() => {
+            // Si c'est la dernière story, ferme la visionneuse
+            if (currentStoryIndex >= stories.length - 1) {
+                closeStoryViewer();
+            } else {
+                // Sinon, passe à la story suivante
+                navigateStory(1);
+            }
+        }, 5000); // 5 secondes par story
+        
+        storyTimers.push(timer);
+    }
+    
+    // Fonction pour effacer les timers
+    function clearStoryTimers() {
+        storyTimers.forEach(timer => clearTimeout(timer));
+        storyTimers = [];
+    }
+    
+    // Fonction pour mettre à jour la barre de progression
+    function updateStoryProgress() {
+        const progressContainer = document.getElementById('story-progress-container');
+        progressContainer.innerHTML = '';
+        
+        // Crée un élément de progression pour chaque story
+        stories.forEach((story, index) => {
+            const progressItem = document.createElement('div');
+            progressItem.className = `story-progress-item ${index === currentStoryIndex ? 'active' : ''}`;
+            progressContainer.appendChild(progressItem);
+        });
+    }
+</script>
+{% endblock %}

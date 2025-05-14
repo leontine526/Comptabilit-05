@@ -1,0 +1,822 @@
+{% extends "base.html" %}
+
+{% block title %}{{ exercise.name }} - Comptabilité OHADA{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('list_exercises') }}">Exercices</a></li>
+        <li class="breadcrumb-item active">{{ exercise.name }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group">
+    {% if not exercise.is_closed %}
+    <a href="{{ url_for('create_transaction', exercise_id=exercise.id) }}" class="btn btn-success">
+        <i data-feather="file-plus"></i> Nouvelle transaction
+    </a>
+    <a href="{{ url_for('upload_document', exercise_id=exercise.id) }}" class="btn btn-info">
+        <i data-feather="upload"></i> Télécharger un document
+    </a>
+    {% endif %}
+    <a href="{{ url_for('generate_report_route', exercise_id=exercise.id) }}" class="btn btn-warning">
+        <i data-feather="bar-chart-2"></i> Générer un rapport
+    </a>
+    <a href="{{ url_for('analyze_exercise_route', exercise_id=exercise.id) }}" class="btn btn-primary">
+        <i data-feather="activity"></i> Analyser l'exercice
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Exercise info card -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="mb-1">{{ exercise.name }}</h4>
+                <p class="text-muted">
+                    Période : {{ exercise.start_date.strftime('%d/%m/%Y') }} - {{ exercise.end_date.strftime('%d/%m/%Y') }}
+                </p>
+                {% if exercise.description %}
+                <p>{{ exercise.description }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-md-end align-items-center h-100">
+                    <div class="text-center me-4">
+                        <h5 class="mb-0">{{ transactions|length }}</h5>
+                        <small class="text-muted">Transactions</small>
+                    </div>
+                    <div class="text-center me-4">
+                        <h5 class="mb-0">{{ documents|length }}</h5>
+                        <small class="text-muted">Documents</small>
+                    </div>
+                    <div>
+                        <span class="badge bg-{{ 'danger' if exercise.is_closed else 'success' }} rounded-pill px-3 py-2">
+                            {{ 'Clôturé' if exercise.is_closed else 'En cours' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs mb-4" id="exerciseTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+            <i data-feather="pie-chart" class="feather-sm me-1"></i> Aperçu
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions" aria-selected="false">
+            <i data-feather="file-text" class="feather-sm me-1"></i> Transactions
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">
+            <i data-feather="file" class="feather-sm me-1"></i> Documents
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">
+            <i data-feather="activity" class="feather-sm me-1"></i> Analyse
+        </button>
+    </li>
+</ul>
+
+<!-- Tab content -->
+<div class="tab-content" id="exerciseTabsContent">
+    <!-- Overview tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Résumé de l'exercice</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h6>Informations générales</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th>Nom</th>
+                                            <td>{{ exercise.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Période</th>
+                                            <td>{{ exercise.start_date.strftime('%d/%m/%Y') }} - {{ exercise.end_date.strftime('%d/%m/%Y') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Statut</th>
+                                            <td>
+                                                <span class="badge bg-{{ 'danger' if exercise.is_closed else 'success' }}">
+                                                    {{ 'Clôturé' if exercise.is_closed else 'En cours' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Création</th>
+                                            <td>{{ exercise.created_at.strftime('%d/%m/%Y') }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <h6>Statistiques</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th>Transactions</th>
+                                            <td>{{ transactions|length }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Documents</th>
+                                            <td>{{ documents|length }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Dernière activité</th>
+                                            <td>
+                                                {% if transactions %}
+                                                {{ transactions[0].transaction_date.strftime('%d/%m/%Y') }}
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Analyse</th>
+                                            <td>
+                                                {% if analysis %}
+                                                <span class="badge bg-success">Disponible</span>
+                                                {% else %}
+                                                <span class="badge bg-warning">Non analysé</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial summary -->
+                        <h6 class="mb-3">Résumé financier</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center p-3">
+                                        <h3 class="text-primary mb-0" id="totalRevenue">-</h3>
+                                        <small class="text-muted">Total des produits</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center p-3">
+                                        <h3 class="text-warning mb-0" id="totalExpenses">-</h3>
+                                        <small class="text-muted">Total des charges</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center p-3">
+                                        <h3 class="text-success mb-0" id="netResult">-</h3>
+                                        <small class="text-muted">Résultat net</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent activity -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Activité récente</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if transactions or documents %}
+                        <div class="list-group list-group-flush">
+                            {% set combined = (transactions + documents)|sort(attribute='created_at', reverse=True) %}
+                            {% for item in combined[:5] %}
+                                {% if item.__tablename__ == 'transactions' %}
+                                <a href="{{ url_for('view_transaction', transaction_id=item.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Transaction: {{ item.reference }}</h6>
+                                        <small>{{ item.transaction_date.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                    <p class="mb-1 text-muted">{{ item.description }}</p>
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('view_document', document_id=item.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Document: {{ item.original_filename }}</h6>
+                                        <small>{{ item.upload_date.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                    <p class="mb-1 text-muted">
+                                        {% if item.processed %}
+                                        <span class="badge bg-success">Traité</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">En attente</span>
+                                        {% endif %}
+                                    </p>
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center p-4">
+                            <div class="mb-3">
+                                <i data-feather="activity" class="text-muted" style="width: 48px; height: 48px;"></i>
+                            </div>
+                            <h6>Aucune activité</h6>
+                            <p class="text-muted mb-0">Commencez à utiliser cet exercice pour voir l'activité ici</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Quick actions -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Actions rapides</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if not exercise.is_closed %}
+                            <a href="{{ url_for('create_transaction', exercise_id=exercise.id) }}" class="btn btn-outline-success">
+                                <i data-feather="file-plus" class="feather-sm me-1"></i> Nouvelle transaction
+                            </a>
+                            <a href="{{ url_for('upload_document', exercise_id=exercise.id) }}" class="btn btn-outline-info">
+                                <i data-feather="upload" class="feather-sm me-1"></i> Télécharger un document
+                            </a>
+                            <a href="{{ url_for('edit_exercise', exercise_id=exercise.id) }}" class="btn btn-outline-primary">
+                                <i data-feather="edit" class="feather-sm me-1"></i> Modifier l'exercice
+                            </a>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#closeExerciseModal">
+                                <i data-feather="lock" class="feather-sm me-1"></i> Clôturer l'exercice
+                            </button>
+                            {% endif %}
+                            <a href="{{ url_for('generate_report_route', exercise_id=exercise.id) }}" class="btn btn-outline-warning">
+                                <i data-feather="bar-chart-2" class="feather-sm me-1"></i> Générer un rapport
+                            </a>
+                            <a href="{{ url_for('analyze_exercise_route', exercise_id=exercise.id) }}" class="btn btn-outline-primary">
+                                <i data-feather="activity" class="feather-sm me-1"></i> Analyser l'exercice
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analysis summary -->
+                {% if analysis %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Analyse financière</h5>
+                        <a href="{{ url_for('analyze_exercise_route', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-primary">Détails</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="position-relative mx-auto" style="width: 150px; height: 75px;">
+                                <canvas id="financialHealthGauge" data-score="{{ analysis.financial_health_score }}"></canvas>
+                            </div>
+                            <p class="mb-0 mt-2">Analyse effectuée le {{ analysis.analysis_date.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body p-2 text-center">
+                                        <h6 class="mb-0">{{ '%.2f'|format(analysis.liquidity_ratio) }}</h6>
+                                        <small class="text-muted">Ratio de liquidité</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body p-2 text-center">
+                                        <h6 class="mb-0">{{ '%.2f'|format(analysis.solvency_ratio) }}</h6>
+                                        <small class="text-muted">Ratio de solvabilité</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mb-2">Recommandations</h6>
+                        {% set recommendations = analysis.recommendations|tojson|fromjson %}
+                        <div class="list-group list-group-flush">
+                            {% for rec in recommendations[:2] %}
+                            <div class="list-group-item px-0">
+                                <h6 class="mb-1">{{ rec.title }}</h6>
+                                <p class="mb-0 small text-muted">{{ rec.description }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Recent documents -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Documents récents</h5>
+                        <a href="#documents" class="btn btn-sm btn-outline-primary" data-bs-toggle="tab" data-bs-target="#documents">Tous</a>
+                    </div>
+                    <div class="card-body">
+                        {% if documents %}
+                        <div class="list-group list-group-flush">
+                            {% for doc in documents[:3] %}
+                            <a href="{{ url_for('view_document', document_id=doc.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    {% if doc.document_type == 'invoice' %}
+                                    <i data-feather="file-text" class="text-primary me-3"></i>
+                                    {% elif doc.document_type == 'receipt' %}
+                                    <i data-feather="file" class="text-success me-3"></i>
+                                    {% elif doc.document_type == 'statement' %}
+                                    <i data-feather="clipboard" class="text-info me-3"></i>
+                                    {% else %}
+                                    <i data-feather="file" class="text-secondary me-3"></i>
+                                    {% endif %}
+                                    
+                                    <div>
+                                        <h6 class="mb-0">{{ doc.original_filename }}</h6>
+                                        <small class="text-muted">{{ doc.upload_date.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center p-3">
+                            <div class="mb-3">
+                                <i data-feather="file" class="text-muted"></i>
+                            </div>
+                            <p class="text-muted mb-0">Aucun document téléchargé</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transactions tab -->
+    <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Transactions de l'exercice</h5>
+                {% if not exercise.is_closed %}
+                <a href="{{ url_for('create_transaction', exercise_id=exercise.id) }}" class="btn btn-sm btn-primary">
+                    <i data-feather="plus"></i> Nouvelle transaction
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover datatable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Référence</th>
+                                <th>Description</th>
+                                <th>Débit</th>
+                                <th>Crédit</th>
+                                <th>Statut</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.transaction_date.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ transaction.reference }}</td>
+                                <td>{{ transaction.description[:30] + '...' if transaction.description and transaction.description|length > 30 else transaction.description }}</td>
+                                {% set total_debit = transaction.items|sum(attribute='debit_amount') %}
+                                {% set total_credit = transaction.items|sum(attribute='credit_amount') %}
+                                <td>{{ '%0.2f'|format(total_debit|float) }} XOF</td>
+                                <td>{{ '%0.2f'|format(total_credit|float) }} XOF</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if transaction.is_posted else 'warning' }}">
+                                        {{ 'Comptabilisé' if transaction.is_posted else 'Brouillon' }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('view_transaction', transaction_id=transaction.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i data-feather="eye"></i>
+                                        </a>
+                                        {% if not exercise.is_closed and not transaction.is_posted %}
+                                        <a href="{{ url_for('edit_transaction', transaction_id=transaction.id) }}" class="btn btn-sm btn-outline-secondary">
+                                            <i data-feather="edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                onclick="confirmAction('Êtes-vous sûr de vouloir supprimer cette transaction ?', 
+                                                function() { document.getElementById('delete-transaction-{{ transaction.id }}').submit(); })">
+                                            <i data-feather="trash-2"></i>
+                                        </button>
+                                        <form id="delete-transaction-{{ transaction.id }}" action="{{ url_for('delete_transaction', transaction_id=transaction.id) }}" method="POST" class="d-none"></form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center p-5">
+                    <div class="mb-3">
+                        <i data-feather="file-text" class="text-muted" style="width: 48px; height: 48px;"></i>
+                    </div>
+                    <h5>Aucune transaction</h5>
+                    <p class="text-muted mb-3">Vous n'avez pas encore créé de transactions pour cet exercice.</p>
+                    
+                    {% if not exercise.is_closed %}
+                    <a href="{{ url_for('create_transaction', exercise_id=exercise.id) }}" class="btn btn-primary">
+                        <i data-feather="plus"></i> Créer une transaction
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Documents tab -->
+    <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Documents de l'exercice</h5>
+                {% if not exercise.is_closed %}
+                <a href="{{ url_for('upload_document', exercise_id=exercise.id) }}" class="btn btn-sm btn-primary">
+                    <i data-feather="upload"></i> Télécharger un document
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if documents %}
+                <div class="table-responsive">
+                    <table class="table table-hover datatable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Nom du fichier</th>
+                                <th>Type</th>
+                                <th>Statut</th>
+                                <th>Transaction</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for document in documents %}
+                            <tr>
+                                <td>{{ document.upload_date.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ document.original_filename }}</td>
+                                <td>
+                                    {% if document.document_type == 'invoice' %}
+                                    <span class="badge bg-primary">Facture</span>
+                                    {% elif document.document_type == 'receipt' %}
+                                    <span class="badge bg-success">Reçu</span>
+                                    {% elif document.document_type == 'statement' %}
+                                    <span class="badge bg-info">Relevé</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ document.document_type|capitalize }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if document.processed else 'warning' }}">
+                                        {{ 'Traité' if document.processed else 'En attente' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if document.transactions.count() > 0 %}
+                                    <a href="{{ url_for('view_transaction', transaction_id=document.transactions[0].id) }}" class="text-decoration-none">
+                                        {{ document.transactions[0].reference }}
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('view_document', document_id=document.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i data-feather="eye"></i>
+                                        </a>
+                                        {% if not document.processed and not exercise.is_closed %}
+                                        <form action="{{ url_for('process_document', document_id=document.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                <i data-feather="cpu"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center p-5">
+                    <div class="mb-3">
+                        <i data-feather="file" class="text-muted" style="width: 48px; height: 48px;"></i>
+                    </div>
+                    <h5>Aucun document</h5>
+                    <p class="text-muted mb-3">Vous n'avez pas encore téléchargé de documents pour cet exercice.</p>
+                    
+                    {% if not exercise.is_closed %}
+                    <a href="{{ url_for('upload_document', exercise_id=exercise.id) }}" class="btn btn-primary">
+                        <i data-feather="upload"></i> Télécharger un document
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analysis tab -->
+    <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+        {% if analysis %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Analyse financière de l'exercice</h5>
+                <span class="text-muted">Dernière analyse: {{ analysis.analysis_date.strftime('%d/%m/%Y') }}</span>
+            </div>
+            <div class="card-body">
+                <!-- Financial health score gauge -->
+                <div class="mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="text-center">
+                                <div class="position-relative mx-auto" style="width: 200px; height: 100px;">
+                                    <canvas id="healthGauge" data-score="{{ analysis.financial_health_score }}"></canvas>
+                                </div>
+                                <h4 class="mt-2">{{ '%0.1f'|format(analysis.financial_health_score) }}</h4>
+                                <p class="text-muted">Score de santé financière</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body p-3 text-center">
+                                            <h5 class="mb-0 {{ 'text-success' if analysis.liquidity_ratio >= 1.5 else ('text-warning' if analysis.liquidity_ratio >= 1 else 'text-danger') }}">
+                                                {{ '%0.2f'|format(analysis.liquidity_ratio) }}
+                                            </h5>
+                                            <small class="text-muted">Liquidité</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body p-3 text-center">
+                                            <h5 class="mb-0 {{ 'text-success' if analysis.solvency_ratio <= 1 else ('text-warning' if analysis.solvency_ratio <= 2 else 'text-danger') }}">
+                                                {{ '%0.2f'|format(analysis.solvency_ratio) }}
+                                            </h5>
+                                            <small class="text-muted">Solvabilité</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body p-3 text-center">
+                                            <h5 class="mb-0 {{ 'text-success' if analysis.profitability_ratio >= 0.1 else ('text-warning' if analysis.profitability_ratio >= 0 else 'text-danger') }}">
+                                                {{ '%0.2f'|format(analysis.profitability_ratio) }}
+                                            </h5>
+                                            <small class="text-muted">Rentabilité</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-6 col-md-3 mb-3">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body p-3 text-center">
+                                            <h5 class="mb-0">{{ analysis.analysis_date.strftime('%d/%m/%Y') }}</h5>
+                                            <small class="text-muted">Date d'analyse</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendations -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Recommandations</h5>
+                    {% set recommendations = analysis.recommendations|tojson|fromjson %}
+                    <div class="row">
+                        {% for rec in recommendations %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ rec.title }}</h6>
+                                    <p class="card-text text-muted mb-0">{{ rec.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Full analysis -->
+                <div>
+                    <h5 class="mb-3">Analyse complète</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <pre class="mb-0" style="white-space: pre-wrap;">{{ analysis.full_analysis }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-center">
+            <a href="{{ url_for('analyze_exercise_route', exercise_id=exercise.id) }}" class="btn btn-primary">
+                <i data-feather="refresh-cw"></i> Mettre à jour l'analyse
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center p-5">
+            <div class="mb-4">
+                <i data-feather="activity" class="text-muted" style="width: 64px; height: 64px;"></i>
+            </div>
+            <h4>Aucune analyse disponible</h4>
+            <p class="text-muted mb-4">Lancez une analyse IA pour obtenir des insights sur la santé financière de cet exercice.</p>
+            <a href="{{ url_for('analyze_exercise_route', exercise_id=exercise.id) }}" class="btn btn-primary">
+                <i data-feather="activity"></i> Analyser l'exercice
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Close exercise confirmation modal -->
+<div class="modal fade" id="closeExerciseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la clôture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i data-feather="alert-triangle" class="me-2"></i>
+                    <strong>Attention !</strong> La clôture d'un exercice est irréversible.
+                </div>
+                <p>Voulez-vous vraiment clôturer l'exercice <strong>{{ exercise.name }}</strong> ?</p>
+                <p>Une fois clôturé :</p>
+                <ul>
+                    <li>Vous ne pourrez plus ajouter ou modifier des transactions</li>
+                    <li>Vous ne pourrez plus ajouter de documents</li>
+                    <li>Les rapports et analyses resteront disponibles</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('close_exercise', exercise_id=exercise.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Clôturer l'exercice</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create financial health gauge chart
+        if (document.getElementById('healthGauge')) {
+            const score = parseFloat(document.getElementById('healthGauge').dataset.score);
+            
+            function getScoreColor(value) {
+                if (value >= 75) return '#70AD47'; // Green
+                if (value >= 50) return '#FFBF00'; // Yellow
+                if (value >= 25) return '#ED7D31'; // Orange
+                return '#C00000'; // Red
+            }
+            
+            new Chart(document.getElementById('healthGauge'), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [score, 100 - score],
+                        backgroundColor: [
+                            getScoreColor(score),
+                            '#e9ecef'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    circumference: 180,
+                    rotation: 270,
+                    plugins: {
+                        tooltip: {
+                            enabled: false
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: false
+                    }
+                }
+            });
+        }
+        
+        // Initialize smaller gauge in overview tab
+        if (document.getElementById('financialHealthGauge')) {
+            const score = parseFloat(document.getElementById('financialHealthGauge').dataset.score);
+            
+            function getScoreColor(value) {
+                if (value >= 75) return '#70AD47';
+                if (value >= 50) return '#FFBF00';
+                if (value >= 25) return '#ED7D31';
+                return '#C00000';
+            }
+            
+            new Chart(document.getElementById('financialHealthGauge'), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [score, 100 - score],
+                        backgroundColor: [
+                            getScoreColor(score),
+                            '#e9ecef'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    circumference: 180,
+                    rotation: 270,
+                    plugins: {
+                        tooltip: {
+                            enabled: false
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: false
+                    }
+                }
+            });
+        }
+        
+        // Fetch financial summary data
+        fetch('/api/exercises/{{ exercise.id }}/summary')
+            .then(response => response.json())
+            .then(data => {
+                // Update financial summary
+                document.getElementById('totalRevenue').textContent = formatCurrency(data.total_revenue);
+                document.getElementById('totalExpenses').textContent = formatCurrency(data.total_expenses);
+                document.getElementById('netResult').textContent = formatCurrency(data.net_income);
+                
+                // Set color for net result
+                if (data.net_income > 0) {
+                    document.getElementById('netResult').className = 'text-success mb-0';
+                } else if (data.net_income < 0) {
+                    document.getElementById('netResult').className = 'text-danger mb-0';
+                } else {
+                    document.getElementById('netResult').className = 'text-warning mb-0';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching summary:', error);
+            });
+    });
+    
+    // Format currency
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'XOF',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h5>
+                        {% if workgroup %}
+                            <i class="fas fa-edit me-2"></i>Modifier le groupe
+                        {% else %}
+                            <i class="fas fa-plus-circle me-2"></i>Créer un groupe de travail
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.name.id }}" class="form-label">{{ form.name.label }}</label>
+                            {{ form.name(class="form-control", placeholder="Nom du groupe") }}
+                            {% for error in form.name.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id }}" class="form-label">{{ form.description.label }}</label>
+                            {{ form.description(class="form-control", rows=3, placeholder="Description du groupe...") }}
+                            {% for error in form.description.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                Une brève description de l'objectif du groupe et de ses activités.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                {{ form.is_private(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.is_private.id }}">
+                                    {{ form.is_private.label }}
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                {% if form.is_private.data %}
+                                    Les groupes privés sont accessibles uniquement sur invitation.
+                                {% else %}
+                                    Les groupes publics sont visibles par tous les utilisateurs.
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('workgroups_list') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                {% if workgroup %}
+                                    Mettre à jour
+                                {% else %}
+                                    Créer le groupe
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if workgroup %}
+                <div class="dashboard-card mt-4">
+                    <div class="card-header bg-danger">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Zone de danger</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>La suppression d'un groupe est définitive et entraînera la perte de tous les messages, notes et partages d'exercices associés.</p>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWorkgroupModal">
+                            <i class="fas fa-trash-alt me-2"></i>Supprimer ce groupe
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Delete Workgroup Modal -->
+                <div class="modal fade" id="deleteWorkgroupModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-dark text-light">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Supprimer le groupe</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Êtes-vous sûr de vouloir supprimer le groupe "{{ workgroup.name }}" ?</p>
+                                <p class="text-danger">Cette action est définitive et supprimera tous les messages et notes.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <form action="{{ url_for('workgroup_delete', workgroup_id=workgroup.id) }}" method="post">
+                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const isPrivateSwitch = document.getElementById('is_private');
+        const privacyHelp = isPrivateSwitch.closest('.mb-4').querySelector('.form-text');
+
+        isPrivateSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                privacyHelp.textContent = 'Les groupes privés sont accessibles uniquement sur invitation.';
+            } else {
+                privacyHelp.textContent = 'Les groupes publics sont visibles par tous les utilisateurs.';
+            }
+        });
+    });
+</script>
+{% endblock %}

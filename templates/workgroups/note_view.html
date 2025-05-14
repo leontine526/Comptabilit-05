@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>{{ note.title }}</h5>
+                    <div>
+                        {% if note.creator_id == current_user.id or workgroup.owner_id == current_user.id or workgroup.get_member_role(current_user) == 'admin' %}
+                            <a href="{{ url_for('workgroup_note_edit', workgroup_id=workgroup.id, note_id=note.id) }}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="fas fa-edit me-1"></i>Modifier
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteNoteModal">
+                                <i class="fas fa-trash-alt me-1"></i>Supprimer
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <p class="text-muted">
+                            <i class="fas fa-user me-1"></i>Créé par {{ note.creator.username }}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-calendar-alt me-1"></i>Créé le {{ note.created_at.strftime('%d/%m/%Y') }}
+                            {% if note.updated_at != note.created_at %}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-edit me-1"></i>Modifié le {{ note.updated_at.strftime('%d/%m/%Y') }}
+                            {% endif %}
+                        </p>
+                        <p class="text-muted">
+                            <i class="fas fa-users me-1"></i>Groupe : {{ workgroup.name }}
+                        </p>
+                    </div>
+                    
+                    <div class="note-content bg-dark p-4 rounded border border-secondary">
+                        {{ note.content|nl2br }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('workgroup_notes', workgroup_id=workgroup.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour aux notes
+                        </a>
+                        <a href="{{ url_for('workgroup_view', workgroup_id=workgroup.id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-users me-2"></i>Retour au groupe
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Note Modal -->
+<div class="modal fade" id="deleteNoteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Supprimer la note</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette note ?</p>
+                <p class="text-danger">Cette action est définitive.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('workgroup_note_delete', workgroup_id=workgroup.id, note_id=note.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

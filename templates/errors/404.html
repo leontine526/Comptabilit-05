@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container error-container">
+    <div class="row">
+        <div class="col-md-8 mx-auto text-center">
+            <div class="error-box">
+                <h1 class="error-code">404</h1>
+                <h2 class="error-title">Page non trouvée</h2>
+                <p class="error-message">
+                    La page que vous recherchez n'existe pas ou a été déplacée.
+                </p>
+                <div class="error-actions">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Retour à l'accueil
+                    </a>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .error-container {
+        padding: 3rem 0;
+    }
+    
+    .error-box {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 3rem;
+        margin-top: 2rem;
+    }
+    
+    .error-code {
+        font-size: 8rem;
+        font-weight: 700;
+        color: #1E2A38;
+        margin-bottom: 0;
+        text-shadow: 2px 2px 0 #F4B400;
+    }
+    
+    .error-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1E2A38;
+    }
+    
+    .error-message {
+        font-size: 1.1rem;
+        color: #6B7280;
+        margin-bottom: 2rem;
+    }
+    
+    .error-actions {
+        margin-top: 2rem;
+    }
+    
+    .error-actions .btn {
+        margin: 0 0.5rem;
+        padding: 0.75rem 1.5rem;
+    }
+</style>
+{% endblock %}

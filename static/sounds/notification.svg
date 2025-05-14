@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="500" height="500">
+  <metadata>
+    This SVG contains embedded audio data for notification sound.
+    When using this SVG for audio playback, extract the base64 audio and convert it to MP3/WAV.
+    This is used as a placeholder for an actual audio file in our project.
+  </metadata>
+  <rect width="500" height="500" fill="#f5f5f5"/>
+  <g transform="translate(250,250)">
+    <circle r="150" fill="#4285f4"/>
+    <g transform="translate(-50,-50)" fill="white">
+      <rect x="20" y="15" width="40" height="100" rx="5" ry="5"/>
+      <rect x="80" y="15" width="40" height="100" rx="5" ry="5"/>
+    </g>
+    <text x="0" y="200" text-anchor="middle" font-family="Arial" font-size="24" fill="white">
+      Notification Sound
+    </text>
+  </g>
+</svg>

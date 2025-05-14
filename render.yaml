@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ohada-comptabilite
+    env: python
+    buildCommand: pip install -r pyproject.toml
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --reuse-port main:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ohada-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      
+databases:
+  - name: ohada-db
+    databaseName: ohada
+    user: ohada_user
+    plan: free

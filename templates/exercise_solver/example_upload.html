@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('exercise_examples_list') }}">Exemples d'exercices</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Télécharger un exemple</li>
+        </ol>
+    </nav>
+    
+    <h1 class="h2 mb-4">Télécharger un exemple d'exercice résolu</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% for error in form.title.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.example_file.label(class="form-label") }}
+                            {{ form.example_file(class="form-control" + (" is-invalid" if form.example_file.errors else "")) }}
+                            {% for error in form.example_file.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Téléchargez un fichier PDF contenant à la fois l'énoncé et la solution de l'exercice.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.category.label(class="form-label") }}
+                                    {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else "")) }}
+                                    {% for error in form.category.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.difficulty.label(class="form-label") }}
+                                    {{ form.difficulty(class="form-select" + (" is-invalid" if form.difficulty.errors else "")) }}
+                                    {% for error in form.difficulty.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=3) }}
+                            {% for error in form.description.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Description optionnelle de l'exercice.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('exercise_examples_list') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Télécharger
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Instructions</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Format attendu :</strong></p>
+                    <ul>
+                        <li>Fichier PDF contenant du texte (pas uniquement des images)</li>
+                        <li>L'énoncé doit être clairement séparé de la solution</li>
+                        <li>Mots-clés comme "Énoncé", "Exercice", "Solution" ou "Résolution" facilitent l'analyse</li>
+                    </ul>
+                    
+                    <p><strong>Après le téléchargement :</strong></p>
+                    <ul>
+                        <li>Le système analysera le contenu et séparera l'énoncé de la solution</li>
+                        <li>L'exemple sera ajouté à la base de connaissances pour la résolution d'exercices similaires</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

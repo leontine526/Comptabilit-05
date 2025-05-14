@@ -1,0 +1,714 @@
+{% extends "base.html" %}
+
+{% block title %}Fil d'actualité{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/social.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Sidebar gauche -->
+        <div class="col-md-3 d-none d-md-block">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Mon profil</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar me-3">
+                            <span class="avatar-initial rounded-circle bg-primary">
+                                {{ current_user.username[0]|upper }}
+                            </span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{ current_user.full_name }}</h6>
+                            <small class="text-muted">{{ current_user.username }}</small>
+                        </div>
+                    </div>
+                    <div class="list-group">
+                        <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person me-2"></i> Profil
+                        </a>
+                        <a href="{{ url_for('workgroups') }}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-people me-2"></i> Groupes de travail
+                        </a>
+                        <a href="{{ url_for('exercises_list') }}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-journal-check me-2"></i> Exercices
+                        </a>
+                        <a href="{{ url_for('stories') }}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-images me-2"></i> Stories
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Utilisateurs en ligne</h5>
+                    <div id="online-count" class="badge bg-success rounded-pill">0</div>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush" id="online-users-list">
+                        <li class="list-group-item text-center text-muted py-3">
+                            Chargement des utilisateurs en ligne...
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fil principal -->
+        <div class="col-md-6">
+            <!-- Formulaire de création de publication -->
+            <div class="card mb-4 post-form">
+                <div class="card-body">
+                    <form id="post-form">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="avatar me-2">
+                                    <span class="avatar-initial rounded-circle bg-primary">
+                                        {{ current_user.username[0]|upper }}
+                                    </span>
+                                </div>
+                                <label for="post-content" class="form-label fw-bold mb-0">Créer une publication</label>
+                            </div>
+                            <textarea class="form-control" id="post-content" rows="3" placeholder="Quoi de neuf, {{ current_user.username }} ?"></textarea>
+                        </div>
+                        <div class="post-form-attachments border-top border-bottom">
+                            <div class="attachment-option" id="attach-image">
+                                <i class="bi bi-image text-success"></i> Photo
+                            </div>
+                            <div class="attachment-option" id="attach-file">
+                                <i class="bi bi-file-earmark text-primary"></i> Fichier
+                            </div>
+                            <div class="attachment-option" id="attach-tag">
+                                <i class="bi bi-tag text-warning"></i> Marquer
+                            </div>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button type="button" class="btn btn-primary" id="submit-post">Publier</button>
+                        </div>
+                        
+                        <!-- Champs cachés pour les pièces jointes -->
+                        <input type="hidden" id="post-image-url">
+                        <input type="hidden" id="post-file-url">
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Liste des stories -->
+            <div class="card mb-4">
+                <div class="card-body p-2">
+                    <div class="story-carousel">
+                        <!-- Carte pour créer une story -->
+                        <div class="story-card story-create" onclick="window.location.href='{{ url_for('stories') }}'">
+                            <i class="bi bi-plus-circle text-primary"></i>
+                            <span>Créer</span>
+                        </div>
+                        
+                        <!-- Exemples de stories (remplacer par des données réelles) -->
+                        <div class="text-center text-muted px-4" style="line-height: 220px;">
+                            <a href="{{ url_for('stories') }}" class="text-decoration-none">
+                                Voir les stories
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liste des publications -->
+            <div id="posts-container">
+                {% if posts %}
+                    {% for post in posts %}
+                        <div class="card mb-4 post" id="post-{{ post.id }}">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar me-2">
+                                        <span class="avatar-initial rounded-circle bg-primary">
+                                            {{ post.author.username[0]|upper }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ post.author.username }}</h6>
+                                        <small class="text-muted">{{ post.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="sharePost({{ post.id }})">Partager</a></li>
+                                        {% if post.user_id == current_user.id %}
+                                            <li><a class="dropdown-item" href="#" onclick="editPost({{ post.id }})">Modifier</a></li>
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="deletePost({{ post.id }})">Supprimer</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ post.content }}</p>
+                                {% if post.image_url %}
+                                    <div class="post-image mt-2">
+                                        <img src="{{ post.image_url }}" class="img-fluid rounded" alt="Image de publication">
+                                    </div>
+                                {% elif post.file_url %}
+                                    <div class="post-file mt-2">
+                                        <a href="{{ post.file_url }}" class="btn btn-outline-primary" target="_blank">
+                                            <i class="bi bi-file-earmark"></i> Voir le fichier joint
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                <div class="reaction-details mt-2 mb-2 small text-muted"></div>
+                                <div class="post-actions mt-2 d-flex border-top border-bottom py-2">
+                                    <button class="btn btn-sm btn-link text-primary me-2 reaction-button {% if post.id in liked_posts %}reacted{% endif %}" 
+                                            data-post-id="{{ post.id }}" data-current-reaction="{{ post.user_reaction }}">
+                                        <i class="bi bi-hand-thumbs-up{% if post.id in liked_posts %}-fill{% endif %}"></i>
+                                        <span>J'aime</span>
+                                    </button>
+                                    <button class="btn btn-sm btn-link text-primary me-2" onclick="focusCommentBox({{ post.id }})">
+                                        <i class="bi bi-chat"></i> Commenter
+                                    </button>
+                                    <button class="btn btn-sm btn-link text-primary me-2" onclick="sharePost({{ post.id }})">
+                                        <i class="bi bi-share"></i> Partager
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white">
+                                <div class="comments-container" id="comments-{{ post.id }}">
+                                    <!-- Commentaires de la publication -->
+                                    {% if post.comments %}
+                                        {% for comment in post.comments %}
+                                            <div class="comment mb-2 {% if comment.parent_id %}comment-reply ms-4{% endif %}" id="comment-{{ comment.id }}">
+                                                <div class="d-flex">
+                                                    <div class="avatar me-2">
+                                                        <span class="avatar-initial rounded-circle bg-primary">
+                                                            {{ comment.author.username[0]|upper }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="comment-content bg-light p-2 rounded flex-grow-1">
+                                                        <div class="comment-header">
+                                                            <strong>{{ comment.author.username }}</strong>
+                                                            <small class="text-muted ms-2">{{ comment.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                                        </div>
+                                                        <div class="comment-body">
+                                                            {{ comment.content }}
+                                                        </div>
+                                                        <div class="comment-actions mt-1">
+                                                            <button class="btn btn-sm btn-link text-primary p-0 reaction-button {% if comment.id in liked_comments %}reacted{% endif %}" 
+                                                                    data-comment-id="{{ comment.id }}" data-current-reaction="{{ comment.user_reaction }}">
+                                                                <i class="bi bi-hand-thumbs-up{% if comment.id in liked_comments %}-fill{% endif %}"></i>
+                                                                <span>J'aime</span>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-link text-primary p-0 ms-2" onclick="replyToComment({{ post.id }}, {{ comment.id }})">
+                                                                <i class="bi bi-reply"></i> Répondre
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Réponses aux commentaires -->
+                                                {% if comment.replies %}
+                                                    <div class="replies-container mt-2">
+                                                        {% for reply in comment.replies %}
+                                                            <div class="comment comment-reply ms-4 mb-2" id="comment-{{ reply.id }}">
+                                                                <div class="d-flex">
+                                                                    <div class="avatar me-2">
+                                                                        <span class="avatar-initial rounded-circle bg-primary">
+                                                                            {{ reply.author.username[0]|upper }}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="comment-content bg-light p-2 rounded flex-grow-1">
+                                                                        <div class="comment-header">
+                                                                            <strong>{{ reply.author.username }}</strong>
+                                                                            <small class="text-muted ms-2">{{ reply.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                                                        </div>
+                                                                        <div class="comment-body">
+                                                                            {{ reply.content }}
+                                                                        </div>
+                                                                        <div class="comment-actions mt-1">
+                                                                            <button class="btn btn-sm btn-link text-primary p-0 reaction-button {% if reply.id in liked_comments %}reacted{% endif %}" 
+                                                                                    data-comment-id="{{ reply.id }}" data-current-reaction="{{ reply.user_reaction }}">
+                                                                                <i class="bi bi-hand-thumbs-up{% if reply.id in liked_comments %}-fill{% endif %}"></i>
+                                                                                <span>J'aime</span>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="comment-form mt-2">
+                                    <div class="d-flex">
+                                        <div class="avatar me-2">
+                                            <span class="avatar-initial rounded-circle bg-primary">
+                                                {{ current_user.username[0]|upper }}
+                                            </span>
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control comment-input" id="comment-input-{{ post.id }}" 
+                                                placeholder="Écrire un commentaire..." aria-label="Commentaire">
+                                            <button class="btn btn-primary" type="button" onclick="addComment({{ post.id }})">
+                                                <i class="bi bi-send"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card mb-4">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-newspaper fs-1 text-muted"></i>
+                            <h5 class="mt-3">Aucune publication</h5>
+                            <p class="text-muted">Soyez le premier à publier quelque chose !</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Sidebar droite -->
+        <div class="col-md-3 d-none d-md-block">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Événements</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% if current_user.notifications.count() > 0 %}
+                            <a href="{{ url_for('notifications') }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Notifications</span>
+                                    <span class="badge bg-danger rounded-pill">{{ current_user.unread_notifications_count }}</span>
+                                </div>
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('workgroups') }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Groupes de travail</span>
+                                <span class="badge bg-primary rounded-pill">{{ current_user.workgroups.count() }}</span>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('exercises_list') }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Exercices</span>
+                                <span class="badge bg-success rounded-pill">{{ current_user.exercises.count() }}</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Tendances</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Les sujets populaires dans vos groupes</p>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="bi bi-hash me-2"></i> comptabilité
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="bi bi-hash me-2"></i> ohada
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="bi bi-hash me-2"></i> bilan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour les images -->
+<div class="modal fade" id="image-upload-modal" tabindex="-1" aria-labelledby="image-upload-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="image-upload-modal-label">Ajouter une image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="image-upload-form">
+                    <div class="mb-3">
+                        <label for="image-file" class="form-label">Sélectionner une image</label>
+                        <input class="form-control" type="file" id="image-file" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <div id="image-preview" class="mt-3 d-none">
+                            <img src="" class="img-fluid rounded" alt="Prévisualisation de l'image">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="confirm-image-upload">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour les fichiers -->
+<div class="modal fade" id="file-upload-modal" tabindex="-1" aria-labelledby="file-upload-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="file-upload-modal-label">Ajouter un fichier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="file-upload-form">
+                    <div class="mb-3">
+                        <label for="file-input" class="form-label">Sélectionner un fichier</label>
+                        <input class="form-control" type="file" id="file-input">
+                    </div>
+                    <div class="mb-3">
+                        <div id="file-info" class="mt-3 d-none">
+                            <div class="alert alert-info">
+                                <i class="bi bi-file-earmark me-2"></i>
+                                <span id="file-name"></span>
+                                (<span id="file-size"></span>)
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="confirm-file-upload">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de partage -->
+<div class="modal fade" id="share-modal" tabindex="-1" aria-labelledby="share-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="share-modal-label">Partager la publication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="share-workgroup" class="form-label">Partager dans un groupe</label>
+                    <select class="form-select" id="share-workgroup">
+                        <option value="">Sélectionner un groupe</option>
+                        {% for workgroup in current_user.workgroups %}
+                            <option value="{{ workgroup.id }}">{{ workgroup.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="share-comment" class="form-label">Ajouter un commentaire (optionnel)</label>
+                    <textarea class="form-control" id="share-comment" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="confirm-share">Partager</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/realtime.js') }}"></script>
+<script src="{{ url_for('static', filename='js/reactions.js') }}"></script>
+<script>
+    // Variables
+    const userId = {{ current_user.id }};
+    let imageFile = null;
+    let documentFile = null;
+    let imageModal = null;
+    let fileModal = null;
+    let shareModal = null;
+    let currentSharedPostId = null;
+    
+    // Initialisation lors du chargement du document
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialise Socket.IO
+        initializeSocketIO(userId);
+        
+        // Initialise les modals Bootstrap
+        imageModal = new bootstrap.Modal(document.getElementById('image-upload-modal'));
+        fileModal = new bootstrap.Modal(document.getElementById('file-upload-modal'));
+        shareModal = new bootstrap.Modal(document.getElementById('share-modal'));
+        
+        // Définit les gestionnaires d'événements
+        setupEventHandlers();
+        
+        // Charge les utilisateurs en ligne
+        loadOnlineUsers();
+        
+        // Initialise les réactions personnalisées
+        initReactionSelectors();
+    });
+    
+    // Configure les gestionnaires d'événements
+    function setupEventHandlers() {
+        // Gestionnaire pour la création de publication
+        const submitPostButton = document.getElementById('submit-post');
+        if (submitPostButton) {
+            submitPostButton.addEventListener('click', function() {
+                const contentInput = document.getElementById('post-content');
+                const content = contentInput.value.trim();
+                
+                if (content) {
+                    // Récupère les URLs des pièces jointes
+                    const imageUrl = document.getElementById('post-image-url').value;
+                    const fileUrl = document.getElementById('post-file-url').value;
+                    
+                    // Crée la publication
+                    createPost(content, null, imageUrl, fileUrl);
+                    
+                    // Réinitialise le formulaire
+                    contentInput.value = '';
+                    document.getElementById('post-image-url').value = '';
+                    document.getElementById('post-file-url').value = '';
+                } else {
+                    showToast('Veuillez entrer un contenu pour votre publication', 'warning');
+                }
+            });
+        }
+        
+        // Gestionnaire pour l'attachement d'image
+        const attachImageButton = document.getElementById('attach-image');
+        if (attachImageButton) {
+            attachImageButton.addEventListener('click', function() {
+                imageModal.show();
+            });
+        }
+        
+        // Gestionnaire pour l'attachement de fichier
+        const attachFileButton = document.getElementById('attach-file');
+        if (attachFileButton) {
+            attachFileButton.addEventListener('click', function() {
+                fileModal.show();
+            });
+        }
+        
+        // Gestionnaire pour la prévisualisation d'image
+        const imageFileInput = document.getElementById('image-file');
+        if (imageFileInput) {
+            imageFileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    imageFile = file;
+                    
+                    // Affiche la prévisualisation
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('image-preview');
+                        preview.classList.remove('d-none');
+                        preview.querySelector('img').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // Gestionnaire pour l'information de fichier
+        const fileInput = document.getElementById('file-input');
+        if (fileInput) {
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    documentFile = file;
+                    
+                    // Affiche les informations du fichier
+                    const fileInfo = document.getElementById('file-info');
+                    fileInfo.classList.remove('d-none');
+                    document.getElementById('file-name').textContent = file.name;
+                    document.getElementById('file-size').textContent = formatFileSize(file.size);
+                }
+            });
+        }
+        
+        // Gestionnaire pour la confirmation d'upload d'image
+        const confirmImageButton = document.getElementById('confirm-image-upload');
+        if (confirmImageButton) {
+            confirmImageButton.addEventListener('click', function() {
+                if (imageFile) {
+                    uploadFile(imageFile, 'image', function(url) {
+                        document.getElementById('post-image-url').value = url;
+                        imageModal.hide();
+                        showToast('Image ajoutée à votre publication', 'success');
+                    });
+                }
+            });
+        }
+        
+        // Gestionnaire pour la confirmation d'upload de fichier
+        const confirmFileButton = document.getElementById('confirm-file-upload');
+        if (confirmFileButton) {
+            confirmFileButton.addEventListener('click', function() {
+                if (documentFile) {
+                    uploadFile(documentFile, 'file', function(url) {
+                        document.getElementById('post-file-url').value = url;
+                        fileModal.hide();
+                        showToast('Fichier ajouté à votre publication', 'success');
+                    });
+                }
+            });
+        }
+        
+        // Gestionnaire pour la confirmation de partage
+        const confirmShareButton = document.getElementById('confirm-share');
+        if (confirmShareButton) {
+            confirmShareButton.addEventListener('click', function() {
+                const workgroupId = document.getElementById('share-workgroup').value;
+                const comment = document.getElementById('share-comment').value;
+                
+                if (workgroupId && currentSharedPostId) {
+                    sharePostInWorkgroup(currentSharedPostId, workgroupId, comment);
+                    shareModal.hide();
+                } else {
+                    showToast('Veuillez sélectionner un groupe', 'warning');
+                }
+            });
+        }
+    }
+    
+    // Charge les utilisateurs en ligne
+    function loadOnlineUsers() {
+        fetch('/api/users/online')
+            .then(response => response.json())
+            .then(data => {
+                const usersList = document.getElementById('online-users-list');
+                const onlineCount = document.getElementById('online-count');
+                
+                if (usersList && data.users) {
+                    // Met à jour le compteur
+                    onlineCount.textContent = data.users.length;
+                    
+                    // Vide la liste
+                    usersList.innerHTML = '';
+                    
+                    if (data.users.length === 0) {
+                        usersList.innerHTML = `
+                            <li class="list-group-item text-center text-muted py-3">
+                                Aucun utilisateur en ligne
+                            </li>
+                        `;
+                        return;
+                    }
+                    
+                    // Ajoute chaque utilisateur à la liste
+                    data.users.forEach(user => {
+                        const userItem = document.createElement('li');
+                        userItem.className = 'list-group-item online-user-item';
+                        userItem.innerHTML = `
+                            <div class="d-flex align-items-center">
+                                <div class="avatar me-2">
+                                    <span class="avatar-initial rounded-circle bg-primary">
+                                        ${user.username.charAt(0).toUpperCase()}
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>${user.username}</span>
+                                        <span class="user-status-indicator text-success" data-user-id="${user.id}" title="En ligne">
+                                            <i class="bi bi-circle-fill"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        usersList.appendChild(userItem);
+                    });
+                }
+            })
+            .catch(error => console.error('Erreur lors du chargement des utilisateurs en ligne:', error));
+    }
+    
+    // Partage une publication
+    function sharePost(postId) {
+        currentSharedPostId = postId;
+        shareModal.show();
+    }
+    
+    // Partage une publication dans un groupe
+    function sharePostInWorkgroup(postId, workgroupId, comment) {
+        // Cette fonction devrait appeler l'API pour partager la publication
+        // Pour l'instant, elle affiche juste un message de succès
+        showToast('Publication partagée avec succès', 'success');
+    }
+    
+    // Supprime une publication
+    function deletePost(postId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette publication ?')) {
+            // Cette fonction devrait appeler l'API pour supprimer la publication
+            // Pour l'instant, elle affiche juste un message de succès
+            showToast('Publication supprimée avec succès', 'success');
+        }
+    }
+    
+    // Édite une publication
+    function editPost(postId) {
+        // Cette fonction devrait ouvrir une fenêtre d'édition
+        showToast('La fonctionnalité d\'édition est en cours de développement', 'info');
+    }
+    
+    // Répond à un commentaire
+    function replyToComment(postId, commentId) {
+        const commentInput = document.getElementById(`comment-input-${postId}`);
+        if (commentInput) {
+            commentInput.focus();
+            commentInput.setAttribute('data-reply-to', commentId);
+            commentInput.placeholder = 'Écrire une réponse...';
+        }
+    }
+    
+    // Fonction pour upload de fichier
+    function uploadFile(file, type, callback) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+        
+        fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                callback(data.url);
+            } else {
+                showToast('Erreur lors de l\'upload: ' + data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de connexion lors de l\'upload', 'danger');
+        });
+    }
+    
+    // Formate la taille du fichier
+    function formatFileSize(bytes) {
+        if (bytes < 1024) {
+            return bytes + ' octets';
+        } else if (bytes < 1048576) {
+            return (bytes / 1024).toFixed(2) + ' Ko';
+        } else {
+            return (bytes / 1048576).toFixed(2) + ' Mo';
+        }
+    }
+</script>
+{% endblock %}

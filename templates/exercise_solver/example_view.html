@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('exercise_examples_list') }}">Exemples d'exercices</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ example.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">{{ example.title }}</h1>
+        <div>
+            <a href="{{ url_for('exercise_solver_form') }}" class="btn btn-primary">
+                <i class="fas fa-magic"></i> Résoudre un exercice similaire
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Catégorie</span>
+                            <span class="badge bg-secondary">{{ example.category|title }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Difficulté</span>
+                            <span class="badge bg-{{ 'primary' if example.difficulty <= 2 else ('warning' if example.difficulty <= 4 else 'danger') }}">
+                                {% set difficulty_labels = ['Très facile', 'Facile', 'Moyen', 'Difficile', 'Très difficile'] %}
+                                {{ difficulty_labels[example.difficulty - 1] }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Ajouté par</span>
+                            <span>{{ example.user.username }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Date</span>
+                            <span>{{ example.upload_date.strftime('%d/%m/%Y') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Fichier</span>
+                            <a href="{{ url_for('static', filename='examples/' + example.filename) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-file-pdf"></i> Voir PDF
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Énoncé de l'exercice</h5>
+                </div>
+                <div class="card-body">
+                    {% if example.problem_text %}
+                        <div class="problem-text">
+                            {% for paragraph in example.problem_text.split('\n\n') %}
+                                <p>{{ paragraph }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Le texte de l'énoncé n'a pas pu être extrait du PDF.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Solution de l'exercice</h5>
+                </div>
+                <div class="card-body">
+                    {% if example.solution_text %}
+                        <div class="solution-text">
+                            {% for paragraph in example.solution_text.split('\n\n') %}
+                                <p>{{ paragraph }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Le texte de la solution n'a pas pu être extrait du PDF.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('exercise_examples_list') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+{% endblock %}

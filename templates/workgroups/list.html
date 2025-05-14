@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Groupes de travail</h1>
+
+    <div class="row mb-4">
+        <div class="col">
+            <a href="{{ url_for('workgroup_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Nouveau groupe
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Mes groupes</h5>
+        </div>
+        <div class="card-body">
+            {% if owned_workgroups %}
+                <div class="list-group">
+                    {% for workgroup in owned_workgroups %}
+                        <a href="{{ url_for('workgroup_view', workgroup_id=workgroup.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ workgroup.name }} <span class="badge badge-secondary">Propriétaire</span></h5>
+                                <small>
+                                    {% if workgroup.is_private %}
+                                        <i class="fas fa-lock text-muted" title="Groupe privé"></i>
+                                    {% else %}
+                                        <i class="fas fa-globe text-muted" title="Groupe public"></i>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <p class="mb-1">{{ workgroup.description }}</p>
+                            <small>{{ workgroup.members|length }} membres · Créé le {{ workgroup.created_at.strftime('%d/%m/%Y') }}</small>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Vous n'avez créé aucun groupe de travail.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if member_workgroups %}
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Groupes auxquels je participe</h5>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for workgroup in member_workgroups %}
+                    {% if workgroup not in owned_workgroups %}
+                        <a href="{{ url_for('workgroup_view', workgroup_id=workgroup.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ workgroup.name }} 
+                                    <span class="badge badge-info">Membre</span>
+                                </h5>
+                                <small>
+                                    {% if workgroup.is_private %}
+                                        <i class="fas fa-lock text-muted" title="Groupe privé"></i>
+                                    {% else %}
+                                        <i class="fas fa-globe text-muted" title="Groupe public"></i>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <p class="mb-1">{{ workgroup.description }}</p>
+                            <small>{{ workgroup.members|length }} membres · Propriétaire: {{ workgroup.owner.username }}</small>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Groupes publics</h5>
+        </div>
+        <div class="card-body">
+            {% if public_workgroups %}
+                <div class="list-group">
+                    {% for workgroup in public_workgroups %}
+                        <a href="{{ url_for('workgroup_view', workgroup_id=workgroup.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ workgroup.name }}</h5>
+                                <small>
+                                    <i class="fas fa-globe text-muted" title="Groupe public"></i>
+                                </small>
+                            </div>
+                            <p class="mb-1">{{ workgroup.description }}</p>
+                            <small>{{ workgroup.members|length }} membres · Créé le {{ workgroup.created_at.strftime('%d/%m/%Y') }}</small>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Aucun groupe public disponible.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

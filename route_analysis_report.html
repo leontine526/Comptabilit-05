@@ -1,0 +1,85 @@
+
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rapport d'Analyse des Routes</title>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+            h1, h2, h3 { color: #333; }
+            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            .issue { color: #d9534f; }
+            .warning { color: #f0ad4e; }
+            .info { color: #5bc0de; }
+            .success { color: #5cb85c; }
+        </style>
+    </head>
+    <body>
+        <h1>Rapport d'Analyse des Routes</h1>
+        <p>Généré le 2025-05-06 00:19:49</p>
+        <h2>Résumé</h2>
+        <table>
+            <tr>
+                <th>Catégorie</th>
+                <th>Nombre</th>
+            </tr>
+            <tr>
+                <td>Nombre total de routes</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Routes sans protection d'authentification</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Routes avec opérations de base de données</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Routes nécessitant une validation de paramètres</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Routes avec chemins dupliqués</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Routes complexes (3+ paramètres)</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Routes avec risques de sécurité potentiels</td>
+                <td>0</td>
+            </tr>
+        </table>
+        
+        <h2>Liste complète des routes</h2>
+        <table>
+            <tr>
+                <th>Endpoint</th>
+                <th>Chemin</th>
+                <th>Méthodes</th>
+                <th>Paramètres</th>
+                <th>Risques potentiels</th>
+            </tr>
+    
+        </table>
+        
+        <h2>Recommandations</h2>
+        <ol>
+            <li>Vérifiez que toutes les routes non-publiques sont protégées par une authentification</li>
+            <li>Ajoutez une validation des paramètres pour les routes qui en ont besoin</li>
+            <li>Utilisez des transactions pour les opérations DB critiques</li>
+            <li>Évitez les routes trop complexes avec de nombreux paramètres</li>
+            <li>Vérifiez les routes avec chemins dupliqués pour éviter les conflits</li>
+            <li>Implémentez une gestion d'erreur robuste pour toutes les routes</li>
+            <li>Ajoutez une protection CSRF pour les routes qui modifient des données</li>
+            <li>Implémentez une limitation de taux (rate limiting) pour les routes sensibles</li>
+        </ol>
+    </body>
+    </html>
+    

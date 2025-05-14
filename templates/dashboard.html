@@ -1,0 +1,527 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="welcome-text">
+            <h1>Tableau de bord</h1>
+            <p class="lead">Bienvenue, {{ current_user.full_name }} 👋</p>
+        </div>
+        
+        <!-- Stats Summary -->
+        <div class="data-summary">
+            <div class="data-card">
+                <i class="fas fa-book data-icon"></i>
+                <div class="data-label">Exercices</div>
+                <div class="data-value">{{ exercises|length }}</div>
+            </div>
+            
+            <div class="data-card">
+                <i class="fas fa-file-invoice data-icon"></i>
+                <div class="data-label">Transactions</div>
+                <div class="data-value">{{ recent_transactions|length }}</div>
+            </div>
+            
+            <div class="data-card">
+                <i class="fas fa-file-alt data-icon"></i>
+                <div class="data-label">Documents</div>
+                <div class="data-value">{{ recent_documents|length }}</div>
+            </div>
+            
+            <div class="data-card">
+                <i class="far fa-calendar-alt data-icon"></i>
+                <div class="data-label">Date</div>
+                <div class="data-value">{{ now.strftime('%d/%m/%Y') }}</div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Controls -->
+        <div class="dashboard-controls">
+            <button id="edit-dashboard-btn" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-edit me-1"></i>Personnaliser
+            </button>
+            <div class="add-widget-dropdown">
+                <button id="add-widget-btn" class="btn btn-primary btn-sm" style="display: none;">
+                    <i class="fas fa-plus me-1"></i>Ajouter un widget
+                </button>
+                <div id="add-widget-menu" class="add-widget-menu">
+                    <div class="add-widget-item" data-widget-type="exercises">
+                        <div class="add-widget-item-icon exercises">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="add-widget-item-text">
+                            <h4>Exercices récents</h4>
+                            <p>Vos exercices comptables les plus récents</p>
+                        </div>
+                    </div>
+                    <div class="add-widget-item" data-widget-type="transactions">
+                        <div class="add-widget-item-icon transactions">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="add-widget-item-text">
+                            <h4>Transactions récentes</h4>
+                            <p>Vos dernières transactions enregistrées</p>
+                        </div>
+                    </div>
+                    <div class="add-widget-item" data-widget-type="documents">
+                        <div class="add-widget-item-icon documents">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="add-widget-item-text">
+                            <h4>Documents récents</h4>
+                            <p>Vos documents récemment téléchargés</p>
+                        </div>
+                    </div>
+                    <div class="add-widget-item" data-widget-type="workgroups">
+                        <div class="add-widget-item-icon workgroups">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="add-widget-item-text">
+                            <h4>Groupes de travail</h4>
+                            <p>Vos groupes de travail</p>
+                        </div>
+                    </div>
+                    <div class="add-widget-item" data-widget-type="notifications">
+                        <div class="add-widget-item-icon notifications">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="add-widget-item-text">
+                            <h4>Notifications</h4>
+                            <p>Vos notifications récentes</p>
+                        </div>
+                    </div>
+                    <div class="add-widget-item" data-widget-type="tools">
+                        <div class="add-widget-item-icon tools">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="add-widget-item-text">
+                            <h4>Outils et ressources</h4>
+                            <p>Accès rapide aux principaux outils</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="save-dashboard-btn" class="btn btn-success btn-sm ms-2" style="display: none;">
+                <i class="fas fa-save me-1"></i>Enregistrer
+            </button>
+            <button id="cancel-dashboard-btn" class="btn btn-outline-secondary btn-sm ms-2" style="display: none;">
+                <i class="fas fa-times me-1"></i>Annuler
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Left Column: Exercises and Documents -->
+        <div class="col-lg-5 mb-4">
+            <!-- Recent Exercises -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-book"></i>Exercices récents</h5>
+                    <a href="{{ url_for('exercises_list') }}" class="btn btn-sm btn-outline-primary">Voir tous</a>
+                </div>
+                <div class="card-body">
+                    {% if exercises %}
+                        <div class="dashboard-list-group">
+                            {% for exercise in exercises %}
+                                <a href="{{ url_for('transactions_list', exercise_id=exercise.id) }}" class="list-group-item dashboard-list-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6>{{ exercise.name }}</h6>
+                                        <small>{{ exercise.start_date.strftime('%d/%m/%Y') }} - {{ exercise.end_date.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                    <small class="text-secondary">{{ exercise.description[:80] + '...' if exercise.description and exercise.description|length > 80 else exercise.description }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-book empty-state-icon"></i>
+                            <p>Vous n'avez aucun exercice comptable.</p>
+                            <a href="{{ url_for('exercise_new') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Créer un exercice
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Recent Documents -->
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-file-alt"></i>Documents récents</h5>
+                    {% if exercises %}
+                        <a href="{{ url_for('documents_list', exercise_id=exercises[0].id) }}" class="btn btn-sm btn-outline-primary">Voir tous</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if recent_documents %}
+                        <div class="table-responsive">
+                            <table class="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Document</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for document in recent_documents %}
+                                        <tr>
+                                            <td>
+                                                <div class="transaction-ref">{{ document.original_filename|truncate(30) }}</div>
+                                                <div class="transaction-desc">
+                                                    {% if document.document_type == 'invoice' %}
+                                                        <span class="badge bg-primary">Facture</span>
+                                                    {% elif document.document_type == 'receipt' %}
+                                                        <span class="badge bg-success">Reçu</span>
+                                                    {% elif document.document_type == 'statement' %}
+                                                        <span class="badge bg-info">Relevé</span>
+                                                    {% elif document.document_type == 'contract' %}
+                                                        <span class="badge bg-warning">Contrat</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Autre</span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="transaction-date">{{ document.upload_date.strftime('%d/%m/%Y') }}</div>
+                                            </td>
+                                            <td>
+                                                {% if document.processed %}
+                                                    <span class="status-badge confirmed">
+                                                        <i class="fas fa-check-circle"></i>Traité
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-badge draft">
+                                                        <i class="fas fa-clock"></i>En attente
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('document_view', document_id=document.id) }}" class="action-btn view" title="Voir le document">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ url_for('document_download', document_id=document.id) }}" class="action-btn edit" title="Télécharger">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-file-upload empty-state-icon"></i>
+                            <p>Aucun document téléchargé.</p>
+                            {% if exercises %}
+                                <a href="{{ url_for('document_upload', exercise_id=exercises[0].id) }}" class="btn btn-primary">
+                                    <i class="fas fa-upload me-2"></i>Télécharger un document
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('exercise_new') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Créer un exercice
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Transactions and Activity -->
+        <div class="col-lg-7 mb-4">
+            <!-- Quick Stats -->
+            <div class="row stats-row">
+                <div class="col-md-6 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-balance-scale stat-icon"></i>
+                        <div class="stat-value">{{ exercises|length }}</div>
+                        <div class="stat-label">Exercices comptables</div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-calculator stat-icon"></i>
+                        <div class="stat-value">{{ recent_transactions|length }}</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-file-invoice-dollar stat-icon"></i>
+                        <div class="stat-value">{{ recent_documents|length }}</div>
+                        <div class="stat-label">Documents</div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line stat-icon"></i>
+                        <div class="stat-value">OHADA</div>
+                        <div class="stat-label">Norme comptable</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Transactions -->
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-file-invoice"></i>Transactions récentes</h5>
+                    {% if exercises %}
+                        <a href="{{ url_for('transactions_list', exercise_id=exercises[0].id) }}" class="btn btn-sm btn-outline-primary">Voir toutes</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if recent_transactions %}
+                        <div class="table-responsive">
+                            <table class="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Référence</th>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in recent_transactions %}
+                                        <tr>
+                                            <td>
+                                                <div class="transaction-ref">{{ transaction.reference }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="transaction-date">{{ transaction.transaction_date.strftime('%d/%m/%Y') }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="transaction-desc">{{ transaction.description }}</div>
+                                            </td>
+                                            <td>
+                                                {% if transaction.is_posted %}
+                                                    <span class="status-badge confirmed">
+                                                        <i class="fas fa-check-circle"></i>Comptabilisé
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-badge draft">
+                                                        <i class="fas fa-pencil-alt"></i>Brouillon
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('transaction_view', transaction_id=transaction.id) }}" class="action-btn view" title="Voir la transaction">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ url_for('transaction_edit', transaction_id=transaction.id) }}" class="action-btn edit" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-file-invoice empty-state-icon"></i>
+                            <p>
+                                {% if exercises %}
+                                    Aucune transaction pour cet exercice.
+                                {% else %}
+                                    Créez d'abord un exercice pour ajouter des transactions.
+                                {% endif %}
+                            </p>
+                            {% if exercises %}
+                                <a href="{{ url_for('transaction_new', exercise_id=exercises[0].id) }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Créer une transaction
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('exercise_new') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Créer un exercice
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Collaboration Section -->
+    <div class="row mb-4">
+        <!-- Workgroups -->
+        <div class="col-lg-6 mb-4">
+            <div class="dashboard-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-users me-2"></i>Mes groupes de travail</h5>
+                    <a href="{{ url_for('workgroups_list') }}" class="btn btn-sm btn-outline-primary">Voir tous</a>
+                </div>
+                <div class="card-body">
+                    {% if current_user.workgroups %}
+                        <div class="dashboard-list-group">
+                            {% for workgroup in current_user.workgroups[:3] %}
+                                <a href="{{ url_for('workgroup_view', workgroup_id=workgroup.id) }}" class="list-group-item dashboard-list-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            {{ workgroup.name }}
+                                            {% if workgroup.owner_id == current_user.id %}
+                                                <span class="ms-2 badge bg-warning text-dark">
+                                                    <i class="fas fa-crown me-1"></i>Admin
+                                                </span>
+                                            {% endif %}
+                                        </h6>
+                                        <small>
+                                            <i class="fas fa-users me-1"></i>{{ workgroup.members|length }}
+                                        </small>
+                                    </div>
+                                    <small class="text-secondary">
+                                        {{ workgroup.description[:50] + '...' if workgroup.description and workgroup.description|length > 50 else workgroup.description }}
+                                    </small>
+                                </a>
+                            {% endfor %}
+                            
+                            {% set workgroups_count = current_user.workgroups.count() %}
+                            {% if workgroups_count > 3 %}
+                                <div class="text-center mt-3">
+                                    <a href="{{ url_for('workgroups_list') }}" class="btn btn-sm btn-outline-primary">
+                                        Voir les {{ workgroups_count - 3 }} autres groupes
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-users empty-state-icon"></i>
+                            <p>Vous n'êtes membre d'aucun groupe de travail.</p>
+                            <a href="{{ url_for('workgroup_new') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Créer un groupe
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notifications -->
+        <div class="col-lg-6 mb-4">
+            <div class="dashboard-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-bell me-2"></i>Notifications</h5>
+                    <a href="{{ url_for('notifications_list') }}" class="btn btn-sm btn-outline-primary">Voir toutes</a>
+                </div>
+                <div class="card-body">
+                    {% if current_user.notifications %}
+                        <div class="dashboard-list-group">
+                            {% for notification in current_user.notifications[:5] %}
+                                <a href="{{ notification.source_url or url_for('notifications_list') }}" class="list-group-item dashboard-list-item {% if not notification.is_read %}bg-primary bg-opacity-10{% endif %}">
+                                    <div class="d-flex align-items-start">
+                                        <div class="me-3">
+                                            {% if notification.notification_type == 'message' %}
+                                                <i class="fas fa-comment text-primary"></i>
+                                            {% elif notification.notification_type == 'invite' %}
+                                                <i class="fas fa-user-plus text-success"></i>
+                                            {% elif notification.notification_type == 'share' %}
+                                                <i class="fas fa-share-alt text-info"></i>
+                                            {% elif notification.notification_type == 'note' %}
+                                                <i class="fas fa-sticky-note text-warning"></i>
+                                            {% else %}
+                                                <i class="fas fa-bell text-secondary"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1">{{ notification.title }}</h6>
+                                                <small>{{ notification.created_at.strftime('%d/%m/%Y') }}</small>
+                                            </div>
+                                            <p class="mb-1 small">{{ notification.content }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash empty-state-icon"></i>
+                            <p>Aucune notification pour le moment.</p>
+                            <p class="text-muted">Les notifications apparaîtront ici lorsque vous recevrez des messages, invitations ou partages d'exercices.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Additional Resources and Tools -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i>Outils et ressources</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-4 mb-md-0">
+                            <div class="text-center">
+                                <div class="feature-icon mx-auto mb-3">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <h5 class="mb-2">Traitement de texte</h5>
+                                <p class="text-muted mb-3">Analysez et résumez vos documents textuels.</p>
+                                <a href="{{ url_for('text_processing') }}" class="btn btn-sm btn-primary">Accéder</a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4 mb-md-0">
+                            <div class="text-center">
+                                <div class="feature-icon mx-auto mb-3">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <h5 class="mb-2">Résolution d'exercices</h5>
+                                <p class="text-muted mb-3">Résolvez des exercices comptables automatiquement.</p>
+                                <a href="{{ url_for('exercise_solver_form') }}" class="btn btn-sm btn-primary">Essayer</a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4 mb-md-0">
+                            <div class="text-center">
+                                <div class="feature-icon mx-auto mb-3">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <h5 class="mb-2">Rapports financiers</h5>
+                                <p class="text-muted mb-3">Générez des rapports financiers détaillés.</p>
+                                {% if exercises %}
+                                    <a href="#" class="btn btn-sm btn-primary">Générer</a>
+                                {% else %}
+                                    <a href="{{ url_for('exercise_new') }}" class="btn btn-sm btn-primary">Créer un exercice</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="feature-icon mx-auto mb-3">
+                                    <i class="fas fa-file-upload"></i>
+                                </div>
+                                <h5 class="mb-2">Traitement de documents</h5>
+                                <p class="text-muted mb-3">Extraire les données comptables automatiquement.</p>
+                                {% if exercises %}
+                                    <a href="{{ url_for('document_upload', exercise_id=exercises[0].id) }}" class="btn btn-sm btn-primary">Télécharger</a>
+                                {% else %}
+                                    <a href="{{ url_for('exercise_new') }}" class="btn btn-sm btn-primary">Créer un exercice</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Get current date for display in the dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        // This is where we would add JavaScript for charts or interactive elements
+    });
+</script>
+{% endblock %}
