@@ -29,4 +29,9 @@ dependencies = [
     "slack-sdk>=3.35.0",
     "flask-socketio>=5.5.1",
     "eventlet>=0.39.1",
+    "fitz",
+    "jinja2",
+    "scipy",
+    "werkzeug",
+    "wtforms",
 ]
