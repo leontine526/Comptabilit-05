@@ -1,0 +1,67 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Résoudre un Exercice Comptable</h1>
+    <form method="POST" action="{{ url_for('resoudre_exercice') }}">
+        <div class="form-group">
+            <label for="texte">Description de l'opération :</label>
+            <input type="text" name="texte" id="texte" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="montant_ht">Montant HT :</label>
+            <input type="number" name="montant_ht" id="montant_ht" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="taux_tva">Taux TVA (%) :</label>
+            <input type="number" name="taux_tva" id="taux_tva" class="form-control" value="16">
+        </div>
+        <div class="form-group">
+            <label for="date_op">Date de l'opération :</label>
+            <input type="date" name="date_op" id="date_op" class="form-control" required>
+        </div>
+        <button type="button" class="btn btn-secondary mt-3" onclick="addOperation()">Ajouter une opération</button>
+
+        <hr>
+        <h3>Opérations à saisir :</h3>
+        <div id="operations-list">
+            <!-- Les opérations ajoutées apparaîtront ici -->
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Soumettre les opérations</button>
+    </form>
+</div>
+
+<script>
+let operationIndex = 0;
+
+function addOperation() {
+    const texte = document.getElementById('texte').value;
+    const montant = document.getElementById('montant_ht').value;
+    const tauxTva = document.getElementById('taux_tva').value;
+    const dateOp = document.getElementById('date_op').value;
+
+    if (texte && montant && dateOp) {
+        const div = document.createElement('div');
+        div.classList.add('operation-item', 'card', 'mb-3', 'p-3');
+        div.innerHTML = `
+            <input type="hidden" name="texte" value="${texte}">
+            <input type="hidden" name="montant_ht" value="${montant}">
+            <input type="hidden" name="taux_tva" value="${tauxTva}">
+            <input type="hidden" name="date_op" value="${dateOp}">
+            <p class="mb-0">Opération ${operationIndex + 1}: ${texte} | Montant HT: ${montant} | TVA: ${tauxTva}% | Date: ${dateOp}</p>
+        `;
+        document.getElementById('operations-list').appendChild(div);
+        operationIndex++;
+        
+        // Réinitialiser les champs
+        document.getElementById('texte').value = '';
+        document.getElementById('montant_ht').value = '';
+        document.getElementById('date_op').value = '';
+    } else {
+        alert("Tous les champs doivent être remplis !");
+    }
+}
+</script>
+{% endblock %}
