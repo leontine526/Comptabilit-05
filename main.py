@@ -76,18 +76,16 @@ if __name__ == '__main__':
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
-    # Initialiser la base de données
+    # Initialiser la base de données une seule fois
     try:
         from db_initialize import initialize_database
         with app.app_context():
-            from db_helper import check_db_connection
-            if not check_db_connection():
-                logger.error("Impossible de se connecter à la base de données. Vérifiez les paramètres de connexion.")
-
-            if initialize_database():
-                logger.info("Base de données initialisée avec succès")
-            else:
-                logger.warning("Problème lors de l'initialisation de la base de données")
+            if not hasattr(app, 'db_initialized'):
+                if initialize_database():
+                    app.db_initialized = True
+                    logger.info("Base de données initialisée avec succès")
+                else:
+                    logger.warning("Problème lors de l'initialisation de la base de données")
     except ImportError:
         logger.warning("Module db_initialize introuvable")
     except Exception as e:

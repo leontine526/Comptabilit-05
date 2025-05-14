@@ -100,16 +100,6 @@ def load_user(user_id):
         logger.error(f"Erreur lors du chargement de l'utilisateur: {str(e)}")
         return None
 
-# Créer les tables de la base de données
-with app.app_context():
-    try:
-        # Importer tous les modèles
-        from models import User, Exercise, Account, Transaction, TransactionItem, Document, Workgroup, Message
-        
-        # Créer les tables
-        db.create_all()
-        logger.info("Tables de base de données créées avec succès")
-    except Exception as e:
-        logger.error(f"Erreur lors de la création des tables: {str(e)}")
+# Les tables seront créées dans db_initialize.py
 
 # Pas besoin d'importer routes ici, cela sera fait dans main.py
