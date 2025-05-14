@@ -8,6 +8,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
+from ecriture_generator import ComptableIA
+
+compta = ComptableIA()
 
 from app import app, db, socketio
 from db_helper import safe_db_operation, init_db_connection
@@ -46,6 +49,36 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html', title="À propos")
+
+@app.route('/resoudre-exercice', methods=['GET', 'POST'])
+@login_required
+def resoudre_exercice():
+    if request.method == 'POST':
+        operations = []
+        
+        textes = request.form.getlist('texte')
+        montants = request.form.getlist('montant_ht')
+        dates = request.form.getlist('date_op')
+        taux_tva = request.form.getlist('taux_tva')
+        
+        for i in range(len(textes)):
+            operations.append({
+                "texte": textes[i],
+                "montant_ht": float(montants[i]),
+                "taux_tva": float(taux_tva[i]) if taux_tva[i] else 0,
+                "date_op": dates[i]
+            })
+            
+        resultat = compta.generer_journal_complet(operations)
+        
+        return render_template(
+            'resultats.html',
+            journal=resultat['journal'],
+            grand_livre=resultat['grand_livre'],
+            bilan=resultat['bilan']
+        )
+        
+    return render_template('formulaire.html')
 
 # Text processing route
 @app.route('/text-processing', methods=['GET', 'POST'])
