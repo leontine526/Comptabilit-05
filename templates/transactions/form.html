@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block styles %}
@@ -94,13 +95,6 @@
                     <div class="form-check">
                         {{ form.is_posted(class="form-check-input") }}
                         {{ form.is_posted.label(class="form-check-label") }}
-                        {% if form.is_posted.errors %}
-                            <div class="text-danger">
-                                {% for error in form.is_posted.errors %}
-                                    <small>{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -162,24 +156,17 @@
             <div class="transaction-items" id="items-container">
                 {% for item_form in form.items %}
                     <div class="transaction-item">
-                        {{ item_form.id }}
+                        {{ item_form.form.id }}
                         <button type="button" class="btn btn-sm btn-outline-danger remove-item">
                             <i class="fas fa-times"></i>
                         </button>
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                {{ item_form.account_id.label(class="form-label") }}
-                                <select name="{{ item_form.account_id.name }}" id="{{ item_form.account_id.id }}" class="form-select bg-dark text-light account-select">
-                                    <option value="">-- Sélectionnez un compte --</option>
-                                    {% for account in accounts %}
-                                        <option value="{{ account.id }}" {{ 'selected' if item_form.account_id.data == account.id else '' }}>
-                                            {{ account.account_number }} - {{ account.name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                {% if item_form.account_id.errors %}
+                                {{ item_form.form.account_id.label(class="form-label") }}
+                                {{ item_form.form.account_id(class="form-select bg-dark text-light account-select") }}
+                                {% if item_form.form.account_id.errors %}
                                     <div class="text-danger">
-                                        {% for error in item_form.account_id.errors %}
+                                        {% for error in item_form.form.account_id.errors %}
                                             <small>{{ error }}</small>
                                         {% endfor %}
                                     </div>
@@ -189,11 +176,11 @@
                         
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                {{ item_form.description.label(class="form-label") }}
-                                {{ item_form.description(class="form-control bg-dark text-light") }}
-                                {% if item_form.description.errors %}
+                                {{ item_form.form.description.label(class="form-label") }}
+                                {{ item_form.form.description(class="form-control bg-dark text-light") }}
+                                {% if item_form.form.description.errors %}
                                     <div class="text-danger">
-                                        {% for error in item_form.description.errors %}
+                                        {% for error in item_form.form.description.errors %}
                                             <small>{{ error }}</small>
                                         {% endfor %}
                                     </div>
@@ -203,28 +190,28 @@
                         
                         <div class="row">
                             <div class="col-md-6">
-                                {{ item_form.debit_amount.label(class="form-label") }}
+                                {{ item_form.form.debit_amount.label(class="form-label") }}
                                 <div class="input-group">
-                                    {{ item_form.debit_amount(class="form-control bg-dark text-light debit-amount") }}
+                                    {{ item_form.form.debit_amount(class="form-control bg-dark text-light debit-amount") }}
                                     <span class="input-group-text">XAF</span>
                                 </div>
-                                {% if item_form.debit_amount.errors %}
+                                {% if item_form.form.debit_amount.errors %}
                                     <div class="text-danger">
-                                        {% for error in item_form.debit_amount.errors %}
+                                        {% for error in item_form.form.debit_amount.errors %}
                                             <small>{{ error }}</small>
                                         {% endfor %}
                                     </div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
-                                {{ item_form.credit_amount.label(class="form-label") }}
+                                {{ item_form.form.credit_amount.label(class="form-label") }}
                                 <div class="input-group">
-                                    {{ item_form.credit_amount(class="form-control bg-dark text-light credit-amount") }}
+                                    {{ item_form.form.credit_amount(class="form-control bg-dark text-light credit-amount") }}
                                     <span class="input-group-text">XAF</span>
                                 </div>
-                                {% if item_form.credit_amount.errors %}
+                                {% if item_form.form.credit_amount.errors %}
                                     <div class="text-danger">
-                                        {% for error in item_form.credit_amount.errors %}
+                                        {% for error in item_form.form.credit_amount.errors %}
                                             <small>{{ error }}</small>
                                         {% endfor %}
                                     </div>
@@ -241,122 +228,108 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Calculate totals
-        function calculateTotals() {
-            let totalDebit = 0;
-            let totalCredit = 0;
-            
-            // Add up all debit and credit amounts
-            document.querySelectorAll('.debit-amount').forEach(function(input) {
-                const value = parseFloat(input.value) || 0;
-                totalDebit += value;
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('transactionForm');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const itemsContainer = document.getElementById('items-container');
+    
+    // Remove item handler
+    function setupRemoveButtons() {
+        document.querySelectorAll('.remove-item').forEach(button => {
+            button.addEventListener('click', function() {
+                const items = document.querySelectorAll('.transaction-item');
+                if (items.length <= 2) {
+                    alert('Une écriture doit contenir au moins deux lignes');
+                    return;
+                }
+                this.closest('.transaction-item').remove();
+                updateTotals();
             });
-            
-            document.querySelectorAll('.credit-amount').forEach(function(input) {
-                const value = parseFloat(input.value) || 0;
-                totalCredit += value;
-            });
-            
-            // Update totals display
-            document.getElementById('totalDebit').value = totalDebit.toFixed(2);
-            document.getElementById('totalCredit').value = totalCredit.toFixed(2);
-            
-            // Calculate balance
-            const balance = Math.abs(totalDebit - totalCredit);
-            document.getElementById('balance').value = balance.toFixed(2);
-            
-            // Update balance status
-            const balanceStatus = document.getElementById('balanceStatus');
-            if (balance < 0.01) {
-                balanceStatus.innerHTML = '<span class="badge bg-success">Équilibrée</span>';
-            } else {
-                balanceStatus.innerHTML = '<span class="badge bg-danger">Non équilibrée</span>';
-            }
-        }
+        });
+    }
+    
+    // Update totals
+    function updateTotals() {
+        let totalDebit = 0;
+        let totalCredit = 0;
         
-        // Remove transaction item
-        function setupRemoveButtons() {
-            document.querySelectorAll('.remove-item').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    // Don't remove if there are only 2 items left
-                    const items = document.querySelectorAll('.transaction-item');
-                    if (items.length <= 2) {
-                        alert('Une écriture doit contenir au moins deux lignes');
-                        return;
+        document.querySelectorAll('.debit-amount').forEach(input => {
+            totalDebit += parseFloat(input.value) || 0;
+        });
+        
+        document.querySelectorAll('.credit-amount').forEach(input => {
+            totalCredit += parseFloat(input.value) || 0;
+        });
+        
+        document.getElementById('totalDebit').value = totalDebit.toFixed(2);
+        document.getElementById('totalCredit').value = totalCredit.toFixed(2);
+        
+        const balance = Math.abs(totalDebit - totalCredit);
+        document.getElementById('balance').value = balance.toFixed(2);
+        
+        const balanceStatus = document.getElementById('balanceStatus');
+        if (balance < 0.01) {
+            balanceStatus.innerHTML = '<span class="badge bg-success">Équilibrée</span>';
+        } else {
+            balanceStatus.innerHTML = '<span class="badge bg-danger">Non équilibrée</span>';
+        }
+    }
+    
+    // Setup amount input handlers
+    function setupAmountInputs() {
+        document.querySelectorAll('.debit-amount, .credit-amount').forEach(input => {
+            input.addEventListener('input', function() {
+                if (parseFloat(this.value) > 0) {
+                    const item = this.closest('.transaction-item');
+                    if (this.classList.contains('debit-amount')) {
+                        item.querySelector('.credit-amount').value = '';
+                    } else {
+                        item.querySelector('.debit-amount').value = '';
                     }
-                    
-                    this.closest('.transaction-item').remove();
-                    calculateTotals();
-                });
+                }
+                updateTotals();
             });
-        }
-        
-        // Add new transaction item
-        document.getElementById('addItemBtn').addEventListener('click', function() {
-            const container = document.getElementById('items-container');
+        });
+    }
+    
+    // Initial setup
+    setupRemoveButtons();
+    setupAmountInputs();
+    updateTotals();
+    
+    // Add new item handler
+    if (addItemBtn) {
+        addItemBtn.addEventListener('click', function() {
             const items = document.querySelectorAll('.transaction-item');
             const lastItem = items[items.length - 1];
-            
-            // Clone the last item
             const newItem = lastItem.cloneNode(true);
             
-            // Update IDs and names
-            const index = items.length;
-            const inputs = newItem.querySelectorAll('input, select');
-            inputs.forEach(function(input) {
-                const name = input.getAttribute('name');
-                const id = input.getAttribute('id');
-                
-                if (name) {
-                    const newName = name.replace(/items-\d+/, `items-${index}`);
-                    input.setAttribute('name', newName);
-                }
-                
-                if (id) {
-                    const newId = id.replace(/items-\d+/, `items-${index}`);
-                    input.setAttribute('id', newId);
-                }
-                
-                // Clear values
-                if (input.type !== 'hidden' || input.id.includes('id')) {
+            // Clear values
+            newItem.querySelectorAll('input').forEach(input => {
+                if (input.type !== 'hidden') {
                     input.value = '';
                 }
             });
             
-            // Add the new item to the container
-            container.appendChild(newItem);
-            
-            // Setup event listeners
-            setupInputListeners();
-            setupRemoveButtons();
-            calculateTotals();
-        });
-        
-        // Setup input listeners for amounts
-        function setupInputListeners() {
-            document.querySelectorAll('.debit-amount, .credit-amount').forEach(function(input) {
-                input.addEventListener('input', function() {
-                    calculateTotals();
-                    
-                    // If one side has a value, clear the other side
-                    const parent = this.closest('.transaction-item');
-                    const debitInput = parent.querySelector('.debit-amount');
-                    const creditInput = parent.querySelector('.credit-amount');
-                    
-                    if (this.classList.contains('debit-amount') && parseFloat(this.value) > 0) {
-                        creditInput.value = '';
-                    } else if (this.classList.contains('credit-amount') && parseFloat(this.value) > 0) {
-                        debitInput.value = '';
-                    }
-                });
+            newItem.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
             });
+            
+            itemsContainer.appendChild(newItem);
+            setupRemoveButtons();
+            setupAmountInputs();
+            updateTotals();
+        });
+    }
+    
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        const balance = parseFloat(document.getElementById('balance').value);
+        if (document.getElementById('is_posted').checked && balance > 0.01) {
+            e.preventDefault();
+            alert('L\'écriture doit être équilibrée pour être comptabilisée');
         }
-        
-        // Initial setup
-        setupRemoveButtons();
-        setupInputListeners();
-        calculateTotals();
     });
+});
 </script>
 {% endblock %}
