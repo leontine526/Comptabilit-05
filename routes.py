@@ -1091,12 +1091,15 @@ def workgroups_list():
         
         # Utilisation de safe_db_operation pour cette requête plus complexe
         # qui pourrait causer des problèmes
-        @safe_db_operation
         def get_public_workgroups():
-            return Workgroup.query.filter(
-                Workgroup.is_private == False,
-                ~Workgroup.id.in_(member_workgroup_ids) if member_workgroup_ids else True
-            ).all()
+            try:
+                return Workgroup.query.filter(
+                    Workgroup.is_private == False,
+                    ~Workgroup.id.in_(member_workgroup_ids) if member_workgroup_ids else True
+                ).all()
+            except Exception as e:
+                logger.error(f"Erreur lors de la récupération des groupes publics: {str(e)}")
+                return []
         
         public_workgroups = get_public_workgroups() or []
         
