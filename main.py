@@ -59,7 +59,6 @@ except Exception as e:
 
 # Importer toutes les routes nécessaires
 from routes import routes
-from routes_social import *
 app.register_blueprint(routes)
 logger.info("Routes chargées avec succès")
 

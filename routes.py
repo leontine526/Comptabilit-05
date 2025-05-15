@@ -17,6 +17,9 @@ from db_helper import safe_db_operation, init_db_connection
 from models import User, Exercise, Account, Transaction, TransactionItem, Document, ExerciseExample, ExerciseSolution, Workgroup, Message, Note, Notification, Post, Comment, Like
 
 # Import des routes sociales
+from flask import Blueprint
+routes = Blueprint('routes', __name__)
+
 from routes_social import *
 from forms import (
     LoginForm, RegistrationForm, ProfileForm, ExerciseForm, AccountForm, 
