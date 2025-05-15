@@ -288,19 +288,24 @@ def exercise_new():
     form = ExerciseForm()
     
     if form.validate_on_submit():
-        exercise = Exercise(
-            name=form.name.data,
-            start_date=form.start_date.data,
-            end_date=form.end_date.data,
-            description=form.description.data,
-            user_id=current_user.id
-        )
-        
-        db.session.add(exercise)
-        db.session.commit()
-        
-        flash('Exercice créé avec succès!', 'success')
-        return redirect(url_for('exercises_list'))
+        try:
+            exercise = Exercise(
+                name=form.name.data,
+                start_date=form.start_date.data,
+                end_date=form.end_date.data,
+                description=form.description.data,
+                user_id=current_user.id
+            )
+            
+            db.session.add(exercise)
+            db.session.commit()
+            
+            flash('Exercice créé avec succès!', 'success')
+            return redirect(url_for('exercises_list'))
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Erreur lors de la création de l'exercice: {str(e)}")
+            flash('Une erreur est survenue lors de la création de l\'exercice.', 'danger')
     
     return render_template('exercises/form.html', title='Nouvel exercice', form=form)
 
