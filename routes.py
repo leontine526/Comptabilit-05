@@ -835,8 +835,7 @@ def document_download(document_id):
     if exercise.user_id != current_user.id:
         abort(403)
 
-    return send_file(document.filename, as_attachment=True, download_name=```python
-document.original_filename)
+    return send_file(document.filename, as_attachment=True, download_name=document.original_filename)
 
 @app.route('/documents/<int:document_id>/delete', methods=['POST'])
 @login_required
