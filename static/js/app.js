@@ -22,11 +22,31 @@ function toggleLoadingSpinner(show) {
     document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
 }
 
-// Intercepter tous les clics sur les liens
+// Intercepter tous les clics sur les liens et boutons
 document.addEventListener('click', function(e) {
-    const link = e.target.closest('a');
-    if (link && !link.hasAttribute('data-no-loading')) {
-        toggleLoadingSpinner(true);
+    const clickable = e.target.closest('a, button');
+    if (clickable && !clickable.hasAttribute('data-no-loading') && !clickable.classList.contains('btn-close')) {
+        if (!document.getElementById('loading-spinner')) {
+            const spinnerHtml = `
+                <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none;">
+                    <div class="d-flex flex-column align-items-center bg-dark bg-opacity-75 p-3 rounded">
+                        <div class="spinner-border text-light mb-2" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <div class="text-light">Chargement en cours...</div>
+                    </div>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', spinnerHtml);
+        }
+        document.getElementById('loading-spinner').style.display = 'block';
+    }
+});
+
+// Masquer le spinner une fois la page chargée
+window.addEventListener('load', function() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none';
     }
 });
 
