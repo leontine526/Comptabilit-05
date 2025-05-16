@@ -810,8 +810,17 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.5rem;
     height: 100%;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.5s ease-in-out;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    width: calc(100% - 2rem);
+    opacity: 1;
+}
+
+.testimonials-container {
+    position: relative;
+    height: 400px; /* Ajustez selon vos besoins */
+    margin-bottom: 2rem;
 }
 
 .testimonial-card:hover {

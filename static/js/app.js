@@ -75,11 +75,48 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser l'animation des témoignages
+    initTestimonialSlider();
+
     // Initialize Bootstrap tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function(tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    function initTestimonialSlider() {
+        const testimonials = document.querySelectorAll('.testimonial-card');
+        if (!testimonials.length) return;
+
+        let currentIndex = 0;
+        const duration = 5000; // 5 secondes par témoignage
+
+        // Cacher tous les témoignages sauf le premier
+        testimonials.forEach((testimonial, index) => {
+            if (index !== 0) {
+                testimonial.style.display = 'none';
+            }
+            testimonial.style.transition = 'opacity 0.5s ease-in-out';
+        });
+
+        // Fonction pour afficher le prochain témoignage
+        function showNextTestimonial() {
+            testimonials[currentIndex].style.opacity = '0';
+            
+            setTimeout(() => {
+                testimonials[currentIndex].style.display = 'none';
+                currentIndex = (currentIndex + 1) % testimonials.length;
+                testimonials[currentIndex].style.display = 'block';
+                
+                setTimeout(() => {
+                    testimonials[currentIndex].style.opacity = '1';
+                }, 50);
+            }, 500);
+        }
+
+        // Démarrer le défilement automatique
+        setInterval(showNextTestimonial, duration);
+    }
 
     // Initialize Bootstrap popovers
     const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
