@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     
     # Profile fields
     avatar = db.Column(db.String(255))  # Lien vers l'avatar ou le chemin du fichier
+    profile_picture = db.Column(db.String(255))  # Photo de profil de l'utilisateur
     bio = db.Column(db.Text)  # Courte biographie de l'utilisateur
     position = db.Column(db.String(100))  # Poste ou fonction
     company = db.Column(db.String(100))  # Entreprise

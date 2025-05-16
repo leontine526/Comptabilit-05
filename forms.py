@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, TextAreaField, SelectField, FileField, FloatField, IntegerField, HiddenField, SubmitField, DateField, DecimalField
+from wtforms import StringField, PasswordField, BooleanField, TextAreaField, SelectField, FileField, FloatField, IntegerField, HiddenField, SubmitField, DateField, DecimalField, EmailField
 from wtforms.fields import FormField, FieldList
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, ValidationError
 from flask_wtf.file import FileRequired, FileAllowed
@@ -38,7 +38,10 @@ class RegistrationForm(FlaskForm):
 class ProfileForm(FlaskForm):
     """Form for editing user profile"""
     full_name = StringField('Nom complet', validators=[DataRequired(), Length(max=100)])
-    email = StringField('Adresse email', validators=[DataRequired(), Email(), Length(max=120)])
+    email = EmailField('Email', validators=[DataRequired(), Email(), Length(max=120)])
+    profile_picture = FileField('Photo de profil', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images uniquement!')
+    ])
     current_password = PasswordField('Mot de passe actuel', validators=[Optional()])
     new_password = PasswordField('Nouveau mot de passe', validators=[Optional(), Length(min=8)])
     confirm_new_password = PasswordField('Confirmer le nouveau mot de passe', validators=[

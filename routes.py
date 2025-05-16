@@ -1667,4 +1667,4 @@ def search():
 
     if form.validate_on_submit() or request.args.get('query'):
         query = form.query.data if form.validate_on_submit() else request.args.get('query')
-        search_type = form.search_type.data if form.validate
+        search_type = form.search_type.data if form.validate_on_submit() else request.args.get('search_type', 'all')
