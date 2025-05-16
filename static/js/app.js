@@ -6,7 +6,34 @@
 // JavaScript principal pour l'application
 
 // Initialiser les composants Bootstrap comme l'accordéon pour la FAQ
+// Fonction pour afficher/masquer le spinner de chargement
+function toggleLoadingSpinner(show) {
+    const spinner = document.getElementById('loading-spinner');
+    if (!spinner) {
+        const spinnerHtml = `
+            <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <div class="mt-2 text-primary">Chargement en cours...</div>
+            </div>`;
+        document.body.insertAdjacentHTML('beforeend', spinnerHtml);
+    }
+    document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
+}
+
+// Intercepter tous les clics sur les liens
+document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && !link.hasAttribute('data-no-loading')) {
+        toggleLoadingSpinner(true);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Masquer le spinner au chargement initial
+    toggleLoadingSpinner(false);
+    
     // Initialiser tous les tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

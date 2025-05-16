@@ -1,3 +1,12 @@
+
+/* Styles pour le spinner de chargement */
+#loading-spinner {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+    border-radius: 1rem;
+    text-align: center;
+}
+
 /* Custom theme with professional color palette 
    Primary: #3a56b4 (Royal Blue)
    Secondary: #0f2147 (Dark Navy)
