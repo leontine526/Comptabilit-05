@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-gray-100 text-gray-800">
+  <!-- Bandeau de bienvenue après inscription -->
+  <section class="bg-indigo-100 border border-indigo-300 rounded-md mx-6 mt-6 p-4">
+    <h2 class="text-lg font-semibold text-indigo-700 mb-2">Bienvenue sur SmartOHADA !</h2>
+    <p class="mb-3">Choisissez une fonctionnalité pour commencer :</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      <!-- Carte Exercices -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-3">Exercices Comptables</h3>
+        <p class="text-gray-600 mb-4">Pratiquez et améliorez vos compétences en comptabilité OHADA</p>
+        <a href="{{ url_for('exercises_list') }}" class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
+          Commencer un exercice
+        </a>
+      </div>
+
+      <!-- Carte Communauté -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-3">Espace Communauté</h3>
+        <p class="text-gray-600 mb-4">Échangez avec d'autres professionnels de la comptabilité</p>
+        <a href="{{ url_for('workgroups_list') }}" class="inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700">
+          Rejoindre la communauté
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

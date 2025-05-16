@@ -53,6 +53,11 @@ def index():
 def about():
     return render_template('about.html', title="À propos")
 
+@app.route('/welcome')
+@login_required
+def welcome():
+    return render_template('welcome.html', title="Bienvenue")
+
 @app.route('/resoudre-exercice', methods=['GET', 'POST'])
 @login_required
 def resoudre_exercice():
@@ -123,7 +128,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             flash(f'Bienvenue, {user.full_name}!', 'success')
-            return redirect(next_page if next_page else url_for('dashboard'))
+            return redirect(next_page if next_page else url_for('welcome'))
         else:
             flash('Identifiant ou mot de passe incorrect.', 'danger')
 
