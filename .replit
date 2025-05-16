@@ -10,10 +10,20 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
+runButton = "Run"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
 author = 42275794
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
+
+[[workflows.workflow]]
+name = "Run"
+author = 42739427
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
