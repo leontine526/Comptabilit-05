@@ -32,7 +32,7 @@
                         <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
                             <i class="bi bi-person me-2"></i> Profil
                         </a>
-                        <a href="{{ url_for('workgroups') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('workgroups_list') }}" class="list-group-item list-group-item-action">
                             <i class="bi bi-people me-2"></i> Groupes de travail
                         </a>
                         <a href="{{ url_for('exercises_list') }}" class="list-group-item list-group-item-action">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Utilisateurs en ligne</h5>
@@ -59,7 +59,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Fil principal -->
         <div class="col-md-6">
             <!-- Formulaire de création de publication -->
@@ -91,14 +91,14 @@
                         <div class="mt-3 text-end">
                             <button type="button" class="btn btn-primary" id="submit-post">Publier</button>
                         </div>
-                        
+
                         <!-- Champs cachés pour les pièces jointes -->
                         <input type="hidden" id="post-image-url">
                         <input type="hidden" id="post-file-url">
                     </form>
                 </div>
             </div>
-            
+
             <!-- Liste des stories -->
             <div class="card mb-4">
                 <div class="card-body p-2">
@@ -108,7 +108,7 @@
                             <i class="bi bi-plus-circle text-primary"></i>
                             <span>Créer</span>
                         </div>
-                        
+
                         <!-- Exemples de stories (remplacer par des données réelles) -->
                         <div class="text-center text-muted px-4" style="line-height: 220px;">
                             <a href="{{ url_for('stories') }}" class="text-decoration-none">
@@ -118,7 +118,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Liste des publications -->
             <div id="posts-container">
                 {% if posts %}
@@ -209,7 +209,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <!-- Réponses aux commentaires -->
                                                 {% if comment.replies %}
                                                     <div class="replies-container mt-2">
@@ -276,7 +276,7 @@
                 {% endif %}
             </div>
         </div>
-        
+
         <!-- Sidebar droite -->
         <div class="col-md-3 d-none d-md-block">
             <div class="card mb-4">
@@ -293,7 +293,7 @@
                                 </div>
                             </a>
                         {% endif %}
-                        <a href="{{ url_for('workgroups') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('workgroups_list') }}" class="list-group-item list-group-item-action">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span>Groupes de travail</span>
                                 <span class="badge bg-primary rounded-pill">{{ current_user.workgroups.count() }}</span>
@@ -308,7 +308,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Tendances</h5>
@@ -440,27 +440,27 @@
     let fileModal = null;
     let shareModal = null;
     let currentSharedPostId = null;
-    
+
     // Initialisation lors du chargement du document
     document.addEventListener('DOMContentLoaded', function() {
         // Initialise Socket.IO
         initializeSocketIO(userId);
-        
+
         // Initialise les modals Bootstrap
         imageModal = new bootstrap.Modal(document.getElementById('image-upload-modal'));
         fileModal = new bootstrap.Modal(document.getElementById('file-upload-modal'));
         shareModal = new bootstrap.Modal(document.getElementById('share-modal'));
-        
+
         // Définit les gestionnaires d'événements
         setupEventHandlers();
-        
+
         // Charge les utilisateurs en ligne
         loadOnlineUsers();
-        
+
         // Initialise les réactions personnalisées
         initReactionSelectors();
     });
-    
+
     // Configure les gestionnaires d'événements
     function setupEventHandlers() {
         // Gestionnaire pour la création de publication
@@ -469,15 +469,15 @@
             submitPostButton.addEventListener('click', function() {
                 const contentInput = document.getElementById('post-content');
                 const content = contentInput.value.trim();
-                
+
                 if (content) {
                     // Récupère les URLs des pièces jointes
                     const imageUrl = document.getElementById('post-image-url').value;
                     const fileUrl = document.getElementById('post-file-url').value;
-                    
+
                     // Crée la publication
                     createPost(content, null, imageUrl, fileUrl);
-                    
+
                     // Réinitialise le formulaire
                     contentInput.value = '';
                     document.getElementById('post-image-url').value = '';
@@ -487,7 +487,7 @@
                 }
             });
         }
-        
+
         // Gestionnaire pour l'attachement d'image
         const attachImageButton = document.getElementById('attach-image');
         if (attachImageButton) {
@@ -495,7 +495,7 @@
                 imageModal.show();
             });
         }
-        
+
         // Gestionnaire pour l'attachement de fichier
         const attachFileButton = document.getElementById('attach-file');
         if (attachFileButton) {
@@ -503,7 +503,7 @@
                 fileModal.show();
             });
         }
-        
+
         // Gestionnaire pour la prévisualisation d'image
         const imageFileInput = document.getElementById('image-file');
         if (imageFileInput) {
@@ -511,7 +511,7 @@
                 const file = event.target.files[0];
                 if (file) {
                     imageFile = file;
-                    
+
                     // Affiche la prévisualisation
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -523,7 +523,7 @@
                 }
             });
         }
-        
+
         // Gestionnaire pour l'information de fichier
         const fileInput = document.getElementById('file-input');
         if (fileInput) {
@@ -531,7 +531,7 @@
                 const file = event.target.files[0];
                 if (file) {
                     documentFile = file;
-                    
+
                     // Affiche les informations du fichier
                     const fileInfo = document.getElementById('file-info');
                     fileInfo.classList.remove('d-none');
@@ -540,7 +540,7 @@
                 }
             });
         }
-        
+
         // Gestionnaire pour la confirmation d'upload d'image
         const confirmImageButton = document.getElementById('confirm-image-upload');
         if (confirmImageButton) {
@@ -554,7 +554,7 @@
                 }
             });
         }
-        
+
         // Gestionnaire pour la confirmation d'upload de fichier
         const confirmFileButton = document.getElementById('confirm-file-upload');
         if (confirmFileButton) {
@@ -568,14 +568,14 @@
                 }
             });
         }
-        
+
         // Gestionnaire pour la confirmation de partage
         const confirmShareButton = document.getElementById('confirm-share');
         if (confirmShareButton) {
             confirmShareButton.addEventListener('click', function() {
                 const workgroupId = document.getElementById('share-workgroup').value;
                 const comment = document.getElementById('share-comment').value;
-                
+
                 if (workgroupId && currentSharedPostId) {
                     sharePostInWorkgroup(currentSharedPostId, workgroupId, comment);
                     shareModal.hide();
@@ -585,7 +585,7 @@
             });
         }
     }
-    
+
     // Charge les utilisateurs en ligne
     function loadOnlineUsers() {
         fetch('/api/users/online')
@@ -593,14 +593,14 @@
             .then(data => {
                 const usersList = document.getElementById('online-users-list');
                 const onlineCount = document.getElementById('online-count');
-                
+
                 if (usersList && data.users) {
                     // Met à jour le compteur
                     onlineCount.textContent = data.users.length;
-                    
+
                     // Vide la liste
                     usersList.innerHTML = '';
-                    
+
                     if (data.users.length === 0) {
                         usersList.innerHTML = `
                             <li class="list-group-item text-center text-muted py-3">
@@ -609,7 +609,7 @@
                         `;
                         return;
                     }
-                    
+
                     // Ajoute chaque utilisateur à la liste
                     data.users.forEach(user => {
                         const userItem = document.createElement('li');
@@ -637,20 +637,20 @@
             })
             .catch(error => console.error('Erreur lors du chargement des utilisateurs en ligne:', error));
     }
-    
+
     // Partage une publication
     function sharePost(postId) {
         currentSharedPostId = postId;
         shareModal.show();
     }
-    
+
     // Partage une publication dans un groupe
     function sharePostInWorkgroup(postId, workgroupId, comment) {
         // Cette fonction devrait appeler l'API pour partager la publication
         // Pour l'instant, elle affiche juste un message de succès
         showToast('Publication partagée avec succès', 'success');
     }
-    
+
     // Supprime une publication
     function deletePost(postId) {
         if (confirm('Êtes-vous sûr de vouloir supprimer cette publication ?')) {
@@ -659,13 +659,13 @@
             showToast('Publication supprimée avec succès', 'success');
         }
     }
-    
+
     // Édite une publication
     function editPost(postId) {
         // Cette fonction devrait ouvrir une fenêtre d'édition
         showToast('La fonctionnalité d\'édition est en cours de développement', 'info');
     }
-    
+
     // Répond à un commentaire
     function replyToComment(postId, commentId) {
         const commentInput = document.getElementById(`comment-input-${postId}`);
@@ -675,13 +675,13 @@
             commentInput.placeholder = 'Écrire une réponse...';
         }
     }
-    
+
     // Fonction pour upload de fichier
     function uploadFile(file, type, callback) {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('type', type);
-        
+
         fetch('/api/upload', {
             method: 'POST',
             body: formData
@@ -699,7 +699,7 @@
             showToast('Erreur de connexion lors de l\'upload', 'danger');
         });
     }
-    
+
     // Formate la taille du fichier
     function formatFileSize(bytes) {
         if (bytes < 1024) {
