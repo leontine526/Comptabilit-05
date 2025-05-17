@@ -90,34 +90,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const slider = document.createElement('div');
         slider.className = 'testimonials-slider';
+        
+        // Récupérer tous les témoignages
+        const testimonials = Array.from(document.querySelectorAll('.testimonial-card'));
+        if (!testimonials.length) return;
+        
+        // Vider le conteneur et ajouter le slider
         container.innerHTML = '';
         container.appendChild(slider);
 
-        // Récupérer tous les témoignages
-        const testimonials = document.querySelectorAll('.testimonial-card');
+        // Ajouter les témoignages originaux
         testimonials.forEach(testimonial => {
             slider.appendChild(testimonial.cloneNode(true));
-            testimonial.remove();
         });
 
-        // Clone les premiers témoignages à la fin pour un défilement infini
-        const clones = Array.from(testimonials).slice(0, 3);
-        clones.forEach(clone => {
-            slider.appendChild(clone.cloneNode(true));
+        // Ajouter des clones pour le défilement infini
+        testimonials.forEach(testimonial => {
+            slider.appendChild(testimonial.cloneNode(true));
         });
 
-        // Animation de défilement
         let position = 0;
+        let animationFrameId = null;
+        const speed = 1; // Vitesse de défilement
+        const resetThreshold = -((testimonials.length * 430) + 30); // 400px width + 30px gap
+
         function animate() {
-            position -= 0.5;
-            if (position <= -33.33 * testimonials.length) {
+            position -= speed;
+            
+            // Réinitialiser la position quand tous les témoignages originaux ont défilé
+            if (position <= resetThreshold) {
                 position = 0;
             }
-            slider.style.transform = `translateX(${position}%)`;
-            requestAnimationFrame(animate);
+            
+            slider.style.transform = `translateX(${position}px)`;
+            animationFrameId = requestAnimationFrame(animate);
         }
 
+        // Démarrer l'animation
         animate();
+
+        // Mettre en pause au survol
+        slider.addEventListener('mouseenter', () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        });
+
+        // Reprendre l'animation quand la souris quitte
+        slider.addEventListener('mouseleave', () => {
+            if (!animationFrameId) {
+                animate();
+            }
+        });
     }
 
     // Initialize Bootstrap popovers
