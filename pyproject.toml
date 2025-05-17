@@ -34,4 +34,5 @@ dependencies = [
     "scipy",
     "werkzeug",
     "wtforms",
+    "flask-caching>=2.3.1",
 ]
