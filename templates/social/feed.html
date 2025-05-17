@@ -87,7 +87,32 @@
                             <div class="attachment-option" id="attach-tag">
                                 <i class="bi bi-tag text-warning"></i> Marquer
                             </div>
+                            <div class="attachment-option" id="toggle-backgrounds">
+                                <i class="bi bi-palette text-info"></i> Arrière-plan
+                            </div>
                         </div>
+                        
+                        <!-- Sélecteur d'arrière-plan coloré -->
+                        <div class="post-background-selector d-none border-bottom pb-3 pt-2 px-3" id="background-selector">
+                            <div class="post-background-option no-bg selected" data-bg="none" title="Aucun arrière-plan"></div>
+                            <div class="post-background-option bg-blue-gradient" data-bg="blue-gradient" title="Bleu"></div>
+                            <div class="post-background-option bg-purple-gradient" data-bg="purple-gradient" title="Violet"></div>
+                            <div class="post-background-option bg-red-gradient" data-bg="red-gradient" title="Rouge"></div>
+                            <div class="post-background-option bg-green-gradient" data-bg="green-gradient" title="Vert"></div>
+                            <div class="post-background-option bg-orange-gradient" data-bg="orange-gradient" title="Orange"></div>
+                            <div class="post-background-option bg-pink-gradient" data-bg="pink-gradient" title="Rose"></div>
+                            <div class="post-background-option bg-teal-gradient" data-bg="teal-gradient" title="Turquoise"></div>
+                            <div class="post-background-option bg-yellow-gradient" data-bg="yellow-gradient" title="Jaune"></div>
+                            <div class="post-background-option bg-gray-gradient" data-bg="gray-gradient" title="Gris"></div>
+                        </div>
+                        
+                        <!-- Prévisualisation du fond coloré -->
+                        <div id="colored-background-preview" class="d-none my-3">
+                            <div class="post-with-color-bg">
+                                <p id="preview-text">Votre texte s'affichera ici</p>
+                            </div>
+                        </div>
+                        
                         <div class="mt-3 text-end">
                             <button type="button" class="btn btn-primary" id="submit-post">Publier</button>
                         </div>
@@ -95,6 +120,7 @@
                         <!-- Champs cachés pour les pièces jointes -->
                         <input type="hidden" id="post-image-url">
                         <input type="hidden" id="post-file-url">
+                        <input type="hidden" id="post-background" value="none">
                     </form>
                 </div>
             </div>
@@ -150,17 +176,23 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="card-text">{{ post.content }}</p>
-                                {% if post.image_url %}
-                                    <div class="post-image mt-2">
-                                        <img src="{{ post.image_url }}" class="img-fluid rounded" alt="Image de publication">
+                                {% if post.background_color %}
+                                    <div class="post-with-color-bg bg-{{ post.background_color }}">
+                                        <p>{{ post.content }}</p>
                                     </div>
-                                {% elif post.file_url %}
-                                    <div class="post-file mt-2">
-                                        <a href="{{ post.file_url }}" class="btn btn-outline-primary" target="_blank">
-                                            <i class="bi bi-file-earmark"></i> Voir le fichier joint
-                                        </a>
-                                    </div>
+                                {% else %}
+                                    <p class="card-text">{{ post.content }}</p>
+                                    {% if post.image_url %}
+                                        <div class="post-image mt-2">
+                                            <img src="{{ post.image_url }}" class="img-fluid rounded" alt="Image de publication">
+                                        </div>
+                                    {% elif post.file_url %}
+                                        <div class="post-file mt-2">
+                                            <a href="{{ post.file_url }}" class="btn btn-outline-primary" target="_blank">
+                                                <i class="bi bi-file-earmark"></i> Voir le fichier joint
+                                            </a>
+                                        </div>
+                                    {% endif %}
                                 {% endif %}
                                 <div class="reaction-details mt-2 mb-2 small text-muted"></div>
                                 <div class="post-actions mt-2 d-flex border-top border-bottom py-2">
@@ -482,18 +514,79 @@
                     // Récupère les URLs des pièces jointes
                     const imageUrl = document.getElementById('post-image-url').value;
                     const fileUrl = document.getElementById('post-file-url').value;
+                    const backgroundType = document.getElementById('post-background').value;
 
                     // Crée la publication
-                    createPost(content, null, imageUrl, fileUrl);
+                    createPost(content, null, imageUrl, fileUrl, backgroundType);
 
                     // Réinitialise le formulaire
                     contentInput.value = '';
                     document.getElementById('post-image-url').value = '';
                     document.getElementById('post-file-url').value = '';
+                    document.getElementById('post-background').value = 'none';
+                    
+                    // Réinitialiser l'interface
+                    resetBackgroundSelector();
                 } else {
                     showToast('Veuillez entrer un contenu pour votre publication', 'warning');
                 }
             });
+        }
+        
+        // Gestionnaire pour le toggling du sélecteur d'arrière-plan
+        const toggleBackgrounds = document.getElementById('toggle-backgrounds');
+        if (toggleBackgrounds) {
+            toggleBackgrounds.addEventListener('click', function() {
+                const selector = document.getElementById('background-selector');
+                selector.classList.toggle('d-none');
+            });
+        }
+        
+        // Gestionnaires pour les options d'arrière-plan
+        const backgroundOptions = document.querySelectorAll('.post-background-option');
+        const preview = document.getElementById('colored-background-preview');
+        const previewElement = document.querySelector('#colored-background-preview .post-with-color-bg');
+        const previewText = document.getElementById('preview-text');
+        const contentInput = document.getElementById('post-content');
+        
+        if (backgroundOptions && preview && previewElement) {
+            backgroundOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const bgType = this.getAttribute('data-bg');
+                    
+                    // Mettre à jour la sélection
+                    backgroundOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Sauvegarder la valeur
+                    document.getElementById('post-background').value = bgType;
+                    
+                    // Gérer la prévisualisation
+                    if (bgType === 'none') {
+                        preview.classList.add('d-none');
+                    } else {
+                        preview.classList.remove('d-none');
+                        
+                        // Mettre à jour la classe de prévisualisation
+                        previewElement.className = 'post-with-color-bg';
+                        previewElement.classList.add('bg-' + bgType);
+                        
+                        // Mettre à jour le texte
+                        const currentText = contentInput.value.trim();
+                        previewText.textContent = currentText || 'Votre texte s'affichera ici';
+                    }
+                });
+            });
+            
+            // Mettre à jour la prévisualisation en temps réel
+            if (contentInput) {
+                contentInput.addEventListener('input', function() {
+                    const currentText = this.value.trim();
+                    if (previewText && !preview.classList.contains('d-none')) {
+                        previewText.textContent = currentText || 'Votre texte s'affichera ici';
+                    }
+                });
+            }
         }
 
         // Gestionnaire pour l'attachement d'image
@@ -717,6 +810,59 @@
         } else {
             return (bytes / 1048576).toFixed(2) + ' Mo';
         }
+    }
+    
+    // Réinitialise le sélecteur d'arrière-plan
+    function resetBackgroundSelector() {
+        // Masquer le sélecteur et la prévisualisation
+        document.getElementById('background-selector').classList.add('d-none');
+        document.getElementById('colored-background-preview').classList.add('d-none');
+        
+        // Réinitialiser la valeur
+        document.getElementById('post-background').value = 'none';
+        
+        // Réinitialiser la sélection visuelle
+        const options = document.querySelectorAll('.post-background-option');
+        options.forEach(opt => opt.classList.remove('selected'));
+        const defaultOption = document.querySelector('.post-background-option.no-bg');
+        if (defaultOption) {
+            defaultOption.classList.add('selected');
+        }
+    }
+    
+    // Fonction pour créer une publication
+    function createPost(content, workgroupId, imageUrl, fileUrl, backgroundType) {
+        // Préparation des données
+        const postData = {
+            content: content,
+            workgroup_id: workgroupId,
+            image_url: imageUrl || null,
+            file_url: fileUrl || null,
+            background_color: backgroundType !== 'none' ? backgroundType : null
+        };
+        
+        // Envoi de la requête au serveur
+        fetch('/api/posts/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Publication créée avec succès', 'success');
+                // Recharger la page pour voir la nouvelle publication
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast('Erreur lors de la création de la publication: ' + data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de connexion', 'danger');
+        });
     }
 </script>
 {% endblock %}

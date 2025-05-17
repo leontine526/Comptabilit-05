@@ -461,7 +461,8 @@ def api_create_post():
         user_id=current_user.id,
         workgroup_id=data.get('workgroup_id'),
         image_url=data.get('image_url'),
-        file_url=data.get('file_url')
+        file_url=data.get('file_url'),
+        background_color=data.get('background_color')
     )
     
     db.session.add(post)
