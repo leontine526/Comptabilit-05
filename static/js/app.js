@@ -110,7 +110,13 @@ document.addEventListener('DOMContentLoaded', function() {
             testimonial.remove(); // Supprimer l'original
         });
 
-        // Ajouter des clones pour le défilement infini
+        // Ajouter des clones pour le défilement infini (doubler pour assurer la continuité)
+        testimonials.forEach(testimonial => {
+            const clone = testimonial.cloneNode(true);
+            slider.appendChild(clone);
+        });
+        
+        // Ajouter une troisième série pour garantir un défilement continu
         testimonials.forEach(testimonial => {
             const clone = testimonial.cloneNode(true);
             slider.appendChild(clone);
@@ -118,14 +124,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let position = 0;
         let animationFrameId = null;
-        const speed = 0.5; // Vitesse réduite pour un défilement plus doux
+        const speed = 0.7; // Vitesse légèrement augmentée pour un défilement visible
         const cardWidth = 430; // Largeur d'une carte + gap
-        const resetThreshold = -(testimonials.length * cardWidth);
-
+        const totalWidth = testimonials.length * cardWidth;
+        
         function animate() {
             position -= speed;
             
-            if (position <= resetThreshold) {
+            // Réinitialiser position quand le premier groupe de cartes est complètement passé
+            if (position <= -totalWidth) {
+                // Reset position au début du second groupe
                 position = 0;
             }
             
