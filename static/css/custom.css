@@ -872,9 +872,22 @@ body {
 }
 
 .testimonials-container {
+    width: 100%;
+    overflow: hidden;
     position: relative;
-    height: 400px; /* Ajustez selon vos besoins */
     margin-bottom: 2rem;
+}
+
+.testimonials-slider {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.1s linear;
+}
+
+.testimonial-card {
+    flex: 0 0 calc(33.33% - 20px);
+    opacity: 1 !important;
+    display: block !important;
 }
 
 .testimonial-card:hover {

@@ -85,37 +85,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function initTestimonialSlider() {
+        const container = document.querySelector('.testimonials-container');
+        if (!container) return;
+
+        const slider = document.createElement('div');
+        slider.className = 'testimonials-slider';
+        container.innerHTML = '';
+        container.appendChild(slider);
+
+        // Récupérer tous les témoignages
         const testimonials = document.querySelectorAll('.testimonial-card');
-        if (!testimonials.length) return;
-
-        let currentIndex = 0;
-        const duration = 5000; // 5 secondes par témoignage
-
-        // Cacher tous les témoignages sauf le premier
-        testimonials.forEach((testimonial, index) => {
-            if (index !== 0) {
-                testimonial.style.display = 'none';
-            }
-            testimonial.style.transition = 'opacity 0.5s ease-in-out';
+        testimonials.forEach(testimonial => {
+            slider.appendChild(testimonial.cloneNode(true));
+            testimonial.remove();
         });
 
-        // Fonction pour afficher le prochain témoignage
-        function showNextTestimonial() {
-            testimonials[currentIndex].style.opacity = '0';
-            
-            setTimeout(() => {
-                testimonials[currentIndex].style.display = 'none';
-                currentIndex = (currentIndex + 1) % testimonials.length;
-                testimonials[currentIndex].style.display = 'block';
-                
-                setTimeout(() => {
-                    testimonials[currentIndex].style.opacity = '1';
-                }, 50);
-            }, 500);
+        // Clone les premiers témoignages à la fin pour un défilement infini
+        const clones = Array.from(testimonials).slice(0, 3);
+        clones.forEach(clone => {
+            slider.appendChild(clone.cloneNode(true));
+        });
+
+        // Animation de défilement
+        let position = 0;
+        function animate() {
+            position -= 0.5;
+            if (position <= -33.33 * testimonials.length) {
+                position = 0;
+            }
+            slider.style.transform = `translateX(${position}%)`;
+            requestAnimationFrame(animate);
         }
 
-        // Démarrer le défilement automatique
-        setInterval(showNextTestimonial, duration);
+        animate();
     }
 
     // Initialize Bootstrap popovers
