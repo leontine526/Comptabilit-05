@@ -88,36 +88,43 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.querySelector('.testimonials-container');
         if (!container) return;
 
-        const slider = document.createElement('div');
-        slider.className = 'testimonials-slider';
-        
+        // Créer le conteneur du slider s'il n'existe pas déjà
+        let slider = container.querySelector('.testimonials-slider');
+        if (!slider) {
+            slider = document.createElement('div');
+            slider.className = 'testimonials-slider';
+            container.appendChild(slider);
+        }
+
         // Récupérer tous les témoignages
         const testimonials = Array.from(document.querySelectorAll('.testimonial-card'));
         if (!testimonials.length) return;
-        
-        // Vider le conteneur et ajouter le slider
-        container.innerHTML = '';
-        container.appendChild(slider);
+
+        // Vider le slider
+        slider.innerHTML = '';
 
         // Ajouter les témoignages originaux
         testimonials.forEach(testimonial => {
-            slider.appendChild(testimonial.cloneNode(true));
+            const clone = testimonial.cloneNode(true);
+            slider.appendChild(clone);
+            testimonial.remove(); // Supprimer l'original
         });
 
         // Ajouter des clones pour le défilement infini
         testimonials.forEach(testimonial => {
-            slider.appendChild(testimonial.cloneNode(true));
+            const clone = testimonial.cloneNode(true);
+            slider.appendChild(clone);
         });
 
         let position = 0;
         let animationFrameId = null;
-        const speed = 1; // Vitesse de défilement
-        const resetThreshold = -((testimonials.length * 430) + 30); // 400px width + 30px gap
+        const speed = 0.5; // Vitesse réduite pour un défilement plus doux
+        const cardWidth = 430; // Largeur d'une carte + gap
+        const resetThreshold = -(testimonials.length * cardWidth);
 
         function animate() {
             position -= speed;
             
-            // Réinitialiser la position quand tous les témoignages originaux ont défilé
             if (position <= resetThreshold) {
                 position = 0;
             }
@@ -129,15 +136,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Démarrer l'animation
         animate();
 
-        // Mettre en pause au survol
+        // Gestion des événements de survol
         slider.addEventListener('mouseenter', () => {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
         });
 
-        // Reprendre l'animation quand la souris quitte
         slider.addEventListener('mouseleave', () => {
             if (!animationFrameId) {
                 animate();
