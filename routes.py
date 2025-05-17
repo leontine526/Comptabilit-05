@@ -139,6 +139,12 @@ def login():
 def logout():
     logout_user()
     flash('Vous êtes déconnecté.', 'info')
+    # Socket.IO - Mettre à jour le statut de l'utilisateur si nécessaire
+    socketio.emit('user_status_change', {
+        'user_id': current_user.id if hasattr(current_user, 'id') else None,
+        'is_online': False
+    }, broadcast=True)
+    session.clear()  # Nettoyer toutes les données de session
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
