@@ -192,7 +192,7 @@ def get_online_users():
 
 # Handler pour les connexions WebSocket
 @socketio.on('connect')
-def handle_connect():
+def handle_connect(auth=None):
     """Gère la connexion WebSocket des clients"""
     if current_user.is_authenticated:
         # Met à jour le statut en ligne et l'heure de dernière connexion
@@ -203,10 +203,10 @@ def handle_connect():
 
         # Rejoint les salles pour les groupes de l'utilisateur
         for workgroup in current_user.workgroups:
-            socketio.enter_room(f"workgroup_{workgroup.id}")
+            socketio.join_room(f"workgroup_{workgroup.id}")
 
         # Rejoint sa propre salle pour les notifications personnelles
-        socketio.enter_room(f"user_{current_user.id}")
+        socketio.join_room(f"user_{current_user.id}")
 
         # Notifie les autres utilisateurs
         socketio.emit('user_status_change', {
@@ -443,6 +443,93 @@ def delete_story(story_id):
     db.session.commit()
 
     return jsonify({'success': True})
+
+# Routes API pour les posts et commentaires
+@app.route('/api/posts/create', methods=['POST'])
+@login_required
+def api_create_post():
+    """API pour créer une nouvelle publication"""
+    data = request.json
+    
+    # Vérifier les données requises
+    if not data or 'content' not in data:
+        return jsonify({'success': False, 'message': 'Contenu requis'})
+    
+    # Créer la publication
+    post = Post(
+        content=data['content'],
+        user_id=current_user.id,
+        workgroup_id=data.get('workgroup_id'),
+        image_url=data.get('image_url'),
+        file_url=data.get('file_url')
+    )
+    
+    db.session.add(post)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True, 
+        'post_id': post.id,
+        'message': 'Publication créée avec succès'
+    })
+
+@app.route('/api/comments/create', methods=['POST'])
+@login_required
+def api_create_comment():
+    """API pour créer un nouveau commentaire"""
+    data = request.json
+    
+    # Vérifier les données requises
+    if not data or 'content' not in data or 'post_id' not in data:
+        return jsonify({'success': False, 'message': 'Contenu et ID de publication requis'})
+    
+    # Vérifier que la publication existe
+    post = Post.query.get(data['post_id'])
+    if not post:
+        return jsonify({'success': False, 'message': 'Publication non trouvée'})
+    
+    # Créer le commentaire
+    comment = Comment(
+        content=data['content'],
+        user_id=current_user.id,
+        post_id=data['post_id'],
+        parent_id=data.get('parent_id')
+    )
+    
+    db.session.add(comment)
+    db.session.commit()
+    
+    # Notifier l'auteur de la publication si ce n'est pas le même utilisateur
+    if post.user_id != current_user.id:
+        notification = Notification(
+            user_id=post.user_id,
+            title="Nouveau commentaire",
+            content=f"{current_user.username} a commenté votre publication.",
+            notification_type="comment",
+            source_id=post.id,
+            source_type="post"
+        )
+        db.session.add(notification)
+        db.session.commit()
+    
+    # Notifier aussi l'auteur du commentaire parent si c'est une réponse
+    if comment.parent_id and comment.parent.user_id != current_user.id:
+        notification = Notification(
+            user_id=comment.parent.user_id,
+            title="Réponse à votre commentaire",
+            content=f"{current_user.username} a répondu à votre commentaire.",
+            notification_type="reply",
+            source_id=comment.id,
+            source_type="comment"
+        )
+        db.session.add(notification)
+        db.session.commit()
+    
+    return jsonify({
+        'success': True, 
+        'comment_id': comment.id,
+        'message': 'Commentaire ajouté avec succès'
+    })
 
 # Routes pour les réactions personnalisées
 
