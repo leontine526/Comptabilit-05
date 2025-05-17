@@ -23,6 +23,9 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirmer le mot de passe', validators=[
         DataRequired(), EqualTo('password', message='Les mots de passe doivent correspondre')
     ])
+    profile_picture = FileField('Photo de profil', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images uniquement!')
+    ])
     show_password = BooleanField('Afficher le mot de passe')
 
     def validate_username(self, username):

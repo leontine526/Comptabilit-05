@@ -3,7 +3,7 @@ import uuid
 import logging
 import xlsxwriter
 import traceback
-from flask import render_template, request, redirect, url_for, flash, abort, send_file, jsonify
+from flask import render_template, request, redirect, url_for, flash, abort, send_file, jsonify, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -162,6 +162,23 @@ def register():
             )
             user.set_password(form.password.data)
 
+            # Gérer l'upload de la photo de profil
+            if form.profile_picture.data:
+                # Assurer que le dossier d'upload existe
+                upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'profile_pics')
+                os.makedirs(upload_folder, exist_ok=True)
+                
+                # Sécuriser le nom de fichier et le rendre unique
+                filename = secure_filename(form.profile_picture.data.filename)
+                unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                file_path = os.path.join(upload_folder, unique_filename)
+                
+                # Sauvegarder le fichier
+                form.profile_picture.data.save(file_path)
+                
+                # Mettre à jour le chemin dans la base de données
+                user.profile_picture = os.path.join('profile_pics', unique_filename)
+
             db.session.add(user)
             db.session.commit()
 
@@ -190,6 +207,12 @@ def profile():
 
         db.session.commit()
         flash('Votre profil a été mis à jour avec succès!', 'success')
+
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    """Sert les fichiers uploadés comme les images de profil"""
+    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
         return redirect(url_for('profile'))
 
     return render_template('auth/profile.html', title='Profil', form=form)

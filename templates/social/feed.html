@@ -91,7 +91,7 @@
                                 <i class="bi bi-palette text-info"></i> Arrière-plan
                             </div>
                         </div>
-                        
+
                         <!-- Sélecteur d'arrière-plan coloré -->
                         <div class="post-background-selector d-none border-bottom pb-3 pt-2 px-3" id="background-selector">
                             <div class="post-background-option no-bg selected" data-bg="none" title="Aucun arrière-plan"></div>
@@ -105,14 +105,14 @@
                             <div class="post-background-option bg-yellow-gradient" data-bg="yellow-gradient" title="Jaune"></div>
                             <div class="post-background-option bg-gray-gradient" data-bg="gray-gradient" title="Gris"></div>
                         </div>
-                        
+
                         <!-- Prévisualisation du fond coloré -->
                         <div id="colored-background-preview" class="d-none my-3">
                             <div class="post-with-color-bg">
                                 <p id="preview-text">Votre texte s'affichera ici</p>
                             </div>
                         </div>
-                        
+
                         <div class="mt-3 text-end">
                             <button type="button" class="btn btn-primary" id="submit-post">Publier</button>
                         </div>
@@ -524,7 +524,7 @@
                     document.getElementById('post-image-url').value = '';
                     document.getElementById('post-file-url').value = '';
                     document.getElementById('post-background').value = 'none';
-                    
+
                     // Réinitialiser l'interface
                     resetBackgroundSelector();
                 } else {
@@ -532,7 +532,7 @@
                 }
             });
         }
-        
+
         // Gestionnaire pour le toggling du sélecteur d'arrière-plan
         const toggleBackgrounds = document.getElementById('toggle-backgrounds');
         if (toggleBackgrounds) {
@@ -541,43 +541,43 @@
                 selector.classList.toggle('d-none');
             });
         }
-        
+
         // Gestionnaires pour les options d'arrière-plan
         const backgroundOptions = document.querySelectorAll('.post-background-option');
         const preview = document.getElementById('colored-background-preview');
         const previewElement = document.querySelector('#colored-background-preview .post-with-color-bg');
         const previewText = document.getElementById('preview-text');
         const contentInput = document.getElementById('post-content');
-        
+
         if (backgroundOptions && preview && previewElement) {
             backgroundOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     const bgType = this.getAttribute('data-bg');
-                    
+
                     // Mettre à jour la sélection
                     backgroundOptions.forEach(opt => opt.classList.remove('selected'));
                     this.classList.add('selected');
-                    
+
                     // Sauvegarder la valeur
                     document.getElementById('post-background').value = bgType;
-                    
+
                     // Gérer la prévisualisation
                     if (bgType === 'none') {
                         preview.classList.add('d-none');
                     } else {
                         preview.classList.remove('d-none');
-                        
+
                         // Mettre à jour la classe de prévisualisation
                         previewElement.className = 'post-with-color-bg';
                         previewElement.classList.add('bg-' + bgType);
-                        
+
                         // Mettre à jour le texte
                         const currentText = contentInput.value.trim();
                         previewText.textContent = currentText || 'Votre texte s'affichera ici';
                     }
                 });
             });
-            
+
             // Mettre à jour la prévisualisation en temps réel
             if (contentInput) {
                 contentInput.addEventListener('input', function() {
@@ -811,16 +811,16 @@
             return (bytes / 1048576).toFixed(2) + ' Mo';
         }
     }
-    
+
     // Réinitialise le sélecteur d'arrière-plan
     function resetBackgroundSelector() {
         // Masquer le sélecteur et la prévisualisation
         document.getElementById('background-selector').classList.add('d-none');
         document.getElementById('colored-background-preview').classList.add('d-none');
-        
+
         // Réinitialiser la valeur
         document.getElementById('post-background').value = 'none';
-        
+
         // Réinitialiser la sélection visuelle
         const options = document.querySelectorAll('.post-background-option');
         options.forEach(opt => opt.classList.remove('selected'));
@@ -829,7 +829,7 @@
             defaultOption.classList.add('selected');
         }
     }
-    
+
     // Fonction pour créer une publication
     function createPost(content, workgroupId, imageUrl, fileUrl, backgroundType) {
         // Préparation des données
@@ -840,7 +840,7 @@
             file_url: fileUrl || null,
             background_color: backgroundType !== 'none' ? backgroundType : null
         };
-        
+
         // Envoi de la requête au serveur
         fetch('/api/posts/create', {
             method: 'POST',

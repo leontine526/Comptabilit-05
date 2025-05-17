@@ -63,6 +63,13 @@
                             {{ form.show_password.label(class="form-check-label") }}
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="profile_picture" class="form-label">Photo de profil</label>
+                            {{ form.profile_picture(class="form-control", id="profile_picture") }}
+                            <div class="form-text">Sélectionnez une image pour votre profil (JPG, PNG).</div>
+                            <div class="mt-2" id="profile-image-preview"></div>
+                        </div>
+                        
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-user-plus me-2"></i>Créer un compte
@@ -88,4 +95,5 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/password_toggle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/profile_image_preview.js') }}"></script>
 {% endblock %}

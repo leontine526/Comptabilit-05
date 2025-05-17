@@ -256,17 +256,17 @@
     .post-form-attachments {
         justify-content: space-around;
     }
-    
+
     .story-carousel {
         padding: 0.25rem;
     }
-    
+
     .story-card {
         width: 90px;
         height: 160px;
         margin-right: 0.5rem;
     }
-    
+
     .reaction-option {
         font-size: 1rem;
         padding: 0.25rem;
@@ -387,4 +387,26 @@
 
 .bg-gray-gradient {
     background: linear-gradient(135deg, #546e7a 0%, #263238 100%);
+}
+
+.user-icon {
+    font-size: 2.5rem;
+    color: #4267B2;
+    margin-right: 10px;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-username {
+    font-size: 0.85rem;
+    color: #65676B;
+    display: block;
 }
