@@ -234,32 +234,14 @@ function updateReactionsCount(button, reactions) {
     
     if (!container) return;
     
-    // Vide le conteneur
-    container.innerHTML = '';
-    
     // Récupère le nombre total de réactions
     const total = reactions.total || 0;
     
+    // Mise à jour simplifiée avec juste le nombre
     if (total > 0) {
-        // Crée le résumé des réactions
-        const summary = document.createElement('div');
-        
-        // Ajoute les icônes des types de réaction présents
-        const types = Object.keys(reactions.counts || {}).filter(type => reactions.counts[type] > 0);
-        
-        types.slice(0, 3).forEach(type => {
-            const icon = document.createElement('i');
-            icon.className = `bi ${REACTION_TYPES[type].icon} me-1`;
-            icon.style.color = REACTION_TYPES[type].color;
-            summary.appendChild(icon);
-        });
-        
-        // Ajoute le nombre total
-        const count = document.createElement('span');
-        count.textContent = `${total} ${total > 1 ? 'réactions' : 'réaction'}`;
-        summary.appendChild(count);
-        
-        container.appendChild(summary);
+        container.textContent = total;
+    } else {
+        container.textContent = '';
     }
 }
 

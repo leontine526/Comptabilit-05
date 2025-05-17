@@ -114,6 +114,30 @@
     margin-top: 1rem;
 }
 
+/* Compteurs de réactions et commentaires */
+.post-footer-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    color: #65676B;
+    font-size: 0.9rem;
+}
+
+.post-footer-stat {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.post-footer-stat:hover {
+    text-decoration: underline;
+}
+
+.post-footer-reaction-icons {
+    display: flex;
+    gap: 0.2rem;
+}
+
 /* Réactions */
 .reaction-selector {
     position: absolute;

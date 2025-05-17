@@ -461,6 +461,14 @@
         initReactionSelectors();
     });
 
+    // Fonction pour mettre le focus sur la zone de commentaire
+    function focusCommentBox(postId) {
+        const commentInput = document.getElementById(`comment-input-${postId}`);
+        if (commentInput) {
+            commentInput.focus();
+        }
+    }
+
     // Configure les gestionnaires d'événements
     function setupEventHandlers() {
         // Gestionnaire pour la création de publication
