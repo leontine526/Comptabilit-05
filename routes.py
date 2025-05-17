@@ -834,7 +834,7 @@ def document_process(document_id):
 @login_required
 def document_download(document_id):
     document = Document.query.get_or_404(document_id)
-    exercise = exercise.exercise
+    exercise = document.exercise
 
     # Check if user has permission
     if exercise.user_id != current_user.id:
@@ -1710,3 +1710,9 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('errors/500.html'), 500
+    
+@app.route('/community')
+@login_required
+def community():
+    """Redirige vers le fil d'actualité social"""
+    return redirect(url_for('feed'))
