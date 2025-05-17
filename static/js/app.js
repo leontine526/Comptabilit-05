@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let position = 0;
         let animationFrameId = null;
-        const speed = 0.7; // Vitesse légèrement augmentée pour un défilement visible
+        const speed = 0.8; // Vitesse optimale pour 10 témoignages
         const cardWidth = 430; // Largeur d'une carte + gap
         const totalWidth = testimonials.length * cardWidth;
         
