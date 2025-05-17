@@ -834,7 +834,7 @@ def document_process(document_id):
 @login_required
 def document_download(document_id):
     document = Document.query.get_or_404(document_id)
-    exercise = document.exercise
+    exercise = exercise.exercise
 
     # Check if user has permission
     if exercise.user_id != current_user.id:
@@ -1673,3 +1673,40 @@ def search():
     if form.validate_on_submit() or request.args.get('query'):
         query = form.query.data if form.validate_on_submit() else request.args.get('query')
         search_type = form.search_type.data if form.validate_on_submit() else request.args.get('search_type', 'all')
+
+        if search_type == 'all' or search_type == 'users':
+            users = User.query.filter(User.username.contains(query) | User.full_name.contains(query) | User.email.contains(query)).all()
+        else:
+            users = []
+
+        if search_type == 'all' or search_type == 'workgroups':
+            workgroups = Workgroup.query.filter(Workgroup.name.contains(query) | Workgroup.description.contains(query)).all()
+        else:
+            workgroups = []
+
+        if search_type == 'all' or search_type == 'exercises':
+            exercises = Exercise.query.filter(Exercise.name.contains(query) | Exercise.description.contains(query)).all()
+        else:
+            exercises = []
+
+        results = {
+            'users': users,
+            'workgroups': workgroups,
+            'exercises': exercises
+        }
+
+    return render_template(
+        'search.html',
+        title='Recherche',
+        form=form,
+        results=results
+    )
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('errors/500.html'), 500

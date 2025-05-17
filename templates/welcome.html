@@ -10,22 +10,26 @@
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
       <!-- Carte Exercices -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all">
         <h3 class="text-xl font-semibold mb-3">Exercices Comptables</h3>
         <p class="text-gray-600 mb-4">Pratiquez et améliorez vos compétences en comptabilité OHADA</p>
-        <a href="{{ url_for('exercises_list') }}" class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
-          Commencer un exercice
+        <a href="{{ url_for('dashboard') }}" class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+          <i class="fas fa-calculator me-2"></i>Accéder au tableau de bord
         </a>
       </div>
 
       <!-- Carte Communauté -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all">
         <h3 class="text-xl font-semibold mb-3">Espace Communauté</h3>
         <p class="text-gray-600 mb-4">Échangez avec d'autres professionnels de la comptabilité</p>
-        <a href="{{ url_for('workgroups_list') }}" class="inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700">
-          Rejoindre la communauté
+        <a href="{{ url_for('feed') }}" class="inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
+          <i class="fas fa-users me-2"></i>Accéder au réseau social
         </a>
       </div>
+    </div>
+    
+    <div class="mt-8 text-sm text-gray-600">
+      <p>Vous pouvez toujours accéder à ces fonctionnalités depuis la barre de navigation en haut de la page.</p>
     </div>
   </section>
 </div>
