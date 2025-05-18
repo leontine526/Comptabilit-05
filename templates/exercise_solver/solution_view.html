@@ -1,108 +1,59 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('exercise_solutions_list') }}">Mes solutions</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ solution.title }}</li>
-        </ol>
-    </nav>
-    
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2">{{ solution.title }}</h1>
-        <div>
-            <a href="{{ url_for('exercise_solver_form') }}" class="btn btn-primary">
-                <i class="fas fa-magic"></i> Résoudre un autre exercice
-            </a>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Informations</h5>
+<div class="container mt-4">
+    <div class="col-md-10 mx-auto">
+        <div class="dashboard-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>{{ title }}</h5>
+                <a href="{{ url_for('exercise_solver_form') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nouvelle résolution
+                </a>
+            </div>
+            <div class="card-body">
+                <h3>Énoncé</h3>
+                <div class="p-3 mb-4 bg-dark rounded">
+                    <pre class="mb-0 text-white">{{ solution.problem_text }}</pre>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
+
+                <h3>Solution</h3>
+                <div class="p-3 bg-light rounded">
+                    <pre class="mb-0">{{ solution.solution_text }}</pre>
+                </div>
+
+                {% if solution.confidence %}
+                <div class="mt-3">
+                    <p><strong>Indice de confiance:</strong> {{ "%.2f"|format(solution.confidence*100) }}%</p>
+                </div>
+                {% endif %}
+
+                {% if examples_used %}
+                <div class="mt-4">
+                    <h4>Exemples similaires utilisés</h4>
+                    <ul class="list-group">
+                        {% for example_data in examples_used %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Date de création</span>
-                            <span>{{ solution.created_at.strftime('%d/%m/%Y à %H:%M') }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Niveau de confiance</span>
-                            <span class="badge bg-{{ 'danger' if solution.confidence < 0.4 else 'warning' if solution.confidence < 0.7 else 'success' }}">
-                                {{ (solution.confidence * 100)|int }}%
+                            <div>
+                                <a href="{{ url_for('exercise_example_view', example_id=example_data.example.id) }}">
+                                    {{ example_data.example.title }}
+                                </a>
+                                <span class="badge bg-secondary ms-2">{{ example_data.example.category }}</span>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">
+                                Similarité: {{ "%.2f"|format(example_data.similarity*100) }}%
                             </span>
                         </li>
+                        {% endfor %}
                     </ul>
                 </div>
+                {% endif %}
             </div>
-            
-            {% if examples_used %}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Exemples utilisés</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text small">Les exemples suivants ont été utilisés pour générer cette solution, classés par ordre de pertinence :</p>
-                        <ul class="list-group list-group-flush">
-                            {% for item in examples_used %}
-                                <li class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <a href="{{ url_for('exercise_example_view', example_id=item.example.id) }}">
-                                            {{ item.example.title }}
-                                        </a>
-                                        <span class="badge bg-{{ 'danger' if item.similarity < 0.4 else 'warning' if item.similarity < 0.7 else 'success' }}">
-                                            {{ (item.similarity * 100)|int }}%
-                                        </span>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-        
-        <div class="col-md-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Énoncé de l'exercice</h5>
-                </div>
-                <div class="card-body">
-                    <div class="problem-text">
-                        {% for paragraph in solution.problem_text.split('\n\n') %}
-                            <p>{{ paragraph }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Solution proposée</h5>
-                </div>
-                <div class="card-body">
-                    <div class="solution-text">
-                        {% for paragraph in solution.solution_text.split('\n\n') %}
-                            <p>{{ paragraph }}</p>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="alert alert-warning mt-4">
-                        <i class="fas fa-exclamation-triangle"></i> <strong>Important :</strong> Cette solution est générée automatiquement en se basant sur des exemples similaires. Vérifiez-la attentivement avant de l'utiliser.
-                    </div>
-                </div>
+            <div class="card-footer">
+                <a href="{{ url_for('exercises_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour aux exercices
+                </a>
             </div>
         </div>
-    </div>
-    
-    <div class="mt-4">
-        <a href="{{ url_for('exercise_solutions_list') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Retour à la liste
-        </a>
     </div>
 </div>
 {% endblock %}

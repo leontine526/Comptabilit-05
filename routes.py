@@ -333,8 +333,8 @@ def exercise_new():
             db.session.add(exercise)
             db.session.commit()
 
-            flash('Exercice créé avec succès!', 'success')
-            return redirect(url_for('exercises_list'))
+            flash('Exercice créé avec succès! Vous pouvez maintenant entrer un énoncé pour résoudre un problème comptable.', 'success')
+            return redirect(url_for('exercise_solver_form'))
         except Exception as e:
             db.session.rollback()
             logger.error(f"Erreur lors de la création de l'exercice: {str(e)}")
