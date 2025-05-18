@@ -713,5 +713,29 @@ function loadDocumentPreview(documentId, containerSelector) {
             container.innerHTML = `<div class="alert alert-danger m-3">
                 <i class="feather-alert-circle"></i> ${error.message}
             </div>`;
+
+// Gestion du lien vers le plan comptable
+document.addEventListener('DOMContentLoaded', function() {
+  const planLink = document.getElementById('plan-comptable-link');
+  if (planLink) {
+    // Vérifier si l'utilisateur est connecté
+    const isAuthenticated = document.body.classList.contains('user-authenticated');
+    
+    if (isAuthenticated) {
+      // Faire une requête AJAX pour obtenir l'ID du premier exercice
+      fetch('/api/get-first-exercise')
+        .then(response => response.json())
+        .then(data => {
+          if (data.exercise_id) {
+            planLink.href = `/exercises/${data.exercise_id}/accounts`;
+          }
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement de l\'exercice:', error);
+        });
+    }
+  }
+});
+
         });
 }

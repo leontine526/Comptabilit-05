@@ -1,1 +1,1 @@
-<li><a class="dropdown-item" href="{% if current_user.is_authenticated %}{% set exercise = current_user.exercises.first() %}{{ url_for('accounts_list', exercise_id=exercise.id) if exercise else '#' }}{% else %}#{% endif %}"><i class="fas fa-sitemap me-2"></i>Consulter le plan</a></li>
+<li><a class="dropdown-item" href="#" id="plan-comptable-link"><i class="fas fa-sitemap me-2"></i>Consulter le plan</a></li>

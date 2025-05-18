@@ -24,7 +24,7 @@
 
     {% block styles %}{% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="{% if current_user.is_authenticated %}user-authenticated{% endif %}">
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
@@ -240,7 +240,7 @@
 
     <!-- Main Content -->
     <main class="flex-grow-1">
-        
+
 <div class="page-header">
     <div class="container-fluid">
         <div class="row mb-3">

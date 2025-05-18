@@ -1879,3 +1879,25 @@ def update_last_seen():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/get-first-exercise')
+@login_required
+def get_first_exercise():
+    """Récupère l'ID du premier exercice de l'utilisateur de manière sécurisée"""
+    try:
+        # Utiliser le décorateur safe_db_operation pour cette opération
+        @safe_db_operation(max_retries=2)
+        def fetch_first_exercise():
+            stmt = db.select(Exercise).filter_by(user_id=current_user.id).limit(1)
+            result = db.session.execute(stmt)
+            exercise = result.scalar_one_or_none()  # Récupère un seul résultat ou None
+            return exercise
+            
+        exercise = fetch_first_exercise()
+        if exercise:
+            return jsonify({'success': True, 'exercise_id': exercise.id}), 200
+        return jsonify({'success': False, 'error': 'Aucun exercice trouvé'}), 404
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération du premier exercice: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
