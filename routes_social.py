@@ -92,26 +92,38 @@ def workgroup_posts(workgroup_id):
 @login_required
 def feed():
     """Affiche le fil d'actualité de l'utilisateur"""
-    # Récupère les groupes de l'utilisateur
-    user_workgroups = [wg.id for wg in current_user.workgroups]
+    try:
+        # Récupère les groupes de l'utilisateur
+        user_workgroups = [wg.id for wg in current_user.workgroups]
 
-    # Récupère les publications des groupes de l'utilisateur et les publications publiques
-    posts = Post.query.filter(
-        (Post.workgroup_id.in_(user_workgroups)) | 
-        (Post.workgroup_id == None)
-    ).order_by(Post.created_at.desc()).limit(50).all()
+        # Utiliser une requête SQL personnalisée pour éviter les problèmes de colonne
+        from sqlalchemy.sql import text
+        
+        # Récupère les publications des groupes de l'utilisateur et les publications publiques
+        posts = db.session.query(Post).filter(
+            (Post.workgroup_id.in_(user_workgroups) if user_workgroups else False) | 
+            (Post.workgroup_id == None)
+        ).order_by(Post.created_at.desc()).limit(50).all()
 
-    # Récupère les likes de l'utilisateur actuel
-    liked_posts = [like.post_id for like in Like.query.filter_by(
-        user_id=current_user.id).all() if like.post_id]
+        # Récupère les likes de l'utilisateur actuel
+        liked_posts = [like.post_id for like in Like.query.filter_by(
+            user_id=current_user.id).all() if like.post_id]
 
-    liked_comments = [like.comment_id for like in Like.query.filter_by(
-        user_id=current_user.id).all() if like.comment_id]
+        liked_comments = [like.comment_id for like in Like.query.filter_by(
+            user_id=current_user.id).all() if like.comment_id]
 
-    return render_template('social/feed.html', 
-                          posts=posts,
-                          liked_posts=liked_posts,
-                          liked_comments=liked_comments)
+        return render_template('social/feed.html', 
+                            posts=posts,
+                            liked_posts=liked_posts,
+                            liked_comments=liked_comments)
+    except Exception as e:
+        import logging
+        logging.error(f"Erreur dans le fil d'actualité: {str(e)}")
+        flash(f"Une erreur s'est produite lors du chargement du fil d'actualité: {str(e)}", "danger")
+        return render_template('social/feed.html', 
+                            posts=[],
+                            liked_posts=[],
+                            liked_comments=[])
 
 # Page de notifications
 @app.route('/notifications')

@@ -176,24 +176,22 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                {% if post.background_color %}
-                                    <div class="post-with-color-bg bg-{{ post.background_color }}">
-                                        <p>{{ post.content }}</p>
+                                
+                                    <div class="post-content p-4">
+                                        <p class="card-text">{{ post.content }}</p>
+                                        {% if post.image_url %}
+                                            <div class="post-image mt-2">
+                                                <img src="{{ post.image_url }}" class="img-fluid rounded" alt="Image de publication">
+                                            </div>
+                                        {% elif post.file_url %}
+                                            <div class="post-file mt-2">
+                                                <a href="{{ post.file_url }}" class="btn btn-outline-primary" target="_blank">
+                                                    <i class="bi bi-file-earmark"></i> Voir le fichier joint
+                                                </a>
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                {% else %}
-                                    <p class="card-text">{{ post.content }}</p>
-                                    {% if post.image_url %}
-                                        <div class="post-image mt-2">
-                                            <img src="{{ post.image_url }}" class="img-fluid rounded" alt="Image de publication">
-                                        </div>
-                                    {% elif post.file_url %}
-                                        <div class="post-file mt-2">
-                                            <a href="{{ post.file_url }}" class="btn btn-outline-primary" target="_blank">
-                                                <i class="bi bi-file-earmark"></i> Voir le fichier joint
-                                            </a>
-                                        </div>
-                                    {% endif %}
-                                {% endif %}
+                                
                                 <div class="reaction-details mt-2 mb-2 small text-muted"></div>
                                 <div class="post-actions mt-2 d-flex border-top border-bottom py-2">
                                     <button class="btn btn-sm btn-link text-primary me-2 reaction-button {% if post.id in liked_posts %}reacted{% endif %}" 

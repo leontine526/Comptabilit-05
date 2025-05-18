@@ -415,7 +415,6 @@ class Post(db.Model):
     workgroup_id = db.Column(db.Integer, db.ForeignKey('workgroup.id'), nullable=True)  # Peut être null si publication générale
     image_url = db.Column(db.String(255))  # URL de l'image attachée (optionnel)
     file_url = db.Column(db.String(255))  # URL du fichier attaché (optionnel)
-    background_color = db.Column(db.String(50))  # Type d'arrière-plan coloré (optionnel)
     
     # Relationships
     comments = db.relationship('Comment', backref='post', lazy='dynamic', cascade='all, delete-orphan')
