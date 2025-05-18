@@ -75,11 +75,26 @@ db.init_app(app)
 def teardown_request(exception=None):
     if exception:
         try:
+            # Annuler la transaction en cours si une exception s'est produite
             db.session.rollback()
             logger.info("Transaction annulée automatiquement après une erreur")
         except Exception as e:
             logger.error(f"Erreur lors de l'annulation de la transaction: {str(e)}")
+    
+    # Toujours nettoyer la session DB à la fin de la requête
     db.session.remove()
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Gestionnaire global d'exceptions"""
+    # Tentative d'annulation de toute transaction en cours
+    try:
+        db.session.rollback()
+    except:
+        pass
+    
+    # Laisser les autres gestionnaires d'erreurs traiter l'exception
+    return app.handle_standard_exception(e)
 
 # Initialiser Socket.IO avec gestion d'erreur
 try:
