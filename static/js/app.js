@@ -53,7 +53,7 @@ window.addEventListener('load', function() {
 document.addEventListener('DOMContentLoaded', function() {
     // Masquer le spinner au chargement initial
     toggleLoadingSpinner(false);
-    
+
     // Initialiser tous les tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const clone = testimonial.cloneNode(true);
             slider.appendChild(clone);
         });
-        
+
         // Ajouter une troisième série pour garantir un défilement continu
         testimonials.forEach(testimonial => {
             const clone = testimonial.cloneNode(true);
@@ -127,16 +127,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const speed = 0.8; // Vitesse optimale pour 10 témoignages
         const cardWidth = 430; // Largeur d'une carte + gap
         const totalWidth = testimonials.length * cardWidth;
-        
+
         function animate() {
             position -= speed;
-            
+
             // Réinitialiser position quand le premier groupe de cartes est complètement passé
             if (position <= -totalWidth) {
                 // Reset position au début du second groupe
                 position = 0;
             }
-            
+
             slider.style.transform = `translateX(${position}px)`;
             animationFrameId = requestAnimationFrame(animate);
         }
@@ -206,6 +206,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize exercise analysis
     initializeAnalysisCharts();
+
+// Gestion du lien vers le plan comptable
+document.addEventListener('DOMContentLoaded', function() {
+  const planLink = document.getElementById('plan-comptable-link');
+  if (planLink) {
+    // Vérifier si l'utilisateur est connecté
+    const isAuthenticated = document.body.classList.contains('user-authenticated');
+
+    if (isAuthenticated) {
+      // Faire une requête AJAX pour obtenir l'ID du premier exercice
+      fetch('/api/get-first-exercise')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.exercise_id) {
+            planLink.href = `/exercises/${data.exercise_id}/accounts`;
+          }
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement de l\'exercice:', error);
+        });
+    }
+  }
+});
 });
 
 /**
@@ -713,29 +736,5 @@ function loadDocumentPreview(documentId, containerSelector) {
             container.innerHTML = `<div class="alert alert-danger m-3">
                 <i class="feather-alert-circle"></i> ${error.message}
             </div>`;
-
-// Gestion du lien vers le plan comptable
-document.addEventListener('DOMContentLoaded', function() {
-  const planLink = document.getElementById('plan-comptable-link');
-  if (planLink) {
-    // Vérifier si l'utilisateur est connecté
-    const isAuthenticated = document.body.classList.contains('user-authenticated');
-    
-    if (isAuthenticated) {
-      // Faire une requête AJAX pour obtenir l'ID du premier exercice
-      fetch('/api/get-first-exercise')
-        .then(response => response.json())
-        .then(data => {
-          if (data.exercise_id) {
-            planLink.href = `/exercises/${data.exercise_id}/accounts`;
-          }
-        })
-        .catch(error => {
-          console.error('Erreur lors du chargement de l\'exercice:', error);
-        });
-    }
-  }
-});
-
         });
 }
