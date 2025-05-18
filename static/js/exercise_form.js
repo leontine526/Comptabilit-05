@@ -1,50 +1,37 @@
-// Script pour le formulaire d'exercice avec énoncé complet uniquement
 document.addEventListener('DOMContentLoaded', function() {
-    // Validation du formulaire d'exercice
+    // Référence au formulaire
     const exerciseForm = document.getElementById('exerciseForm');
+
+    // S'assurer que l'élément existe avant d'ajouter un écouteur d'événement
     if (exerciseForm) {
         const nameInput = document.querySelector('input[name="name"]');
         const startDateInput = document.querySelector('input[name="start_date"]');
         const endDateInput = document.querySelector('input[name="end_date"]');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Ajouter des valeurs par défaut pour les dates
-        if (startDateInput && !startDateInput.value) {
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), 0, 1); // 1er janvier de l'année courante
-            startDateInput.value = firstDay.toISOString().split('T')[0];
-        }
-
-        if (endDateInput && !endDateInput.value) {
-            const today = new Date();
-            const lastDay = new Date(today.getFullYear(), 11, 31); // 31 décembre de l'année courante
-            endDateInput.value = lastDay.toISOString().split('T')[0];
-        }
-
-        // Validation du formulaire
-        exerciseForm.addEventListener('submit', function(e) {
+        exerciseForm.addEventListener('submit', function(event) {
             let isValid = true;
 
             // Validation des dates
-            if (startDateInput.value && endDateInput.value) {
+            if (startDateInput && startDateInput.value && endDateInput && endDateInput.value) {
                 const startDate = new Date(startDateInput.value);
                 const endDate = new Date(endDateInput.value);
 
                 if (endDate < startDate) {
                     endDateInput.classList.add('is-invalid');
                     const errorMsg = endDateInput.nextElementSibling;
-                     if (errorMsg && errorMsg.classList.contains('invalid-feedback')) {
-                         errorMsg.textContent = 'La date de fin doit être postérieure à la date de début';
-                     } else {
-                         const newErrorMsg = document.createElement('div');
-                         newErrorMsg.classList.add('invalid-feedback');
-                         newErrorMsg.textContent = 'La date de fin doit être postérieure à la date de début';
-                         endDateInput.parentNode.insertBefore(newErrorMsg, endDateInput.nextElementSibling);
-                     }
+                    if (errorMsg && errorMsg.classList.contains('invalid-feedback')) {
+                        errorMsg.textContent = 'La date de fin doit être postérieure à la date de début';
+                    } else {
+                        const newErrorMsg = document.createElement('div');
+                        newErrorMsg.classList.add('invalid-feedback');
+                        newErrorMsg.textContent = 'La date de fin doit être postérieure à la date de début';
+                        endDateInput.parentNode.insertBefore(newErrorMsg, endDateInput.nextElementSibling);
+                    }
                     isValid = false;
                 } else {
                     endDateInput.classList.remove('is-invalid');
-                     const errorMsg = endDateInput.nextElementSibling;
+                    const errorMsg = endDateInput.nextElementSibling;
                     if (errorMsg && errorMsg.classList.contains('invalid-feedback')) {
                         errorMsg.remove();
                     }
@@ -52,70 +39,67 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Validation du nom
-            if (!nameInput.value.trim()) {
+            if (nameInput && !nameInput.value.trim()) {
                 nameInput.classList.add('is-invalid');
                 isValid = false;
-            } else {
+            } else if (nameInput){
                 nameInput.classList.remove('is-invalid');
             }
 
-            if (!startDateInput.value) {
+            if (startDateInput && !startDateInput.value) {
                 startDateInput.classList.add('is-invalid');
                 isValid = false;
-            } else {
+            } else if (startDateInput){
                 startDateInput.classList.remove('is-invalid');
             }
 
-            if (!endDateInput.value) {
+            if (endDateInput && !endDateInput.value) {
                 endDateInput.classList.add('is-invalid');
                 isValid = false;
-            } else {
+            } else if (endDateInput){
                 endDateInput.classList.remove('is-invalid');
             }
 
+            // Récupérer l'énoncé
+            const enonce = document.getElementById('enonce').value.trim();
+
+            // Vérifier si l'énoncé est vide
+            if (!enonce) {
+                event.preventDefault();
+                alert('Veuillez saisir un énoncé pour résoudre l\'exercice.');
+                return false;
+            }
 
             if (!isValid) {
-                e.preventDefault();
+                event.preventDefault();
+                return false;
             } else {
-                // Désactiver le bouton pour éviter les soumissions multiples
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
+                 // Désactiver le bouton pour éviter les soumissions multiples
+                if(submitBtn){
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
+                }
+
+                // Si tout est valide, laisser le formulaire se soumettre normalement
+                console.log('Soumission du formulaire avec énoncé:', enonce);
+                return true;
             }
+
+
         });
-
-         // Validation en temps réel pour les dates
-        if (startDateInput && endDateInput) {
-            [startDateInput, endDateInput].forEach(input => {
-                input.addEventListener('change', function() {
-                    if (startDateInput.value && endDateInput.value) {
-                        const startDate = new Date(startDateInput.value);
-                        const endDate = new Date(endDateInput.value);
-
-                        if (endDate < startDate) {
-                            endDateInput.classList.add('is-invalid');
-                            const errorMsg = endDateInput.nextElementSibling;
-                            if (errorMsg && errorMsg.classList.contains('invalid-feedback')) {
-                                errorMsg.textContent = 'La date de fin doit être postérieure à la date de début';
-                            } else {
-                                const newErrorMsg = document.createElement('div');
-                                newErrorMsg.classList.add('invalid-feedback');
-                                newErrorMsg.textContent = 'La date de fin doit être postérieure à la date de début';
-                                endDateInput.parentNode.insertBefore(newErrorMsg, endDateInput.nextElementSibling);
-                            }
-                        } else {
-                            endDateInput.classList.remove('is-invalid');
-                            const errorMsg = endDateInput.nextElementSibling;
-                            if (errorMsg && errorMsg.classList.contains('invalid-feedback')) {
-                                errorMsg.remove();
-                            }
-                        }
-                    }
-                });
-            });
-        }
     }
 
-    // Formulaire de résolution avec énoncé uniquement
+    // Prévenir le comportement par défaut des boutons qui pourraient interférer
+    const buttons = document.querySelectorAll('button[type="button"]');
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+        });
+    });
+
+    console.log('Script de formulaire d\'exercice initialisé.');
+
+     // Formulaire de résolution avec énoncé uniquement
     const operationForm = document.getElementById('operation-form');
     if (operationForm) {
         operationForm.addEventListener('submit', function(e) {

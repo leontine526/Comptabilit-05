@@ -14,7 +14,10 @@
                     <h4><i class="fas fa-calculator mr-2"></i>Résolution d'Exercice Comptable</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" id="operation-form">
+                  
+                    <form id="exerciseForm" method="POST" action="{{ url_for('resoudre_exercice') }}">
+                        {{ csrf_token() if csrf_token }}
+
                         <div class="form-group">
                             <label for="exercice-select">Exercice comptable:</label>
                             <select class="form-control" id="exercice-select" name="exercise_id">
@@ -67,7 +70,7 @@
         document.getElementById('enonce').focus();
 
         // Vérification du formulaire
-        const form = document.getElementById('operation-form');
+        const form = document.getElementById('exerciseForm');
         form.addEventListener('submit', function(e) {
             const enonce = document.getElementById('enonce');
             if (!enonce.value.trim()) {
