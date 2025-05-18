@@ -67,7 +67,7 @@ def resoudre_exercice():
     ).order_by(Exercise.created_at.desc()).first()
     
     if request.method == 'POST':
-        # Option 1: Traitement simple avec génération directe
+        # Option 1: Traitement avec énoncé complet via exercise_resolution.py
         if 'enonce' in request.form:
             enonce = request.form['enonce']
             exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
@@ -76,7 +76,7 @@ def resoudre_exercice():
                 flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
                 return redirect(url_for('exercise_new'))
             
-            # Utiliser le résolveur d'exercice pour générer la solution complète
+            # Utiliser le module exercise_resolution pour générer la solution complète
             result = resolve_exercise_completely(exercise_id, enonce)
             
             if result['success']:
@@ -94,7 +94,7 @@ def resoudre_exercice():
             else:
                 flash("Erreur lors de la résolution: " + " ".join(result['errors']), "danger")
         
-        # Option 2: Traitement avec les opérations individuelles
+        # Option 2: Traitement avec les opérations individuelles via ComptableIA
         else:
             operations = []
 
@@ -102,17 +102,25 @@ def resoudre_exercice():
             montants = request.form.getlist('montant_ht')
             dates = request.form.getlist('date_op')
             taux_tva = request.form.getlist('taux_tva')
+            frais = request.form.getlist('frais_accessoires')
+            remises = request.form.getlist('remise')
 
             for i in range(len(textes)):
                 operations.append({
                     "texte": textes[i],
                     "montant_ht": float(montants[i]),
                     "taux_tva": float(taux_tva[i]) if taux_tva[i] else 0,
-                    "date_op": dates[i]
+                    "date_op": dates[i],
+                    "frais_accessoires": float(frais[i]) if i < len(frais) and frais[i] else 0,
+                    "remise": float(remises[i]) if i < len(remises) and remises[i] else 0
                 })
 
+            # Utiliser ComptableIA pour générer les documents comptables
             resultat = compta.generer_journal_complet(operations)
 
+            logger.info(f"Génération des documents comptables réussie avec {len(operations)} opérations")
+            
+            # Utiliser le template resultats.html pour afficher les documents générés
             return render_template(
                 'resultats.html',
                 journal=resultat['journal'],
