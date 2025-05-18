@@ -98,7 +98,8 @@ if __name__ == '__main__':
             host='0.0.0.0', 
             port=5000, 
             debug=True,
-            log_output=True
+            log_output=True,
+            allow_unsafe_werkzeug=True
         )
     except Exception as e:
         logger.error(f"Erreur lors du démarrage du serveur: {str(e)}")
