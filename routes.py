@@ -828,7 +828,8 @@ def document_process(document_id):
 
     # Check if user has permission
     if exercise.user_id != current_user.id:
-        abort(403)
+        abort<replit_final_file>
+(403)
 
     # Check if exercise is closed
     if exercise.is_closed:
@@ -1744,3 +1745,13 @@ def internal_error(error):
 def community():
     """Redirige vers le fil d'actualité social"""
     return redirect(url_for('feed'))
+
+@app.route('/api/last-seen', methods=['POST'])
+def update_last_seen():
+    current_user.last_seen = datetime.utcnow()
+    try:
+        db.session.commit()
+        return jsonify({'success': True}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
