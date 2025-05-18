@@ -1,2 +1,240 @@
-The code modification adds profile picture display functionality to the dashboard.
-```
+
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-widgets.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="welcome-text">
+            <h1>Bienvenue, {{ current_user.full_name }}</h1>
+            <p class="lead">Voici un aperçu de vos activités comptables</p>
+        </div>
+    </div>
+    
+    <!-- Dashboard Content -->
+    <div class="row">
+        <!-- Left Column - Exercises -->
+        <div class="col-lg-6 mb-4">
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-book me-2"></i>Exercices récents</h5>
+                    <a href="{{ url_for('exercises_list') }}" class="btn btn-sm btn-outline-primary">Tout voir</a>
+                </div>
+                <div class="card-body">
+                    {% if exercises %}
+                        <div class="dashboard-list-group">
+                            {% for exercise in exercises %}
+                                <a href="{{ url_for('transactions_list', exercise_id=exercise.id) }}" class="list-group-item dashboard-list-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>{{ exercise.name }}</h6>
+                                        <small class="d-block">{{ exercise.start_date.strftime('%d/%m/%Y') }} - {{ exercise.end_date.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                    <span class="badge rounded-pill {% if exercise.is_closed %}bg-danger{% else %}bg-success{% endif %}">
+                                        {% if exercise.is_closed %}Clôturé{% else %}En cours{% endif %}
+                                    </span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-book empty-state-icon"></i>
+                            <p>Vous n'avez pas encore créé d'exercice.</p>
+                            <a href="{{ url_for('exercise_new') }}" class="btn btn-primary">Créer un exercice</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column - Transactions -->
+        <div class="col-lg-6 mb-4">
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-exchange-alt me-2"></i>Transactions récentes</h5>
+                    {% if exercises %}
+                        <a href="{{ url_for('transactions_list', exercise_id=exercises[0].id) }}" class="btn btn-sm btn-outline-primary">Tout voir</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if recent_transactions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Référence</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in recent_transactions %}
+                                        <tr>
+                                            <td>{{ transaction.transaction_date.strftime('%d/%m/%Y') }}</td>
+                                            <td>{{ transaction.reference }}</td>
+                                            <td class="transaction-desc">{{ transaction.description }}</td>
+                                            <td>
+                                                <a href="{{ url_for('transaction_view', transaction_id=transaction.id) }}" class="action-btn view" title="Voir"><i class="fas fa-eye"></i></a>
+                                                {% if not transaction.is_posted %}
+                                                    <a href="{{ url_for('transaction_edit', transaction_id=transaction.id) }}" class="action-btn edit" title="Modifier"><i class="fas fa-pencil-alt"></i></a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-exchange-alt empty-state-icon"></i>
+                            <p>Aucune transaction récente.</p>
+                            {% if exercises %}
+                                <a href="#" class="btn btn-primary">Créer une transaction</a>
+                            {% else %}
+                                <p class="text-muted">Créez d'abord un exercice pour ajouter des transactions.</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Second Row -->
+    <div class="row">
+        <!-- Left Column - Documents -->
+        <div class="col-lg-6 mb-4">
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-file-alt me-2"></i>Documents récents</h5>
+                    {% if exercises %}
+                        <a href="{{ url_for('documents_list', exercise_id=exercises[0].id) }}" class="btn btn-sm btn-outline-primary">Tout voir</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if recent_documents %}
+                        <div class="dashboard-list-group">
+                            {% for document in recent_documents %}
+                                <a href="{{ url_for('document_view', document_id=document.id) }}" class="list-group-item dashboard-list-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>{{ document.original_filename }}</h6>
+                                        <small class="d-block text-secondary">{{ document.upload_date.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                    <span class="badge bg-info rounded-pill">{{ document.document_type|capitalize }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-file-alt empty-state-icon"></i>
+                            <p>Vous n'avez pas encore téléchargé de document.</p>
+                            {% if exercises %}
+                                <a href="{{ url_for('document_upload', exercise_id=exercises[0].id) }}" class="btn btn-primary">Télécharger un document</a>
+                            {% else %}
+                                <p class="text-muted">Créez d'abord un exercice pour ajouter des documents.</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column - Workgroups -->
+        <div class="col-lg-6 mb-4">
+            <div class="dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-users me-2"></i>Groupes de travail</h5>
+                    <a href="{{ url_for('workgroups_list') }}" class="btn btn-sm btn-outline-primary">Tout voir</a>
+                </div>
+                <div class="card-body">
+                    {% if workgroups %}
+                        <div class="dashboard-list-group">
+                            {% for workgroup in workgroups %}
+                                <a href="{{ url_for('workgroup_view', workgroup_id=workgroup.id) }}" class="list-group-item dashboard-list-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>{{ workgroup.name }}</h6>
+                                        <small class="d-block text-secondary">{{ workgroup.members|length }} membre{% if workgroup.members|length > 1 %}s{% endif %}</small>
+                                    </div>
+                                    <span class="badge {% if workgroup.is_private %}bg-warning{% else %}bg-success{% endif %} rounded-pill">
+                                        {% if workgroup.is_private %}Privé{% else %}Public{% endif %}
+                                    </span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-users empty-state-icon"></i>
+                            <p>Vous n'avez pas encore rejoint de groupe.</p>
+                            <a href="{{ url_for('workgroups_list') }}" class="btn btn-primary">Rejoindre un groupe</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Section -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-circle me-2"></i>Mon profil</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        {% if current_user.profile_picture %}
+                            <img src="{{ url_for('uploaded_file', filename=current_user.profile_picture) }}" 
+                                 class="rounded-circle me-4" 
+                                 alt="Photo de profil"
+                                 width="80" height="80">
+                        {% else %}
+                            <div class="dashboard-profile-placeholder me-4">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h4 class="mb-1">{{ current_user.full_name }}</h4>
+                            <p class="mb-2 text-muted">@{{ current_user.username }}</p>
+                            <small class="text-muted">Dernière connexion: {{ current_user.last_seen.strftime('%d/%m/%Y à %H:%M') if current_user.last_seen else 'Inconnue' }}</small>
+                        </div>
+                        <div class="ms-auto">
+                            <a href="{{ url_for('profile') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-1"></i> Modifier mon profil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser les tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+    
+    // Mettre à jour l'heure du dernier accès
+    function updateLastSeen() {
+      const now = new Date();
+      fetch('/api/last-seen', { method: 'POST' })
+        .catch(err => console.error('Error updating last seen:', err));
+    }
+    
+    // Mise à jour au chargement
+    updateLastSeen();
+  });
+</script>
+{% endblock %}
