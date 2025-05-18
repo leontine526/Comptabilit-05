@@ -828,8 +828,7 @@ def document_process(document_id):
 
     # Check if user has permission
     if exercise.user_id != current_user.id:
-        abort<replit_final_file>
-(403)
+        abort(403)
 
     # Check if exercise is closed
     if exercise.is_closed:
