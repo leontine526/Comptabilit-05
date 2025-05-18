@@ -70,6 +70,17 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 # Initialiser les extensions
 db.init_app(app)
 
+# Configurer les hooks pour gérer automatiquement les transactions avortées
+@app.teardown_request
+def teardown_request(exception=None):
+    if exception:
+        try:
+            db.session.rollback()
+            logger.info("Transaction annulée automatiquement après une erreur")
+        except Exception as e:
+            logger.error(f"Erreur lors de l'annulation de la transaction: {str(e)}")
+    db.session.remove()
+
 # Initialiser Socket.IO avec gestion d'erreur
 try:
     socketio = SocketIO(app, async_mode="eventlet", 

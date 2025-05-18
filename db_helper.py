@@ -27,32 +27,54 @@ def safe_db_operation(max_retries=3, retry_delay=1):
             while retries < max_retries:
                 try:
                     # Exécute la fonction avec ses arguments
-                    return func(*args, **kwargs)
+                    result = func(*args, **kwargs)
+                    # Si on arrive ici, l'opération a réussi
+                    return result
                 except (OperationalError, DisconnectionError) as e:
                     # Erreurs de connexion, on peut réessayer
                     last_error = e
                     retries += 1
                     logger.warning(f"Erreur de connexion à la base de données: {str(e)}. Tentative {retries}/{max_retries}")
 
-                    # Si la session est invalide, on la réinitialise
+                    # Annuler toute transaction en cours
+                    try:
+                        db.session.rollback()
+                    except Exception:
+                        pass
+                    
+                    # Réinitialiser complètement la session
                     db.session.remove()
+                    
+                    # Si nécessaire, reconnecter le moteur de base de données
+                    if "connection" in str(e).lower() or "timeout" in str(e).lower():
+                        try:
+                            db.engine.dispose()
+                            logger.info("Moteur de base de données réinitialisé")
+                        except Exception as dispose_error:
+                            logger.error(f"Erreur lors de la réinitialisation du moteur: {str(dispose_error)}")
 
                     # Attendre avant de réessayer
                     time.sleep(retry_delay)
                 except (SQLAlchemyError, DBAPIError) as e:
-                    # Autres erreurs SQLAlchemy, on annule la transaction et on lève l'erreur
+                    # Autres erreurs SQLAlchemy, on annule la transaction
                     last_error = e
                     logger.error(f"Erreur SQLAlchemy: {str(e)}")
 
+                    # Toujours annuler la transaction en cours
                     try:
                         db.session.rollback()
+                        logger.info("Transaction annulée avec succès")
                     except Exception as rollback_error:
-                        logger.error(f"Erreur lors du rollback: {str(rollback_error)}")
-
+                        logger.error(f"Erreur lors de l'annulation: {str(rollback_error)}")
+                        # En cas d'erreur d'annulation, on réinitialise complètement la session
+                        db.session.remove()
+                        
                     # Si c'est une erreur de transaction avortée, on peut réessayer
-                    if "current transaction is aborted" in str(e):
+                    if "current transaction is aborted" in str(e) or "inactive transaction" in str(e):
                         retries += 1
                         logger.warning(f"Transaction avortée, tentative de récupération {retries}/{max_retries}")
+                        # Réinitialiser la session pour s'assurer d'avoir une transaction propre
+                        db.session.remove()
                         time.sleep(retry_delay)
                     else:
                         # Pour les autres erreurs, on arrête et on remonte l'erreur
@@ -71,20 +93,31 @@ def init_db_connection():
     from app import app
     max_attempts = 5
     attempt = 1
+    
     with app.app_context():
-        while attempt < max_attempts:
-            attempt += 1
+        while attempt <= max_attempts:
             try:
+                # Réinitialiser le pool de connexions
+                db.engine.dispose()
+                
                 # Essayer de faire une requête simple pour tester la connexion
                 with db.engine.connect() as conn:
-                    conn.execute(db.text("SELECT 1"))
-                logger.info("Connexion à la base de données établie avec succès")
-                return True
+                    result = conn.execute(text("SELECT 1"))
+                    # Vérifier que la requête a bien retourné un résultat
+                    if result.scalar() == 1:
+                        logger.info("Connexion à la base de données établie avec succès")
+                        return True
+                    else:
+                        logger.warning("La requête de test a retourné une valeur inattendue")
             except Exception as e:
                 logger.warning(f"Tentative {attempt}/{max_attempts} de connexion à la base de données échouée: {str(e)}")
-                if attempt < max_attempts:
-                    time.sleep(2)  # Attendre avant de réessayer
-
+                
+            # Incrémenter le compteur d'essais
+            attempt += 1
+            
+            if attempt <= max_attempts:
+                time.sleep(2)  # Attendre avant de réessayer
+        
         logger.error(f"Impossible d'établir une connexion à la base de données après {max_attempts} tentatives")
         return False
 

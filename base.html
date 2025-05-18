@@ -1,0 +1,1 @@
+<li><a class="dropdown-item" href="{{ url_for('accounts_list', exercise_id=current_user.exercises.first().id) if current_user.is_authenticated and current_user.exercises.first() else '#' }}"><i class="fas fa-sitemap me-2"></i>Consulter le plan</a></li>
