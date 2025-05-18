@@ -827,7 +827,7 @@ def document_process(document_id):
     exercise = document.exercise
 
     # Check if user has permission
-    if exercise.user_id != current_user.id:```python
+    if exercise.user_id != current_user.id:
         abort(403)
 
     # Check if exercise is closed
