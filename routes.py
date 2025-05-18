@@ -67,66 +67,34 @@ def resoudre_exercice():
     ).order_by(Exercise.created_at.desc()).first()
     
     if request.method == 'POST':
-        # Option 1: Traitement avec énoncé complet via exercise_resolution.py
-        if 'enonce' in request.form:
-            enonce = request.form['enonce']
-            exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
-            
-            if not exercise_id:
-                flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
-                return redirect(url_for('exercise_new'))
-            
-            # Utiliser le module exercise_resolution pour générer la solution complète
-            result = resolve_exercise_completely(exercise_id, enonce)
-            
-            if result['success']:
-                flash("Exercice résolu avec succès!", "success")
-                return render_template(
-                    'exercise_solver/complete_solution.html',
-                    solution=result['solution'],
-                    documents={
-                        'journal': result.get('journal'),
-                        'grand_livre': result.get('grand_livre'),
-                        'bilan': result.get('bilan')
-                    },
-                    title="Résolution complète"
-                )
-            else:
-                flash("Erreur lors de la résolution: " + " ".join(result['errors']), "danger")
+        enonce = request.form.get('enonce')
+        exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
         
-        # Option 2: Traitement avec les opérations individuelles via ComptableIA
-        else:
-            operations = []
-
-            textes = request.form.getlist('texte')
-            montants = request.form.getlist('montant_ht')
-            dates = request.form.getlist('date_op')
-            taux_tva = request.form.getlist('taux_tva')
-            frais = request.form.getlist('frais_accessoires')
-            remises = request.form.getlist('remise')
-
-            for i in range(len(textes)):
-                operations.append({
-                    "texte": textes[i],
-                    "montant_ht": float(montants[i]),
-                    "taux_tva": float(taux_tva[i]) if taux_tva[i] else 0,
-                    "date_op": dates[i],
-                    "frais_accessoires": float(frais[i]) if i < len(frais) and frais[i] else 0,
-                    "remise": float(remises[i]) if i < len(remises) and remises[i] else 0
-                })
-
-            # Utiliser ComptableIA pour générer les documents comptables
-            resultat = compta.generer_journal_complet(operations)
-
-            logger.info(f"Génération des documents comptables réussie avec {len(operations)} opérations")
-            
-            # Utiliser le template resultats.html pour afficher les documents générés
+        if not exercise_id:
+            flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
+            return redirect(url_for('exercise_new'))
+        
+        if not enonce:
+            flash("Veuillez saisir un énoncé pour résoudre l'exercice.", "warning")
+            return redirect(url_for('resoudre_exercice'))
+        
+        # Utiliser le module exercise_resolution pour générer la solution complète
+        result = resolve_exercise_completely(exercise_id, enonce)
+        
+        if result['success']:
+            flash("Exercice résolu avec succès!", "success")
             return render_template(
-                'resultats.html',
-                journal=resultat['journal'],
-                grand_livre=resultat['grand_livre'],
-                bilan=resultat['bilan']
+                'exercise_solver/complete_solution.html',
+                solution=result['solution'],
+                documents={
+                    'journal': result.get('journal'),
+                    'grand_livre': result.get('grand_livre'),
+                    'bilan': result.get('bilan')
+                },
+                title="Résolution complète"
             )
+        else:
+            flash("Erreur lors de la résolution: " + " ".join(result['errors']), "danger")
 
     return render_template(
         'formulaire.html', 
@@ -379,7 +347,7 @@ def exercise_new():
             db.session.add(exercise)
             db.session.commit()
 
-            flash('Exercice créé avec succès! Vous pouvez maintenant entrer un énoncé pour résoudre un problème comptable.', 'success')
+            flash('Exercice créé avec succès! Veuillez maintenant saisir l\'énoncé complet pour résoudre l\'exercice.', 'success')
             return redirect(url_for('resoudre_exercice'))
         except Exception as e:
             db.session.rollback()
