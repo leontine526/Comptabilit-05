@@ -105,8 +105,7 @@ if __name__ == '__main__':
             # Démarrage avec Eventlet pour Socket.IO
             socketio.run(app, host='0.0.0.0', port=5000, debug=debug_mode, 
                          allow_unsafe_werkzeug=True,
-                         log_output=True,
-                         cors_allowed_origins="*")
+                         log_output=True)
     except Exception as e:
         logger.error(f"Erreur lors du démarrage du serveur: {str(e)}")
         import traceback

@@ -72,14 +72,14 @@ db.init_app(app)
 
 # Initialiser Socket.IO avec gestion d'erreur
 try:
-    socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet", 
+    socketio = SocketIO(app, async_mode="eventlet", 
                        logger=True, engineio_logger=False,
                        ping_timeout=60, ping_interval=25)
     logger.info("Socket.IO initialisé avec succès")
 except Exception as e:
     logger.error(f"Erreur lors de l'initialisation de Socket.IO: {str(e)}")
     # Fallback sans WebSockets si nécessaire
-    socketio = SocketIO(app, cors_allowed_origins="*", async_mode=None)
+    socketio = SocketIO(app, async_mode=None)
     logger.warning("Socket.IO initialisé en mode de secours sans WebSockets")
 
 # Configurer le gestionnaire de connexion
