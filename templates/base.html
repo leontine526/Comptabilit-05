@@ -240,6 +240,28 @@
 
     <!-- Main Content -->
     <main class="flex-grow-1">
+        
+<div class="page-header">
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    {% if request.path != '/dashboard' and request.path != '/' and request.path != '/index' %}
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary me-2" title="Retour">
+                        <i data-feather="arrow-left"></i>
+                    </a>
+                    {% endif %}
+                    <h2 class="mb-0">{{ title }}</h2>
+                </div>
+                {% block breadcrumbs %}{% endblock %}
+            </div>
+            <div class="col-md-6 d-flex justify-content-md-end align-items-center">
+                {% block page_actions %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+
         {% block content %}{% endblock %}
     </main>
 

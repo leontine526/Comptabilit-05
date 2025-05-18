@@ -1,121 +1,131 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4 mb-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle mr-2"></i> Exercice résolu avec succès!
-            </div>
-
-            <!-- Affichage de la solution -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Solution comptable</h3>
+<div class="container">
+    <div class="mb-3">
+        <a href="{{ url_for('resoudre_exercice') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la saisie d'exercice
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-home"></i> Tableau de bord
+        </a>
+    </div>
+    <div class="container mt-4 mb-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle mr-2"></i> Exercice résolu avec succès!
                 </div>
-                <div class="card-body">
-                    <pre class="solution-text">{{ solution.solution_text }}</pre>
-                </div>
-            </div>
 
-            <!-- Documents générés -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Documents comptables</h3>
+                <!-- Affichage de la solution -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Solution comptable</h3>
+                    </div>
+                    <div class="card-body">
+                        <pre class="solution-text">{{ solution.solution_text }}</pre>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <ul class="nav nav-tabs" id="resultTabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="journal-tab" data-toggle="tab" href="#journal" role="tab">
-                                <i class="fas fa-book mr-2"></i>Journal
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="grand-livre-tab" data-toggle="tab" href="#grand-livre" role="tab">
-                                <i class="fas fa-list-alt mr-2"></i>Grand Livre
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="bilan-tab" data-toggle="tab" href="#bilan" role="tab">
-                                <i class="fas fa-balance-scale mr-2"></i>Bilan
-                            </a>
-                        </li>
-                    </ul>
 
-                    <div class="tab-content p-3" id="resultTabsContent">
-                        <!-- Journal -->
-                        <div class="tab-pane fade show active" id="journal" role="tabpanel">
+                <!-- Documents générés -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Documents comptables</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="nav nav-tabs" id="resultTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="journal-tab" data-toggle="tab" href="#journal" role="tab">
+                                    <i class="fas fa-book mr-2"></i>Journal
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="grand-livre-tab" data-toggle="tab" href="#grand-livre" role="tab">
+                                    <i class="fas fa-list-alt mr-2"></i>Grand Livre
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="bilan-tab" data-toggle="tab" href="#bilan" role="tab">
+                                    <i class="fas fa-balance-scale mr-2"></i>Bilan
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content p-3" id="resultTabsContent">
+                            <!-- Journal -->
+                            <div class="tab-pane fade show active" id="journal" role="tabpanel">
+                                {% if documents.journal %}
+                                    <iframe src="{{ url_for('uploaded_file', filename=documents.journal) }}" width="100%" height="500px" style="border:none;"></iframe>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle mr-2"></i> Aucun journal généré pour cet exercice.
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Grand livre -->
+                            <div class="tab-pane fade" id="grand-livre" role="tabpanel">
+                                {% if documents.grand_livre %}
+                                    <iframe src="{{ url_for('uploaded_file', filename=documents.grand_livre) }}" width="100%" height="500px" style="border:none;"></iframe>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle mr-2"></i> Aucun grand livre généré pour cet exercice.
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Bilan -->
+                            <div class="tab-pane fade" id="bilan" role="tabpanel">
+                                {% if documents.bilan %}
+                                    <iframe src="{{ url_for('uploaded_file', filename=documents.bilan) }}" width="100%" height="500px" style="border:none;"></iframe>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle mr-2"></i> Aucun bilan généré pour cet exercice.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liens directs vers les documents -->
+                {% if documents %}
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h3 class="mb-0">Télécharger les documents</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
                             {% if documents.journal %}
-                                <iframe src="{{ url_for('uploaded_file', filename=documents.journal) }}" width="100%" height="500px" style="border:none;"></iframe>
-                            {% else %}
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle mr-2"></i> Aucun journal généré pour cet exercice.
-                                </div>
+                            <a href="{{ url_for('uploaded_file', filename=documents.journal) }}" class="list-group-item list-group-item-action" target="_blank">
+                                <i class="fas fa-download mr-2"></i> Télécharger le journal comptable
+                            </a>
                             {% endif %}
-                        </div>
 
-                        <!-- Grand livre -->
-                        <div class="tab-pane fade" id="grand-livre" role="tabpanel">
                             {% if documents.grand_livre %}
-                                <iframe src="{{ url_for('uploaded_file', filename=documents.grand_livre) }}" width="100%" height="500px" style="border:none;"></iframe>
-                            {% else %}
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle mr-2"></i> Aucun grand livre généré pour cet exercice.
-                                </div>
+                            <a href="{{ url_for('uploaded_file', filename=documents.grand_livre) }}" class="list-group-item list-group-item-action" target="_blank">
+                                <i class="fas fa-download mr-2"></i> Télécharger le grand livre
+                            </a>
                             {% endif %}
-                        </div>
 
-                        <!-- Bilan -->
-                        <div class="tab-pane fade" id="bilan" role="tabpanel">
                             {% if documents.bilan %}
-                                <iframe src="{{ url_for('uploaded_file', filename=documents.bilan) }}" width="100%" height="500px" style="border:none;"></iframe>
-                            {% else %}
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle mr-2"></i> Aucun bilan généré pour cet exercice.
-                                </div>
+                            <a href="{{ url_for('uploaded_file', filename=documents.bilan) }}" class="list-group-item list-group-item-action" target="_blank">
+                                <i class="fas fa-download mr-2"></i> Télécharger le bilan
+                            </a>
                             {% endif %}
                         </div>
                     </div>
                 </div>
-            </div>
+                {% endif %}
 
-            <!-- Liens directs vers les documents -->
-            {% if documents %}
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h3 class="mb-0">Télécharger les documents</h3>
+                <div class="text-center">
+                    <a href="{{ url_for('resoudre_exercice') }}" class="btn btn-primary mr-2">
+                        <i class="fas fa-calculator mr-2"></i>Résoudre un autre exercice
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-home mr-2"></i>Retour au tableau de bord
+                    </a>
                 </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        {% if documents.journal %}
-                        <a href="{{ url_for('uploaded_file', filename=documents.journal) }}" class="list-group-item list-group-item-action" target="_blank">
-                            <i class="fas fa-download mr-2"></i> Télécharger le journal comptable
-                        </a>
-                        {% endif %}
-
-                        {% if documents.grand_livre %}
-                        <a href="{{ url_for('uploaded_file', filename=documents.grand_livre) }}" class="list-group-item list-group-item-action" target="_blank">
-                            <i class="fas fa-download mr-2"></i> Télécharger le grand livre
-                        </a>
-                        {% endif %}
-
-                        {% if documents.bilan %}
-                        <a href="{{ url_for('uploaded_file', filename=documents.bilan) }}" class="list-group-item list-group-item-action" target="_blank">
-                            <i class="fas fa-download mr-2"></i> Télécharger le bilan
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <div class="text-center">
-                <a href="{{ url_for('resoudre_exercice') }}" class="btn btn-primary mr-2">
-                    <i class="fas fa-calculator mr-2"></i>Résoudre un autre exercice
-                </a>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
-                    <i class="fas fa-home mr-2"></i>Retour au tableau de bord
-                </a>
             </div>
         </div>
     </div>

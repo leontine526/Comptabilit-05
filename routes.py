@@ -334,6 +334,24 @@ def exercises_list():
     exercises = Exercise.query.filter_by(user_id=current_user.id).order_by(Exercise.start_date.desc()).all()
     return render_template('exercises/list.html', title='Exercices', exercises=exercises)
 
+@app.route('/exercises/<int:exercise_id>')
+@login_required
+def view_exercise(exercise_id):
+    exercise = Exercise.query.get_or_404(exercise_id)
+    
+    # Vérifier que l'utilisateur a les droits
+    if exercise.user_id != current_user.id:
+        abort(403)
+        
+    transactions = Transaction.query.filter_by(exercise_id=exercise_id).order_by(Transaction.transaction_date.desc()).all()
+    documents = Document.query.filter_by(exercise_id=exercise_id).order_by(Document.upload_date.desc()).all()
+    
+    return render_template('exercises/view.html', 
+                          title=f'Exercice: {exercise.name}', 
+                          exercise=exercise,
+                          transactions=transactions,
+                          documents=documents)
+
 @app.route('/exercises/new', methods=['GET', 'POST'])
 @login_required
 def exercise_new():
@@ -400,6 +418,38 @@ def exercise_close(exercise_id):
 
     flash('Exercice clôturé avec succès!', 'success')
     return redirect(url_for('exercises_list'))
+
+@app.route('/exercises/<int:exercise_id>/delete', methods=['POST'])
+@login_required
+def delete_exercise(exercise_id):
+    exercise = Exercise.query.get_or_404(exercise_id)
+
+    # Check if user has permission
+    if exercise.user_id != current_user.id:
+        abort(403)
+
+    # Supprimer l'exercice (en cascade pour ses dépendances)
+    db.session.delete(exercise)
+    db.session.commit()
+
+    flash('Exercice supprimé avec succès!', 'success')
+    return redirect(url_for('exercises_list'))
+
+@app.route('/exercises/<int:exercise_id>/publish', methods=['POST'])
+@login_required
+def publish_exercise(exercise_id):
+    exercise = Exercise.query.get_or_404(exercise_id)
+
+    # Check if user has permission
+    if exercise.user_id != current_user.id:
+        abort(403)
+
+    # Marquer l'exercice comme publié
+    exercise.is_published = True
+    db.session.commit()
+
+    flash('Exercice publié avec succès!', 'success')
+    return redirect(url_for('view_exercise', exercise_id=exercise_id))
 
 # Account routes
 @app.route('/exercises/<int:exercise_id>/accounts')

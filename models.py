@@ -145,6 +145,7 @@ class Exercise(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     description = db.Column(db.Text)
     is_closed = db.Column(db.Boolean, default=False)
+    is_published = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
