@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% include 'includes/head.html' %}
+    <title>Résultats | SmartOHADA</title>
+    <style>
+        .results-card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .tab-content {
+            padding: 20px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0,123,255,0.1);
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+            border-top: 3px solid #4e73df;
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/header.html' %}
+    
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle mr-2"></i> Exercice résolu avec succès !
+                </div>
+                
+                <div class="card results-card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Résultats de l'exercice</h3>
+                    </div>
+                    
+                    <div class="card-body p-0">
+                        <ul class="nav nav-tabs" id="resultTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="journal-tab" data-toggle="tab" href="#journal" role="tab">
+                                    <i class="fas fa-book mr-2"></i>Journal
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="grand-livre-tab" data-toggle="tab" href="#grand-livre" role="tab">
+                                    <i class="fas fa-list-alt mr-2"></i>Grand Livre
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="bilan-tab" data-toggle="tab" href="#bilan" role="tab">
+                                    <i class="fas fa-balance-scale mr-2"></i>Bilan
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content" id="resultTabsContent">
+                            <!-- Journal -->
+                            <div class="tab-pane fade show active" id="journal" role="tabpanel">
+                                <h4 class="mb-3">{{ journal.libelle_journal }}</h4>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Compte</th>
+                                                <th>Libellé</th>
+                                                <th class="text-right">Débit</th>
+                                                <th class="text-right">Crédit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for ecriture in journal.écritures %}
+                                                <!-- Partie débit -->
+                                                {% for debit in ecriture.débit %}
+                                                <tr>
+                                                    <td>{{ ecriture.date if loop.first else "" }}</td>
+                                                    <td>{{ debit.compte }}</td>
+                                                    <td>{{ debit.libelle }}</td>
+                                                    <td class="text-right">{{ debit.montant | round(2) }}</td>
+                                                    <td></td>
+                                                </tr>
+                                                {% endfor %}
+                                                
+                                                <!-- Partie crédit -->
+                                                {% for credit in ecriture.crédit %}
+                                                <tr>
+                                                    <td>{{ ecriture.date if loop.first and not ecriture.débit else "" }}</td>
+                                                    <td>{{ credit.compte }}</td>
+                                                    <td>{{ credit.libelle }}</td>
+                                                    <td></td>
+                                                    <td class="text-right">{{ credit.montant | round(2) }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                
+                                                <!-- Ligne vide entre les écritures -->
+                                                <tr><td colspan="5" class="bg-light"></td></tr>
+                                            {% endfor %}
+                                            
+                                            <!-- Totaux -->
+                                            <tr class="table-primary font-weight-bold">
+                                                <td colspan="3" class="text-right">TOTAUX</td>
+                                                <td class="text-right">{{ journal.total_débit | round(2) }}</td>
+                                                <td class="text-right">{{ journal.total_crédit | round(2) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Grand Livre -->
+                            <div class="tab-pane fade" id="grand-livre" role="tabpanel">
+                                <h4 class="mb-3">Grand Livre</h4>
+                                
+                                {% for compte, infos in grand_livre.items() %}
+                                <div class="card mb-3">
+                                    <div class="card-header bg-secondary text-white">
+                                        Compte {{ compte }}
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-bordered mb-0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Débit</th>
+                                                    <th>Crédit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for i in range(max(infos.debit|length, infos.credit|length)) %}
+                                                <tr>
+                                                    <td class="text-right">
+                                                        {{ infos.debit[i] | round(2) if i < infos.debit|length else "" }}
+                                                    </td>
+                                                    <td class="text-right">
+                                                        {{ infos.credit[i] | round(2) if i < infos.credit|length else "" }}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                
+                                                <!-- Totaux du compte -->
+                                                <tr class="table-info font-weight-bold">
+                                                    <td class="text-right">{{ infos.debit | sum | round(2) }}</td>
+                                                    <td class="text-right">{{ infos.credit | sum | round(2) }}</td>
+                                                </tr>
+                                                
+                                                <!-- Solde -->
+                                                {% set solde = (infos.debit | sum) - (infos.credit | sum) %}
+                                                <tr class="table-secondary">
+                                                    <td colspan="2" class="text-center">
+                                                        Solde: 
+                                                        {% if solde > 0 %}
+                                                            <span class="text-success">{{ solde | abs | round(2) }} (Débiteur)</span>
+                                                        {% elif solde < 0 %}
+                                                            <span class="text-danger">{{ solde | abs | round(2) }} (Créditeur)</span>
+                                                        {% else %}
+                                                            <span>0 (Nul)</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Bilan -->
+                            <div class="tab-pane fade" id="bilan" role="tabpanel">
+                                <h4 class="mb-3">Bilan comptable</h4>
+                                
+                                <div class="row">
+                                    <!-- Actif -->
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-primary text-white">
+                                                ACTIF
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <table class="table table-bordered mb-0">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th>Compte</th>
+                                                            <th class="text-right">Montant</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for compte, solde in bilan.actif.items() %}
+                                                        <tr>
+                                                            <td>{{ compte }}</td>
+                                                            <td class="text-right">{{ solde | round(2) }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                        
+                                                        <tr class="table-primary font-weight-bold">
+                                                            <td>TOTAL ACTIF</td>
+                                                            <td class="text-right">{{ bilan.total_actif | round(2) }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Passif -->
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-danger text-white">
+                                                PASSIF
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <table class="table table-bordered mb-0">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th>Compte</th>
+                                                            <th class="text-right">Montant</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for compte, solde in bilan.passif.items() %}
+                                                        <tr>
+                                                            <td>{{ compte }}</td>
+                                                            <td class="text-right">{{ solde | round(2) }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                        
+                                                        <tr class="table-danger font-weight-bold">
+                                                            <td>TOTAL PASSIF</td>
+                                                            <td class="text-right">{{ bilan.total_passif | round(2) }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Équilibre du bilan -->
+                                <div class="alert {{ 'alert-success' if bilan.total_actif == bilan.total_passif else 'alert-danger' }} mt-3">
+                                    {% if bilan.total_actif == bilan.total_passif %}
+                                        <i class="fas fa-check-circle mr-2"></i> Le bilan est équilibré.
+                                    {% else %}
+                                        <i class="fas fa-exclamation-triangle mr-2"></i> Le bilan n'est pas équilibré!
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4 mb-5">
+                    <a href="{{ url_for('resoudre_exercice') }}" class="btn btn-primary mr-2">
+                        <i class="fas fa-calculator mr-2"></i>Résoudre un autre exercice
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-home mr-2"></i>Retour au tableau de bord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% include 'includes/footer.html' %}
+</body>
+</html>

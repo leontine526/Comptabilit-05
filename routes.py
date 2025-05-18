@@ -61,32 +61,70 @@ def welcome():
 @app.route('/resoudre-exercice', methods=['GET', 'POST'])
 @login_required
 def resoudre_exercice():
+    # Récupérer le dernier exercice créé par l'utilisateur
+    last_exercise = Exercise.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Exercise.created_at.desc()).first()
+    
     if request.method == 'POST':
-        operations = []
+        # Option 1: Traitement simple avec génération directe
+        if 'enonce' in request.form:
+            enonce = request.form['enonce']
+            exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
+            
+            if not exercise_id:
+                flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
+                return redirect(url_for('exercise_new'))
+            
+            # Utiliser le résolveur d'exercice pour générer la solution complète
+            result = resolve_exercise_completely(exercise_id, enonce)
+            
+            if result['success']:
+                flash("Exercice résolu avec succès!", "success")
+                return render_template(
+                    'exercise_solver/complete_solution.html',
+                    solution=result['solution'],
+                    documents={
+                        'journal': result.get('journal'),
+                        'grand_livre': result.get('grand_livre'),
+                        'bilan': result.get('bilan')
+                    },
+                    title="Résolution complète"
+                )
+            else:
+                flash("Erreur lors de la résolution: " + " ".join(result['errors']), "danger")
+        
+        # Option 2: Traitement avec les opérations individuelles
+        else:
+            operations = []
 
-        textes = request.form.getlist('texte')
-        montants = request.form.getlist('montant_ht')
-        dates = request.form.getlist('date_op')
-        taux_tva = request.form.getlist('taux_tva')
+            textes = request.form.getlist('texte')
+            montants = request.form.getlist('montant_ht')
+            dates = request.form.getlist('date_op')
+            taux_tva = request.form.getlist('taux_tva')
 
-        for i in range(len(textes)):
-            operations.append({
-                "texte": textes[i],
-                "montant_ht": float(montants[i]),
-                "taux_tva": float(taux_tva[i]) if taux_tva[i] else 0,
-                "date_op": dates[i]
-            })
+            for i in range(len(textes)):
+                operations.append({
+                    "texte": textes[i],
+                    "montant_ht": float(montants[i]),
+                    "taux_tva": float(taux_tva[i]) if taux_tva[i] else 0,
+                    "date_op": dates[i]
+                })
 
-        resultat = compta.generer_journal_complet(operations)
+            resultat = compta.generer_journal_complet(operations)
 
-        return render_template(
-            'resultats.html',
-            journal=resultat['journal'],
-            grand_livre=resultat['grand_livre'],
-            bilan=resultat['bilan']
-        )
+            return render_template(
+                'resultats.html',
+                journal=resultat['journal'],
+                grand_livre=resultat['grand_livre'],
+                bilan=resultat['bilan']
+            )
 
-    return render_template('formulaire.html')
+    return render_template(
+        'formulaire.html', 
+        exercise=last_exercise,
+        title="Résoudre un exercice comptable"
+    )
 
 # Text processing route
 @app.route('/text-processing', methods=['GET', 'POST'])
@@ -334,7 +372,7 @@ def exercise_new():
             db.session.commit()
 
             flash('Exercice créé avec succès! Vous pouvez maintenant entrer un énoncé pour résoudre un problème comptable.', 'success')
-            return redirect(url_for('exercise_solver_form'))
+            return redirect(url_for('resoudre_exercice'))
         except Exception as e:
             db.session.rollback()
             logger.error(f"Erreur lors de la création de l'exercice: {str(e)}")

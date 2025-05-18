@@ -1,67 +1,92 @@
 
-{% extends "base.html" %}
-
-{% block content %}
-<div class="container mt-5">
-    <h1>Résoudre un Exercice Comptable</h1>
-    <form method="POST" action="{{ url_for('resoudre_exercice') }}">
-        <div class="form-group">
-            <label for="texte">Description de l'opération :</label>
-            <input type="text" name="texte" id="texte" class="form-control" required>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% include 'includes/head.html' %}
+    <title>{{ title or "Résoudre un exercice comptable" }} | SmartOHADA</title>
+    <style>
+        .resolution-card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+        .resolution-card:hover {
+            transform: translateY(-5px);
+        }
+        .form-control {
+            border-radius: 6px;
+        }
+        .btn-submit {
+            background-color: #4e73df;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #2e59d9;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/header.html' %}
+    
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card resolution-card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Résoudre un exercice comptable</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if exercise %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle mr-2"></i> Vous travaillez sur l'exercice <strong>{{ exercise.name }}</strong>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> Vous n'avez pas d'exercice actif. <a href="{{ url_for('exercise_new') }}">Créer un exercice</a>
+                        </div>
+                        {% endif %}
+                        
+                        <form method="POST" action="{{ url_for('resoudre_exercice') }}">
+                            {% if exercise %}
+                            <input type="hidden" name="exercise_id" value="{{ exercise.id }}">
+                            {% endif %}
+                            
+                            <div class="form-group">
+                                <label for="enonce"><i class="fas fa-pencil-alt mr-2"></i>Énoncé de l'exercice :</label>
+                                <textarea class="form-control" id="enonce" name="enonce" rows="10" required
+                                    placeholder="Saisissez l'énoncé complet de votre exercice comptable ici..."></textarea>
+                                <small class="form-text text-muted">Entrez les détails complets de l'opération, y compris les montants, les comptes concernés et les dates.</small>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-lg btn-submit">
+                                    <i class="fas fa-calculator mr-2"></i>Comptabiliser
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="mt-5">
+                            <h4 class="border-bottom pb-2"><i class="fas fa-lightbulb mr-2 text-warning"></i>Comment ça fonctionne ?</h4>
+                            <ul class="list-group mt-3">
+                                <li class="list-group-item">
+                                    <strong>Étape 1:</strong> Entrez l'énoncé complet de votre exercice comptable
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Étape 2:</strong> Notre système analyse l'énoncé et génère automatiquement les écritures comptables
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Étape 3:</strong> Vous obtenez instantanément le journal comptable, le grand livre et le bilan
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="montant_ht">Montant HT :</label>
-            <input type="number" name="montant_ht" id="montant_ht" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="taux_tva">Taux TVA (%) :</label>
-            <input type="number" name="taux_tva" id="taux_tva" class="form-control" value="16">
-        </div>
-        <div class="form-group">
-            <label for="date_op">Date de l'opération :</label>
-            <input type="date" name="date_op" id="date_op" class="form-control" required>
-        </div>
-        <button type="button" class="btn btn-secondary mt-3" onclick="addOperation()">Ajouter une opération</button>
-
-        <hr>
-        <h3>Opérations à saisir :</h3>
-        <div id="operations-list">
-            <!-- Les opérations ajoutées apparaîtront ici -->
-        </div>
-
-        <button type="submit" class="btn btn-primary mt-3">Soumettre les opérations</button>
-    </form>
-</div>
-
-<script>
-let operationIndex = 0;
-
-function addOperation() {
-    const texte = document.getElementById('texte').value;
-    const montant = document.getElementById('montant_ht').value;
-    const tauxTva = document.getElementById('taux_tva').value;
-    const dateOp = document.getElementById('date_op').value;
-
-    if (texte && montant && dateOp) {
-        const div = document.createElement('div');
-        div.classList.add('operation-item', 'card', 'mb-3', 'p-3');
-        div.innerHTML = `
-            <input type="hidden" name="texte" value="${texte}">
-            <input type="hidden" name="montant_ht" value="${montant}">
-            <input type="hidden" name="taux_tva" value="${tauxTva}">
-            <input type="hidden" name="date_op" value="${dateOp}">
-            <p class="mb-0">Opération ${operationIndex + 1}: ${texte} | Montant HT: ${montant} | TVA: ${tauxTva}% | Date: ${dateOp}</p>
-        `;
-        document.getElementById('operations-list').appendChild(div);
-        operationIndex++;
-        
-        // Réinitialiser les champs
-        document.getElementById('texte').value = '';
-        document.getElementById('montant_ht').value = '';
-        document.getElementById('date_op').value = '';
-    } else {
-        alert("Tous les champs doivent être remplis !");
-    }
-}
-</script>
-{% endblock %}
+    </div>
+    
+    {% include 'includes/footer.html' %}
+</body>
+</html>
