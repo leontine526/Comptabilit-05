@@ -90,6 +90,13 @@ def too_many_requests(e):
 @app.errorhandler(SQLAlchemyError)
 def handle_db_error(e):
     """Gestionnaire pour les erreurs de base de données"""
+    # Annuler toute transaction en cours pour éviter les erreurs "transaction aborted"
+    try:
+        db.session.rollback()
+        logger.info("Transaction en cours annulée avec succès")
+    except Exception as rollback_error:
+        logger.error(f"Erreur lors de l'annulation de la transaction: {str(rollback_error)}")
+    
     # Log détaillé de l'erreur DB
     error_id = log_error(e, 'DB')
 

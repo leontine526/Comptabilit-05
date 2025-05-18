@@ -67,7 +67,7 @@ def safe_db_operation(max_retries=3, retry_delay=1):
     return decorator
 
 def init_db_connection():
-    """Reinitializes the database connection"""
+    """Initialiser ou réinitialiser la connexion à la base de données"""
     from app import app
     max_attempts = 5
     attempt = 1
