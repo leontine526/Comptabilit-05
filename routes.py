@@ -167,15 +167,15 @@ def register():
                 # Assurer que le dossier d'upload existe
                 upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'profile_pics')
                 os.makedirs(upload_folder, exist_ok=True)
-                
+
                 # Sécuriser le nom de fichier et le rendre unique
                 filename = secure_filename(form.profile_picture.data.filename)
                 unique_filename = f"{uuid.uuid4().hex}_{filename}"
                 file_path = os.path.join(upload_folder, unique_filename)
-                
+
                 # Sauvegarder le fichier
                 form.profile_picture.data.save(file_path)
-                
+
                 # Mettre à jour le chemin dans la base de données
                 user.profile_picture = os.path.join('profile_pics', unique_filename)
 
@@ -207,15 +207,14 @@ def profile():
 
         db.session.commit()
         flash('Votre profil a été mis à jour avec succès!', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('auth/profile.html', title='Profil', form=form)
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     """Sert les fichiers uploadés comme les images de profil"""
     return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-        return redirect(url_for('profile'))
-
-    return render_template('auth/profile.html', title='Profil', form=form)
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
@@ -828,7 +827,7 @@ def document_process(document_id):
     exercise = document.exercise
 
     # Check if user has permission
-    if exercise.user_id != current_user.id:
+    if exercise.user_id != current_user.id:```python
         abort(403)
 
     # Check if exercise is closed
@@ -1739,7 +1738,7 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('errors/500.html'), 500
-    
+
 @app.route('/community')
 @login_required
 def community():
