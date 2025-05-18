@@ -338,6 +338,7 @@ def exercise_new():
         except Exception as e:
             db.session.rollback()
             logger.error(f"Erreur lors de la création de l'exercice: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             flash('Une erreur est survenue lors de la création de l\'exercice.', 'danger')
 
     return render_template('exercises/form.html', title='Nouvel exercice', form=form)
