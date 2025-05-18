@@ -64,7 +64,7 @@
                                     <div class="col-md-6">
                                         <li><h6 class="dropdown-header">Journal comptable</h6></li>
                                         <li><a class="dropdown-item" href="{{ url_for('transactions_list', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-file-invoice me-2"></i>Journal général</a></li>
-                                        <li><a class="dropdown-item" href="{{ url_for('transaction_new', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-edit me-2"></i>Saisie d'écritures</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('transactions_list', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-edit me-2"></i>Saisie d'écritures</a></li>
 
                                         <li><hr class="dropdown-divider"></li>
                                         <li><h6 class="dropdown-header">États financiers</h6></li>

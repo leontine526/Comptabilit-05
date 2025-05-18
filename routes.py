@@ -523,6 +523,61 @@ def transactions_list(exercise_id):
 
     return render_template('transactions/list.html', title='Journal', exercise=exercise, transactions=transactions)
 
+@app.route('/exercises/<int:exercise_id>/transactions/new', methods=['GET', 'POST'])
+@login_required
+def transaction_new(exercise_id):
+    """Création d'une nouvelle transaction"""
+    exercise = Exercise.query.get_or_404(exercise_id)
+    
+    # Check if user has permission
+    if exercise.user_id != current_user.id:
+        abort(403)
+        
+    # Check if exercise is closed
+    if exercise.is_closed:
+        flash('Impossible de créer une transaction sur un exercice clôturé.', 'danger')
+        return redirect(url_for('transactions_list', exercise_id=exercise_id))
+        
+    form = TransactionForm()
+    
+    # Setup transaction items
+    form.setup_transaction_items()
+    
+    if form.validate_on_submit():
+        transaction = Transaction(
+            reference=form.reference.data,
+            transaction_date=form.transaction_date.data,
+            description=form.description.data,
+            is_posted=form.is_posted.data,
+            exercise_id=exercise_id,
+            user_id=current_user.id
+        )
+        
+        db.session.add(transaction)
+        db.session.commit()
+        
+        # Add items
+        for item in form.items:
+            if item.account_id.data and (item.debit_amount.data > 0 or item.credit_amount.data > 0):
+                transaction_item = TransactionItem(
+                    transaction_id=transaction.id,
+                    account_id=item.account_id.data,
+                    description=item.description.data,
+                    debit_amount=item.debit_amount.data or 0,
+                    credit_amount=item.credit_amount.data or 0
+                )
+                db.session.add(transaction_item)
+                
+        db.session.commit()
+        
+        flash('Transaction créée avec succès!', 'success')
+        return redirect(url_for('transactions_list', exercise_id=exercise_id))
+        
+    # Load accounts for dropdown
+    accounts = Account.query.filter_by(exercise_id=exercise_id, is_active=True).order_by(Account.account_number).all()
+    
+    return render_template('transactions/form.html', title='Nouvelle transaction', form=form, exercise=exercise, accounts=accounts)
+
 @app.route('/transactions/<int:transaction_id>/edit', methods=['GET', 'POST'])
 @login_required
 def transaction_edit(transaction_id):
