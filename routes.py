@@ -66,6 +66,11 @@ def resoudre_exercice():
         user_id=current_user.id
     ).order_by(Exercise.created_at.desc()).first()
     
+    # Si aucun exercice n'existe, rediriger vers la création d'exercice
+    if not last_exercise:
+        flash("Veuillez d'abord créer un exercice comptable.", "warning")
+        return redirect(url_for('exercise_new'))
+    
     if request.method == 'POST':
         enonce = request.form.get('enonce')
         exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
@@ -94,7 +99,7 @@ def resoudre_exercice():
                 title="Résolution complète"
             )
         else:
-            flash("Erreur lors de la résolution: " + " ".join(result['errors']), "danger")
+            flash("Erreur lors de la résolution: " + " ".join(result.get('errors', ['Une erreur est survenue'])), "danger")
 
     return render_template(
         'formulaire.html', 

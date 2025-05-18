@@ -136,63 +136,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-// Fonctions pour gérer le formulaire de résolution d'exercice
+// Script pour le formulaire de résolution d'exercice avec énoncé uniquement
 document.addEventListener('DOMContentLoaded', function() {
     // Vérifier si on est sur la page de résolution d'exercice
     const operationForm = document.getElementById('operation-form');
     if (!operationForm) return;
 
-    // Fonctionnalité pour vérifier l'équilibre des écritures
+    // Validation du formulaire d'énoncé
     operationForm.addEventListener('submit', function(e) {
-        const modeEnonce = document.getElementById('mode-enonce');
-        
-        // Si on est en mode énoncé, pas besoin de vérifier l'équilibre
-        if (modeEnonce && modeEnonce.checked) return true;
-        
-        // Vérifier que toutes les opérations ont une description et un montant
-        const descriptions = document.querySelectorAll('textarea[name="texte"]');
-        const amounts = document.querySelectorAll('input[name="montant_ht"]');
-        let isValid = true;
-        
-        descriptions.forEach((desc, index) => {
-            if (!desc.value.trim()) {
-                desc.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                desc.classList.remove('is-invalid');
-            }
-            
-            if (!amounts[index].value || parseFloat(amounts[index].value) <= 0) {
-                amounts[index].classList.add('is-invalid');
-                isValid = false;
-            } else {
-                amounts[index].classList.remove('is-invalid');
-            }
-        });
-        
-        if (!isValid) {
+        const enonceField = document.getElementById('enonce');
+        if (!enonceField.value.trim()) {
             e.preventDefault();
-            alert('Veuillez remplir correctement toutes les opérations.');
+            enonceField.classList.add('is-invalid');
+            alert('Veuillez saisir un énoncé pour résoudre l\'exercice.');
             return false;
+        } else {
+            enonceField.classList.remove('is-invalid');
+            return true;
         }
-        
-        return true;
-    });
-    
-    // Mise à jour automatique des dates
-    const today = new Date().toISOString().split('T')[0];
-    document.querySelectorAll('input[name="date_op"]').forEach(input => {
-        if (!input.value) {
-            input.value = today;
-        }
-    });
-    
-    // Mise en forme des nombres
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-        input.addEventListener('blur', function() {
-            if (this.value && !isNaN(parseFloat(this.value))) {
-                this.value = parseFloat(this.value).toFixed(2);
-            }
-        });
     });
 });
