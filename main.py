@@ -93,14 +93,20 @@ if __name__ == '__main__':
 
     try:
         logger.info("Démarrage du serveur de développement Socket.IO")
-        socketio.run(
-            app, 
-            host='0.0.0.0', 
-            port=5000, 
-            debug=True,
-            log_output=True,
-            allow_unsafe_werkzeug=True
-        )
+        # Optimisation pour la production si l'environnement n'est pas de développement
+        import os
+        debug_mode = os.environ.get('FLASK_ENV') == 'development'
+
+        # Utiliser gunicorn en production, eventlet sinon
+        if os.environ.get('GUNICORN_WORKERS'):
+            # Configuration pour Gunicorn déjà en cours
+            app.run(host='0.0.0.0', port=5000, debug=False)
+        else:
+            # Démarrage avec Eventlet pour Socket.IO
+            socketio.run(app, host='0.0.0.0', port=5000, debug=debug_mode, 
+                         allow_unsafe_werkzeug=True,
+                         log_output=True,
+                         cors_allowed_origins="*")
     except Exception as e:
         logger.error(f"Erreur lors du démarrage du serveur: {str(e)}")
         import traceback
