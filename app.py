@@ -42,7 +42,7 @@ database_uri = os.environ.get("DATABASE_URL")
 if not database_uri:
     logger.error("DATABASE_URL non définie dans les variables d'environnement")
     # Utiliser une URL par défaut si non définie
-    database_uri = "sqlite:///ohada_comptabilite.db"
+    database_uri = "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
     logger.warning(f"Utilisation de l'URL de base de données par défaut: {database_uri}")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
