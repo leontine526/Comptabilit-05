@@ -99,6 +99,8 @@ def init_db_connection():
                     app.config["SQLALCHEMY_DATABASE_URI"] = new_url
                 except Exception as e:
                     logger.warning(f"Impossible d'optimiser l'URL pour le connection pooling: {str(e)}")
+            else:
+                logger.info("L'URL utilise déjà le connection pooler Neon")
         
         while attempt <= max_attempts:
             try:

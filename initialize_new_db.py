@@ -6,6 +6,7 @@ import traceback
 from app import app, db
 from sqlalchemy import text
 from dotenv import load_dotenv
+from models import User, Exercise, ExerciseExample, ExerciseSolution, Workgroup
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO, 
@@ -40,6 +41,20 @@ def initialize_new_database():
             tables = [row[0] for row in result]
             logger.info(f"Tables créées: {', '.join(tables)}")
             
+            # Créer un utilisateur administrateur par défaut
+            admin_exists = User.query.filter_by(email="admin@smartohada.com").first()
+            if not admin_exists:
+                admin = User(
+                    username="admin",
+                    email="admin@smartohada.com",
+                    name="Administrateur",
+                    is_admin=True
+                )
+                admin.set_password("Admin123!")
+                db.session.add(admin)
+                db.session.commit()
+                logger.info("Utilisateur administrateur créé avec succès")
+            
             return True
             
     except Exception as e:
@@ -51,6 +66,7 @@ def initialize_new_database():
 if __name__ == "__main__":
     if initialize_new_database():
         logger.info("Base de données initialisée avec succès")
+        sys.exit(0)
     else:
         logger.error("Échec de l'initialisation de la base de données")
         sys.exit(1)
