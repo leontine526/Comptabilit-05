@@ -18,10 +18,10 @@ def initialize_database():
         with app.app_context():
             # Vérifier la configuration de la base de données
             db_url = app.config.get('SQLALCHEMY_DATABASE_URI')
-            if 'sqlite' in db_url:
-                logger.warning("Utilisation d'une base de données SQLite locale. Pour la production, utilisez PostgreSQL.")
+            if 'neon.tech' in db_url:
+                logger.info("Connexion à la base de données Neon PostgreSQL")
             else:
-                logger.info(f"Connexion à la base de données PostgreSQL: {db_url.split('@')[1] if '@' in db_url else 'hidden'}")
+                logger.warning("URL de base de données non reconnue")
 
             logger.info("Initialisation de la base de données...")
 
