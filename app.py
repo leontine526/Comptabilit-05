@@ -8,7 +8,7 @@ load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
-                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                   format='%(asctime)s - %(name)s - %(levelname)s - %(message.s')
 logger = logging.getLogger(__name__)
 
 # Imports de Flask et ses extensions
@@ -80,7 +80,7 @@ def teardown_request(exception=None):
             logger.info("Transaction annulée automatiquement après une erreur")
         except Exception as e:
             logger.error(f"Erreur lors de l'annulation de la transaction: {str(e)}")
-    
+
     # Toujours nettoyer la session DB à la fin de la requête
     db.session.remove()
 
@@ -92,7 +92,7 @@ def handle_exception(e):
         db.session.rollback()
     except:
         pass
-    
+
     # Laisser les autres gestionnaires d'erreurs traiter l'exception
     return app.handle_standard_exception(e)
 
@@ -129,3 +129,9 @@ def load_user(user_id):
 # Les tables seront créées dans db_initialize.py
 
 # Pas besoin d'importer routes ici, cela sera fait dans main.py
+
+# Route welcome désactivée pour rediriger directement vers le dashboard
+# @app.route('/welcome')
+# @login_required
+# def welcome():
+#     return render_template('welcome.html', title="Bienvenue")

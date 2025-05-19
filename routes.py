@@ -147,7 +147,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             flash(f'Bienvenue, {user.full_name}!', 'success')
-            return redirect(next_page if next_page else url_for('welcome'))
+            return redirect(next_page if next_page else url_for('dashboard'))
         else:
             flash('Identifiant ou mot de passe incorrect.', 'danger')
 
@@ -200,9 +200,11 @@ def register():
 
             db.session.add(user)
             db.session.commit()
-
-            flash('Votre compte a été créé avec succès! Vous pouvez maintenant vous connecter.', 'success')
-            return redirect(url_for('login'))
+            
+            # Connecter automatiquement l'utilisateur
+            login_user(user)
+            flash('Votre compte a été créé avec succès! Bienvenue sur SmartOHADA.', 'success')
+            return redirect(url_for('dashboard'))
         except Exception as e:
             db.session.rollback()
             import logging
