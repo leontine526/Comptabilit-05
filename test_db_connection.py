@@ -2,59 +2,71 @@
 import os
 import sys
 import logging
-import psycopg2
+import traceback
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, 
+# Configuration du logging
+logging.basicConfig(level=logging.INFO,
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 def test_connection():
-    """Test connection to PostgreSQL database specified in DATABASE_URL."""
-    # Load environment variables from .env file
-    load_dotenv()
+    """Tester la connexion à la base de données"""
+    load_dotenv()  # Charger les variables d'environnement
     
-    # Get database URL from environment variables
     database_url = os.environ.get("DATABASE_URL")
-    
     if not database_url:
-        logger.error("DATABASE_URL is not defined in environment variables")
+        logger.error("DATABASE_URL n'est pas définie dans les variables d'environnement")
         return False
     
-    logger.info(f"Tentative de connexion à la base de données: {database_url.split('@')[1]}")
+    logger.info(f"Test de connexion à: {database_url.split('@')[1] if '@' in database_url else 'URL masquée'}")
     
-    # Test with psycopg2
     try:
-        logger.info("Test de connexion avec psycopg2...")
-        conn = psycopg2.connect(database_url)
-        cur = conn.cursor()
-        cur.execute("SELECT version();")
-        version = cur.fetchone()[0]
-        logger.info(f"Connexion réussie! Version PostgreSQL: {version}")
-        cur.close()
-        conn.close()
+        # Créer un moteur SQLAlchemy
+        engine = create_engine(
+            database_url,
+            pool_size=5,
+            max_overflow=10,
+            pool_timeout=30,
+            pool_recycle=1800,
+            pool_pre_ping=True,
+        )
+        
+        # Tester la connexion
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT 1"))
+            row = result.fetchone()
+            if row and row[0] == 1:
+                logger.info("✅ Connexion à la base de données établie avec succès!")
+                
+                # Afficher les tables existantes
+                tables_result = conn.execute(text("""
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema='public'
+                    ORDER BY table_name;
+                """))
+                tables = [row[0] for row in tables_result]
+                
+                if tables:
+                    logger.info(f"Tables existantes: {', '.join(tables)}")
+                else:
+                    logger.info("Aucune table n'existe encore dans cette base de données.")
+                
+                return True
+            else:
+                logger.error("❌ La requête de test a échoué")
+                return False
     except Exception as e:
-        logger.error(f"Erreur de connexion avec psycopg2: {str(e)}")
+        logger.error(f"❌ Erreur de connexion: {str(e)}")
+        traceback.print_exc()
         return False
-    
-    # Test with SQLAlchemy
-    try:
-        logger.info("Test de connexion avec SQLAlchemy...")
-        engine = create_engine(database_url)
-        with engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
-            logger.info(f"Connexion SQLAlchemy réussie: {result.fetchone()}")
-    except Exception as e:
-        logger.error(f"Erreur de connexion avec SQLAlchemy: {str(e)}")
-        return False
-    
-    logger.info("Tests de connexion à la base de données réussis!")
-    return True
 
 if __name__ == "__main__":
-    success = test_connection()
-    print("Script de test de connexion à la base de données terminé avec succès!" if success 
-          else "Échec du test de connexion à la base de données.")
-    sys.exit(0 if success else 1)
+    if test_connection():
+        print("\n✅ La connexion à la base de données a réussi!")
+        sys.exit(0)
+    else:
+        print("\n❌ La connexion à la base de données a échoué!")
+        sys.exit(1)

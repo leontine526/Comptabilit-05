@@ -76,10 +76,30 @@ def safe_db_operation(max_retries=3):
 def init_db_connection():
     """Initialiser ou réinitialiser la connexion à la base de données"""
     from app import app
+    import os
+    from sqlalchemy.engine.url import make_url
+    
     max_attempts = 5
     attempt = 1
 
     with app.app_context():
+        # Optimiser l'URL pour utiliser le connection pooler de Neon
+        database_url = os.environ.get("DATABASE_URL")
+        if database_url and 'neon.tech' in database_url:
+            # Vérifier si l'URL utilise déjà le connection pooler
+            if '-pooler' not in database_url:
+                try:
+                    url_obj = make_url(database_url)
+                    host = url_obj.host
+                    # Remplacer le host normal par la version pooler
+                    pooler_host = host.replace('.', '-pooler.', 1)
+                    new_url = database_url.replace(host, pooler_host)
+                    logger.info(f"URL de base de données optimisée pour connection pooling")
+                    # Mettre à jour l'URL dans l'application
+                    app.config["SQLALCHEMY_DATABASE_URI"] = new_url
+                except Exception as e:
+                    logger.warning(f"Impossible d'optimiser l'URL pour le connection pooling: {str(e)}")
+        
         while attempt <= max_attempts:
             try:
                 # Réinitialiser le pool de connexions
