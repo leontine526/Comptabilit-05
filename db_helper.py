@@ -78,9 +78,11 @@ def init_db_connection():
     from app import app
     import os
     from sqlalchemy.engine.url import make_url
+    from sqlalchemy import create_engine
     
-    max_attempts = 5
+    max_attempts = 3  # Réduit le nombre de tentatives
     attempt = 1
+    connect_timeout = 3  # Timeout de 3 secondes
 
     with app.app_context():
         # Optimiser l'URL pour utiliser le connection pooler de Neon

@@ -48,10 +48,12 @@ if not database_uri:
 app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_size": 5,
-    "pool_recycle": 300,
+    "pool_size": 10,
+    "pool_recycle": 60,  # Recycle connections plus fréquemment
     "pool_pre_ping": True,
-    "max_overflow": 10
+    "max_overflow": 15,
+    "pool_timeout": 10,
+    "connect_args": {"connect_timeout": 3}
 }
 
 # Configurer les uploads de fichiers
