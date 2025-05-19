@@ -182,7 +182,7 @@ def register():
             user.set_password(form.password.data)
 
             # Gérer l'upload de la photo de profil
-            if form.profile_picture.data:
+            if form.profile_picture.data and hasattr(form.profile_picture.data, 'filename'):
                 # Assurer que le dossier d'upload existe
                 upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'profile_pics')
                 os.makedirs(upload_folder, exist_ok=True)
