@@ -75,14 +75,18 @@ def safe_db_operation(max_retries=3):
 
 def init_db_connection():
     """Initialiser ou réinitialiser la connexion à la base de données"""
-    from app import app
+    from app import app, db
     import os
     from sqlalchemy.engine.url import make_url
-    from sqlalchemy import create_engine
+    from sqlalchemy import create_engine, text
     
-    max_attempts = 3  # Réduit le nombre de tentatives
+    max_attempts = 3
     attempt = 1
-    connect_timeout = 3  # Timeout de 3 secondes
+    connect_timeout = 3
+
+    # Forcer l'utilisation de l'URL PostgreSQL
+    database_url = "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
     with app.app_context():
         # Optimiser l'URL pour utiliser le connection pooler de Neon
