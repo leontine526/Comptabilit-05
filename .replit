@@ -415,6 +415,19 @@ args = "python enable_file_logging.py"
 task = "shell.exec"
 args = "python robust_app_starter.py"
 
+[[workflows.workflow]]
+name = "Installer Dépendances avec UPM"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "upm add flask-wtf flask-login flask-sqlalchemy sqlalchemy flask-socketio python-dotenv xlsxwriter eventlet psycopg2-binary werkzeug"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_requirements.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80

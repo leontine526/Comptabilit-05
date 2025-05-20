@@ -13,15 +13,23 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger("module_fixer")
 
 def install_module(module_name):
-    """Installe un module pip"""
+    """Installe un module via upm dans Replit"""
     logger.info(f"Installation du module {module_name}...")
     try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", module_name])
+        # Utiliser upm au lieu de pip dans l'environnement Replit
+        subprocess.check_call(["upm", "add", module_name])
         logger.info(f"✅ Module {module_name} installé avec succès")
         return True
     except Exception as e:
         logger.error(f"❌ Erreur lors de l'installation de {module_name}: {str(e)}")
-        return False
+        logger.info(f"Alternative: essai avec pip install --user")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", module_name])
+            logger.info(f"✅ Module {module_name} installé avec succès via pip --user")
+            return True
+        except Exception as e2:
+            logger.error(f"❌ Échec de l'installation alternative: {str(e2)}")
+            return False
 
 def check_and_install_modules():
     """Vérifie et installe les modules nécessaires"""

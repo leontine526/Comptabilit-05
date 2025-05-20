@@ -43,17 +43,27 @@ def main():
     logger.info("Vérification des modules requis...")
     
     all_modules_installed = True
+    missing_modules = []
     
     for module in REQUIRED_MODULES:
         if not check_module(module):
             all_modules_installed = False
+            missing_modules.append(module)
     
     if all_modules_installed:
         logger.info("✅ Tous les modules requis sont installés et fonctionnels!")
         return 0
     else:
         logger.error("❌ Certains modules requis ne sont pas installés ou fonctionnels.")
-        logger.info("Exécutez 'pip install -r requirements.txt' pour installer les modules manquants.")
+        logger.info("Modules manquants: " + ", ".join(missing_modules))
+        logger.info("Dans l'environnement Replit, utilisez 'upm add package_name' pour installer les modules.")
+        
+        # Créer un fichier requirements.txt pour les modules manquants
+        with open('requirements.txt', 'w') as f:
+            for module in missing_modules:
+                f.write(f"{module}\n")
+        
+        logger.info("Un fichier requirements.txt a été créé avec les modules manquants.")
         return 1
 
 if __name__ == "__main__":
