@@ -136,6 +136,92 @@
     transition: all 0.3s ease;
 }
 
+/* Styles responsives pour le tableau de bord */
+@media (max-width: 991px) {
+    .dashboard-profile-placeholder {
+        width: 70px;
+        height: 70px;
+        font-size: 2.2rem;
+    }
+    
+    .dashboard-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .dashboard-card .card-header h5 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .dashboard-profile-placeholder {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+        border-width: 2px;
+    }
+    
+    .dashboard-card {
+        margin-bottom: 1rem;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .dashboard-card .card-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    .dashboard-card .card-body {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .dashboard-profile-placeholder {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-header {
+        text-align: center;
+    }
+    
+    .dashboard-user-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .dashboard-user-details {
+        margin-top: 0.5rem;
+        margin-left: 0 !important;
+    }
+    
+    .dashboard-card {
+        border-radius: 8px;
+    }
+    
+    .dashboard-card .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .dashboard-card .card-header h5 {
+        font-size: 1rem;
+    }
+    
+    .dashboard-card .card-header h5 i {
+        font-size: 1rem;
+        margin-right: 0.5rem;
+    }
+    
+    .dashboard-card .card-body {
+        padding: 0.75rem;
+    }
+}
+
 .dashboard-card:hover {
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     transform: translateY(-5px);
