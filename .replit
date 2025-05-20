@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Run SmartOHADA avec DB"
+runButton = "Run Fixed App v2"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -346,6 +346,31 @@ args = "python check_logs.py"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python db_initialize.py --retry 3"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
+
+[[workflows.workflow]]
+name = "Run Fixed App v2"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "export DATABASE_URL=\"postgresql://neondb_owner:npg_APBmGjkT0y1H@ep-rough-truth-a5ntheq6-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python fix_database_connection.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python enable_file_logging.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_db_tables.py"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
