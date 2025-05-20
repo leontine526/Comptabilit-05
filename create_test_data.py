@@ -49,19 +49,21 @@ def create_test_users():
     logger.info("Création des utilisateurs de test...")
     users = []
     
-    # Créer un administrateur
-    admin = User(
-        username="admin",
-        email="admin@smartohada.com",
-        full_name="Administrateur SmartOHADA",
-        is_admin=True,
-        bio="Administrateur du système SmartOHADA",
-        position="Administrateur",
-        company="SmartOHADA",
-        is_online=True
-    )
-    admin.set_password("admin123")
-    users.append(admin)
+    # Récupérer ou créer l'administrateur
+    admin = User.query.filter_by(username="admin").first()
+    if not admin:
+        admin = User(
+            username="admin",
+            email="admin@smartohada.com",
+            full_name="Administrateur SmartOHADA",
+            is_admin=True,
+            bio="Administrateur du système SmartOHADA",
+            position="Administrateur",
+            company="SmartOHADA",
+            is_online=True
+        )
+        admin.set_password("admin123")
+        users.append(admin)
     
     # Créer quelques utilisateurs réguliers
     for i in range(1, 6):
