@@ -37,10 +37,15 @@ class DBConnectionManager:
     
     def initialize(self, connection_string, **kwargs):
         """Initialise le gestionnaire avec la chaîne de connexion"""
+        if '-pooler' not in connection_string:
+            connection_string = connection_string.replace('.us-east-2', '-pooler.us-east-2')
+        if '?' not in connection_string:
+            connection_string += "?sslmode=require&connect_timeout=10"
+            
         self.connection_string = connection_string
-        self.max_retries = kwargs.get('max_retries', 5)
-        self.retry_delay = kwargs.get('retry_delay', 1)
-        self.health_check_interval = kwargs.get('health_check_interval', 300)
+        self.max_retries = kwargs.get('max_retries', 3)
+        self.retry_delay = kwargs.get('retry_delay', 2)
+        self.health_check_interval = kwargs.get('health_check_interval', 60)
         
         # Créer le moteur SQLAlchemy
         self.engine = create_engine(

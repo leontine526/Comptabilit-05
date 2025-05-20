@@ -12,11 +12,11 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = database_url
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_size": 3,
-        "pool_recycle": 200,
+        "pool_size": 2,
+        "pool_recycle": 55,
         "pool_pre_ping": True,
-        "max_overflow": 5,
-        "pool_timeout": 30,
+        "max_overflow": 3,
+        "pool_timeout": 10,
         "connect_args": {
             "connect_timeout": 20,
             "keepalives": 1,
