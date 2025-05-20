@@ -606,16 +606,16 @@ function showReactions(postId) {
                     </div>
                 </div>
             `;
-            
+
             // Ajoute la modal au body
             const modalElement = document.createElement('div');
             modalElement.innerHTML = modalHtml;
             document.body.appendChild(modalElement.firstElementChild);
-            
+
             // Affiche la modal
             const modal = new bootstrap.Modal(document.getElementById('reactionsModal'));
             modal.show();
-            
+
             // Supprime la modal quand elle est fermée
             document.getElementById('reactionsModal').addEventListener('hidden.bs.modal', function () {
                 this.remove();
@@ -624,6 +624,553 @@ function showReactions(postId) {
         .catch(error => {
             console.error('Erreur lors de la récupération des réactions:', error);
         });
+}
+
+
+            // Mettre à jour l'icône
+            const currentReaction = reactionTypes.find(r => r.type === (data.reactions.current_type || 'like'));
+            if (currentReaction) {
+                const icon = button.querySelector('i');
+                if (icon) {
+                    icon.className = currentReaction.icon;
+                }
+            }
+        } else {
+            // Réinitialiser à l'icône par défaut
+            const icon = button.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-thumbs-up';
+            }
+        }
+
+        // Mettre à jour le compteur
+        const counter = button.querySelector('.reaction-count');
+        if (counter) {
+            counter.textContent = data.reactions.count;
+        }
+
+        // Afficher un résumé des réactions
+        const summary = button.closest('.post-actions, .comment-actions').querySelector('.reactions-summary');
+        if (summary && data.reactions.details) {
+            let summaryHTML = '';
+            for (const [type, count] of Object.entries(data.reactions.details)) {
+                if (count > 0) {
+                    const reaction = reactionTypes.find(r => r.type === type);
+                    if (reaction) {
+                        summaryHTML += `<span class="reaction-badge" title="${count} ${reaction.label}"><i class="${reaction.icon}"></i> ${count}</span>`;
+                    }
+                }
+            }
+            summary.innerHTML = summaryHTML;
+        }
+    }
+
+    // Fermer le menu si on clique ailleurs
+    document.addEventListener('click', function() {
+        const menu = document.querySelector('.reaction-menu');
+        if (menu) {
+            menu.remove();
+        }
+    });
+});
+// Gestion des réactions (likes, commentaires, partages)
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser les gestionnaires d'événements pour les boutons de réaction
+    setupReactionButtons();
+
+    // Gestion des erreurs de réactions
+    window.addEventListener('reaction-error', function(e) {
+        console.error('Erreur de réaction:', e.detail.message);
+        // Réinitialiser l'UI si nécessaire
+        if (e.detail.elementId) {
+            const element = document.getElementById(e.detail.elementId);
+            if (element) {
+                element.classList.remove('active', 'liked', 'processing');
+                if (e.detail.originalState) {
+                    // Rétablir l'état original
+                    Object.keys(e.detail.originalState).forEach(key => {
+                        element.dataset[key] = e.detail.originalState[key];
+                    });
+                }
+            }
+        }
+
+        // Notifier l'utilisateur de manière non intrusive
+        showToast('Une erreur est survenue. Veuillez réessayer.', 'error');
+    });
+
+    // Système de partage amélioré
+    setupSharingSystem();
+});
+
+// Afficher un toast de notification
+function showToast(message, type = 'info') {
+    // Créer l'élément toast s'il n'existe pas
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Créer le toast
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} text-white">
+                <strong class="me-auto">${type === 'error' ? 'Erreur' : type === 'success' ? 'Succès' : 'Information'}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+
+    // Ajouter le toast au conteneur
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+    // Initialiser et afficher le toast
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+    toast.show();
+
+    // Nettoyer le toast après fermeture
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// Configuration avancée des boutons de réaction
+function setupReactionButtons() {
+    // Gestionnaire pour les boutons "J'aime"
+    document.querySelectorAll('.btn-like, .reaction-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Vérifier si le bouton est déjà en cours de traitement
+            if (this.classList.contains('processing')) {
+                return;
+            }
+
+            // Marquer comme en traitement
+            this.classList.add('processing');
+
+            // Sauvegarder l'état original pour rollback en cas d'erreur
+            const originalState = {
+                count: this.dataset.count || '0',
+                liked: this.dataset.liked || 'false'
+            };
+
+            // Optimistic UI update
+            const isLiked = this.dataset.liked === 'true';
+            const likeCountElement = this.querySelector('.like-count') || this.nextElementSibling;
+            let likeCount = parseInt(this.dataset.count || likeCountElement.textContent || '0');
+
+            if (isLiked) {
+                likeCount = Math.max(0, likeCount - 1);
+                this.classList.remove('liked', 'active');
+                this.dataset.liked = 'false';
+            } else {
+                likeCount++;
+                this.classList.add('liked', 'active');
+                this.dataset.liked = 'true';
+            }
+
+            if (likeCountElement) {
+                likeCountElement.textContent = likeCount;
+            }
+            this.dataset.count = likeCount.toString();
+
+            // Préparer les données
+            const postId = this.dataset.postId;
+            const commentId = this.dataset.commentId;
+            const reactionType = this.dataset.reactionType || 'like';
+
+            // Envoyer la requête au serveur
+            fetch('/api/reactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    post_id: postId,
+                    comment_id: commentId,
+                    reaction_type: reactionType
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur de réponse du serveur');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Mise à jour UI avec les données réelles du serveur
+                if (likeCountElement) {
+                    likeCountElement.textContent = data.reactions.count;
+                }
+                this.dataset.count = data.reactions.count.toString();
+
+                // Retirer le marqueur de traitement
+                this.classList.remove('processing');
+            })
+            .catch(error => {
+                console.error('Erreur lors de la réaction:', error);
+
+                // Rollback des changements UI
+                if (likeCountElement) {
+                    likeCountElement.textContent = originalState.count;
+                }
+                this.classList.remove('processing', 'liked', 'active');
+                if (originalState.liked === 'true') {
+                    this.classList.add('liked', 'active');
+                }
+                this.dataset.liked = originalState.liked;
+                this.dataset.count = originalState.count;
+
+                // Notifier l'utilisateur
+                showToast('Une erreur est survenue lors de la réaction', 'error');
+
+                // Émettre un événement pour la gestion globale des erreurs
+                window.dispatchEvent(new CustomEvent('reaction-error', {
+                    detail: {
+                        message: error.message,
+                        elementId: this.id,
+                        originalState: originalState
+                    }
+                }));
+            });
+        });
+    });
+
+    // Gestionnaire de commentaires
+    document.querySelectorAll('.comment-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Envoi...';
+            }
+
+            const formData = new FormData(this);
+            const content = formData.get('content');
+            const postId = formData.get('post_id');
+            const commentId = formData.get('parent_id'); // Si c'est une réponse
+
+            // Vérifier que le contenu n'est pas vide
+            if (!content || content.trim() === '') {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Commenter';
+                }
+                showToast('Le commentaire ne peut pas être vide', 'error');
+                return;
+            }
+
+            // Envoyer au serveur
+            fetch('/api/comments/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    content: content,
+                    post_id: postId,
+                    parent_id: commentId || null
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'envoi du commentaire');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Réinitialiser le formulaire
+                this.reset();
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Commenter';
+                }
+
+                // Recharger les commentaires ou ajouter le nouveau commentaire au DOM
+                reloadComments(postId);
+
+                // Notification
+```text
+                showToast('Commentaire ajouté avec succès', 'success');
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'envoi du commentaire:', error);
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Commenter';
+                }
+                showToast('Une erreur est survenue lors de l\'envoi du commentaire', 'error');
+            });
+        });
+    });
+}
+
+// Recharger les commentaires d'un post
+function reloadComments(postId) {
+    const commentsContainer = document.querySelector(`.comments-container[data-post-id="${postId}"]`);
+    if (!commentsContainer) return;
+
+    // Afficher un indicateur de chargement
+    commentsContainer.innerHTML = '<div class="text-center my-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div></div>';
+
+    // Récupérer les commentaires
+    fetch(`/api/posts/${postId}/comments`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement des commentaires');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Vider le conteneur
+            commentsContainer.innerHTML = '';
+
+            if (data.comments && data.comments.length > 0) {
+                // Ajouter chaque commentaire
+                data.comments.forEach(comment => {
+                    const commentHtml = createCommentHTML(comment);
+                    commentsContainer.insertAdjacentHTML('beforeend', commentHtml);
+                });
+
+                // Réinitialiser les gestionnaires d'événements
+                setupReactionButtons();
+            } else {
+                // Aucun commentaire
+                commentsContainer.innerHTML = '<p class="text-center text-muted my-3">Aucun commentaire pour le moment. Soyez le premier à commenter !</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors du chargement des commentaires:', error);
+            commentsContainer.innerHTML = '<p class="text-center text-danger my-3">Impossible de charger les commentaires. Veuillez réessayer.</p>';
+        });
+}
+
+// Créer le HTML d'un commentaire
+function createCommentHTML(comment) {
+    const isLiked = comment.is_liked_by_user ? 'liked active' : '';
+    const likeCount = comment.like_count || 0;
+
+    // Générer les réponses si présentes
+    let repliesHtml = '';
+    if (comment.replies && comment.replies.length > 0) {
+        repliesHtml = '<div class="replies ms-4 mt-2">';
+        comment.replies.forEach(reply => {
+            repliesHtml += createCommentHTML(reply);
+        });
+        repliesHtml += '</div>';
+    }
+
+    return `
+        <div class="comment mb-3" data-comment-id="${comment.id}">
+            <div class="d-flex">
+                <img src="${comment.user.profile_picture || '/static/images/default-avatar.png'}" class="rounded-circle me-2" width="40" height="40" alt="${comment.user.username}">
+                <div class="comment-content w-100">
+                    <div class="bg-light p-2 rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">${comment.user.username}</h6>
+                            <small class="text-muted">${comment.created_at_formatted}</small>
+                        </div>
+                        <p class="mb-0">${comment.content}</p>
+                    </div>
+                    <div class="comment-actions mt-1 d-flex">
+                        <button class="btn btn-sm btn-link text-decoration-none reaction-button ${isLiked}" 
+                                data-comment-id="${comment.id}" 
+                                data-liked="${comment.is_liked_by_user ? 'true' : 'false'}" 
+                                data-count="${likeCount}">
+                            <i class="fas fa-thumbs-up"></i> <span class="like-count">${likeCount}</span>
+                        </button>
+                        <button class="btn btn-sm btn-link text-decoration-none reply-button" 
+                                data-comment-id="${comment.id}">
+                            <i class="fas fa-reply"></i> Répondre
+                        </button>
+                    </div>
+                    <div class="reply-form-container d-none mt-2" data-for-comment="${comment.id}">
+                        <form class="comment-form">
+                            <input type="hidden" name="post_id" value="${comment.post_id}">
+                            <input type="hidden" name="parent_id" value="${comment.id}">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" name="content" placeholder="Votre réponse...">
+                                <button class="btn btn-sm btn-primary" type="submit">Répondre</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            ${repliesHtml}
+        </div>
+    `;
+}
+
+// Récupérer le jeton CSRF
+function getCSRFToken() {
+    const tokenElement = document.querySelector('meta[name="csrf-token"]');
+    return tokenElement ? tokenElement.getAttribute('content') : '';
+}
+
+// Système de partage amélioré
+function setupSharingSystem() {
+    document.querySelectorAll('.btn-share').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const postId = this.dataset.postId;
+            const shareUrl = this.dataset.shareUrl || window.location.href;
+            const shareTitle = this.dataset.shareTitle || document.title;
+
+            // Vérifier si l'API Web Share est disponible
+            if (navigator.share) {
+                navigator.share({
+                    title: shareTitle,
+                    url: shareUrl
+                }).catch(error => {
+                    console.error('Erreur lors du partage:', error);
+                    showShareDialog(postId, shareUrl, shareTitle);
+                });
+            } else {
+                showShareDialog(postId, shareUrl, shareTitle);
+            }
+        });
+    });
+}
+
+// Afficher un dialogue de partage personnalisé
+function showShareDialog(postId, shareUrl, shareTitle) {
+    // Créer le dialogue de partage s'il n'existe pas
+    let shareDialog = document.getElementById('shareDialog');
+    if (!shareDialog) {
+        const dialogHtml = `
+            <div class="modal fade" id="shareDialog" tabindex="-1" aria-labelledby="shareDialogLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="shareDialogLabel">Partager ce contenu</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex justify-content-center mb-3">
+                                <a href="#" class="btn btn-outline-primary mx-1 share-facebook" data-bs-dismiss="modal">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-info mx-1 share-twitter" data-bs-dismiss="modal">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-success mx-1 share-whatsapp" data-bs-dismiss="modal">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-secondary mx-1 share-email" data-bs-dismiss="modal">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control share-url" readonly>
+                                <button class="btn btn-outline-secondary copy-url" type="button">Copier</button>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sharePublishCheckbox">
+                                <label class="form-check-label" for="sharePublishCheckbox">
+                                    Publier également sur mon profil
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            <button type="button" class="btn btn-primary publish-share" data-bs-dismiss="modal">Partager</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', dialogHtml);
+        shareDialog = document.getElementById('shareDialog');
+
+        // Initialiser le dialogue
+        const modal = new bootstrap.Modal(shareDialog);
+
+        // Gestionnaires d'événements pour les boutons de partage
+        shareDialog.querySelector('.share-facebook').addEventListener('click', function() {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.dataset.url)}`, '_blank');
+        });
+
+        shareDialog.querySelector('.share-twitter').addEventListener('click', function() {
+            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(this.dataset.url)}&text=${encodeURIComponent(this.dataset.title)}`, '_blank');
+        });
+
+        shareDialog.querySelector('.share-whatsapp').addEventListener('click', function() {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(this.dataset.title + ' ' + this.dataset.url)}`, '_blank');
+        });
+
+        shareDialog.querySelector('.share-email').addEventListener('click', function() {
+            window.location.href = `mailto:?subject=${encodeURIComponent(this.dataset.title)}&body=${encodeURIComponent(this.dataset.url)}`;
+        });
+
+        // Gestionnaire pour le bouton de copie
+        shareDialog.querySelector('.copy-url').addEventListener('click', function() {
+            const urlInput = shareDialog.querySelector('.share-url');
+            urlInput.select();
+            document.execCommand('copy');
+            this.textContent = 'Copié !';
+            setTimeout(() => {
+                this.textContent = 'Copier';
+            }, 2000);
+        });
+
+        // Gestionnaire pour le bouton de publication
+        shareDialog.querySelector('.publish-share').addEventListener('click', function() {
+            const publishToProfile = shareDialog.querySelector('#sharePublishCheckbox').checked;
+            const postId = this.dataset.postId;
+
+            if (publishToProfile && postId) {
+                // Envoyer une requête pour partager sur le profil
+                fetch('/api/posts/share', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        post_id: postId
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur lors du partage sur le profil');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showToast('Publication partagée sur votre profil', 'success');
+                })
+                .catch(error => {
+                    console.error('Erreur lors du partage sur le profil:', error);
+                    showToast('Une erreur est survenue lors du partage sur votre profil', 'error');
+                });
+            }
+        });
+    }
+
+    // Mettre à jour les données
+    shareDialog.querySelector('.share-url').value = shareUrl;
+    shareDialog.querySelectorAll('.share-facebook, .share-twitter, .share-whatsapp, .share-email').forEach(element => {
+        element.dataset.url = shareUrl;
+        element.dataset.title = shareTitle;
+    });
+    shareDialog.querySelector('.publish-share').dataset.postId = postId;
+
+    // Afficher le dialogue
+    const modal = new bootstrap.Modal(shareDialog);
+    modal.show();
 }
 
 

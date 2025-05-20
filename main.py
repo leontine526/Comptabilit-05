@@ -74,7 +74,7 @@ except Exception as e:
 # en utilisant le workflow configuré dans Replit
 if __name__ == '__main__':
     import logging
-    
+
     # Configuration du logging améliorée
     log_level = logging.INFO if os.environ.get('FLASK_ENV') == 'production' else logging.DEBUG
     logging.basicConfig(
@@ -100,11 +100,11 @@ if __name__ == '__main__':
     try:
         from db_initialize import initialize_database
         from db_helper import init_db_connection
-        
+
         # Vérifier d'abord la connexion à la base de données
         if init_db_connection():
             logger.info("Connexion à la base de données établie avec succès")
-            
+
             # Initialiser les tables si nécessaire
             with app.app_context():
                 if not hasattr(app, 'db_initialized'):
@@ -146,10 +146,10 @@ if __name__ == '__main__':
         # Optimisation pour la production si l'environnement n'est pas de développement
         import os
         debug_mode = os.environ.get('FLASK_ENV') == 'development'
-        
+
         # Configurer l'environnement pour la production
         is_prod = os.environ.get('FLASK_ENV') == 'production'
-        
+
         # Choisir la configuration appropriée
         from config import config
         config_name = 'production' if is_prod else 'development'
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
         # Déterminer le port
         port = int(os.getenv('PORT', 5000))
-        
+
         # Utiliser gunicorn en production, eventlet sinon
         if is_prod:
             # Configuration pour production
@@ -167,6 +167,10 @@ if __name__ == '__main__':
         else:
             # Démarrage avec Eventlet pour Socket.IO en développement
             logger.info(f"Démarrage en mode développement sur le port {port}")
+            from maintenance_mode import init_maintenance_mode
+
+            # Initialiser le mode maintenance
+            init_maintenance_mode(app)
             socketio.run(app, 
                         host='0.0.0.0',
                         port=port,

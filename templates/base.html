@@ -364,16 +364,83 @@
     <script src="{{ url_for('static', filename='js/password_toggle.js') }}"></script>
     <script src="{{ url_for('static', filename='js/exercise_form.js') }}"></script>
     <script src="{{ url_for('static', filename='js/responsive-helper.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/page-optimizer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/form-validator.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/realtime-enhanced.js') }}"></script>
 
+    <!-- Son de notification -->
+    <audio id="notification-sound" preload="auto">
+        <source src="{{ url_for('static', filename='sounds/notification.wav') }}" type="audio/wav">
+    </audio>
+
+    <!-- Scripts pour améliorer la stabilité -->
+    <script>
+        // Récupération de l'état des formulaires pour restauration en cas d'erreur
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form:not([data-no-autosave])');
+            forms.forEach(form => {
+                // Récupérer les données sauvegardées si elles existent
+                const formId = form.id || form.getAttribute('name') || 'default-form';
+                const savedData = localStorage.getItem('form-' + formId);
+                if (savedData) {
+                    try {
+                        const formData = JSON.parse(savedData);
+                        Object.keys(formData).forEach(key => {
+                            const input = form.querySelector(`[name="${key}"]`);
+                            if (input && !input.value) {
+                                input.value = formData[key];
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Erreur lors de la restauration du formulaire:', e);
+                    }
+                }
+
+                // Sauvegarder les données à chaque changement
+                form.addEventListener('input', function(e) {
+                    if (e.target.type !== 'password') {
+                        const formData = {};
+                        new FormData(form).forEach((value, key) => {
+                            formData[key] = value;
+                        });
+                        localStorage.setItem('form-' + formId, JSON.stringify(formData));
+                    }
+                });
+
+                // Nettoyer après soumission réussie
+                form.addEventListener('submit', function() {
+                    localStorage.removeItem('form-' + formId);
+                });
+            });
+
+            // Gestion des erreurs JavaScript
+            window.addEventListener('error', function(e) {
+                console.error('Erreur JavaScript interceptée:', e.message, 'à', e.filename, 'ligne', e.lineno);
+                // Éviter d'afficher des alertes intrusives, mais enregistrer l'erreur
+                return false;
+            });
+
+            // Récupération des images en cas d'échec
+            document.querySelectorAll('img').forEach(img => {
+                img.addEventListener('error', function() {
+                    if (!this.hasAttribute('data-error-handled')) {
+                        this.setAttribute('data-error-handled', 'true');
+                        // Essayer de charger une image de remplacement
+                        this.src = "{{ url_for('static', filename='images/placeholder.png') }}";
+                    }
+                });
+            });
+        });
+    </script>
     {% block scripts %}{% endblock %}
-    
+
     <script>
     // Ajouter une classe au body selon la taille de l'écran
     document.addEventListener('DOMContentLoaded', function() {
         function updateBodyClass() {
             const width = window.innerWidth;
             document.body.classList.remove('device-xs', 'device-sm', 'device-md', 'device-lg', 'device-xl');
-            
+
             if (width < 576) {
                 document.body.classList.add('device-xs');
             } else if (width < 768) {
@@ -386,7 +453,7 @@
                 document.body.classList.add('device-xl');
             }
         }
-        
+
         updateBodyClass();
         window.addEventListener('resize', updateBodyClass);
     });

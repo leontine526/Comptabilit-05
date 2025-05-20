@@ -56,6 +56,17 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_timeout": 10
 }
 
+# Initialiser le gestionnaire de connexion amélioré
+from db_connection_manager import db_manager
+db_manager.initialize(
+    database_uri,
+    max_retries=5,
+    pool_size=10,
+    max_overflow=15,
+    pool_recycle=600,
+    enable_monitoring=True
+)
+
 # Configurer les uploads de fichiers
 uploads_folder = os.path.join(os.getcwd(), 'uploads')
 if not os.path.exists(uploads_folder):
@@ -85,6 +96,10 @@ def teardown_request(exception=None):
 
     # Toujours nettoyer la session DB à la fin de la requête
     db.session.remove()
+
+# Ajouter le middleware de gestion globale des erreurs
+from error_middleware import ErrorMiddleware
+app.wsgi_app = ErrorMiddleware(app.wsgi_app)
 
 @app.errorhandler(Exception)
 def handle_exception(e):
