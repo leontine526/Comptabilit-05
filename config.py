@@ -62,6 +62,23 @@ class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
     
+    # Optimisation de la base de données pour la production
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_size": 20,
+        "pool_recycle": 300,
+        "pool_pre_ping": True,
+        "max_overflow": 30,
+        "pool_timeout": 30
+    }
+    
+    # Configuration de sécurité
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    PERMANENT_SESSION_LIFETIME = timedelta(days=14)
+    
+    # Configuration pour le déploiement
+    PREFERRED_URL_SCHEME = 'https'
+    
 # Config dictionary for easy access
 config = {
     'development': DevelopmentConfig,

@@ -92,22 +92,31 @@ if __name__ == '__main__':
         logger.error(f"Erreur lors de l'initialisation de la base de données: {str(e)}")
 
     try:
-        logger.info("Démarrage du serveur de développement Socket.IO")
+        logger.info("Démarrage du serveur Socket.IO")
         # Optimisation pour la production si l'environnement n'est pas de développement
         import os
         debug_mode = os.environ.get('FLASK_ENV') == 'development'
+        
+        # Configurer l'environnement Replit pour la production
+        is_replit_prod = os.environ.get('REPL_SLUG') and not debug_mode
+        
+        # Choisir la configuration appropriée
+        from config import config
+        config_name = 'production' if is_replit_prod else 'development'
+        logger.info(f"Utilisation de la configuration: {config_name}")
+        app.config.from_object(config[config_name])
 
         # Utiliser gunicorn en production, eventlet sinon
-        if os.environ.get('GUNICORN_WORKERS'):
-            # Configuration pour Gunicorn déjà en cours
+        if os.environ.get('GUNICORN_WORKERS') or is_replit_prod:
+            # Configuration pour production
             app.run(host='0.0.0.0', port=5000, debug=False)
         else:
-            # Démarrage avec Eventlet pour Socket.IO
+            # Démarrage avec Eventlet pour Socket.IO en développement
             port = int(os.getenv('PORT', 5000))
             socketio.run(app, 
                         host='0.0.0.0',
                         port=port,
-                        debug=False,
+                        debug=debug_mode,
                         allow_unsafe_werkzeug=True,
                         log_output=True)
     except Exception as e:

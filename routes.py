@@ -48,6 +48,28 @@ def index():
     """Route pour la page d'accueil"""
     return render_template('index.html', title="Accueil")
 
+@app.route('/health')
+def health_check():
+    """
+    Route pour vérifier l'état de santé de l'application 
+    Utile pour les vérifications de déploiement et monitoring
+    """
+    try:
+        # Vérifier la connexion à la base de données
+        from app import db
+        db.session.execute("SELECT 1")
+        db_status = "ok"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    # Retourner un statut JSON
+    return jsonify({
+        "status": "online",
+        "timestamp": datetime.utcnow().isoformat(),
+        "database": db_status,
+        "version": "1.0.0"
+    })
+
 # About route
 @app.route('/about')
 def about():

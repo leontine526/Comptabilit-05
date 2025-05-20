@@ -79,14 +79,20 @@ def init_db_connection():
     import os
     from sqlalchemy.engine.url import make_url
     from sqlalchemy import create_engine, text
+    import logging
     
-    max_attempts = 3
+    logger = logging.getLogger(__name__)
+    max_attempts = 5  # Augmentation du nombre de tentatives
     attempt = 1
-    connect_timeout = 3
+    connect_timeout = 5  # Augmentation du timeout
 
-    # Forcer l'utilisation de l'URL PostgreSQL
+    # Forcer l'utilisation de l'URL PostgreSQL avec Neon
     database_url = "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+
+    # S'assurer que les dossiers nécessaires existent
+    os.makedirs('uploads', exist_ok=True)
+    os.makedirs('examples', exist_ok=True)
 
     with app.app_context():
         # Optimiser l'URL pour utiliser le connection pooler de Neon
