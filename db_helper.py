@@ -74,82 +74,30 @@ def safe_db_operation(max_retries=3):
     return decorator
 
 def init_db_connection():
-    """Initialiser ou réinitialiser la connexion à la base de données"""
-    from app import app, db
-    import os
-    from sqlalchemy.engine.url import make_url
-    from sqlalchemy import create_engine, text
-    import logging
+    """Initialise la connexion à la base de données avec retry"""
+    max_retries = 3
+    retry_count = 0
 
-    logger = logging.getLogger(__name__)
-    max_attempts = 5  # Augmenter le nombre de tentatives
-    attempt = 1
-    connect_timeout = 10  # Augmenter le timeout de connexion
+    while retry_count < max_retries:
+        try:
+            # Fermer toute connexion existante
+            db.session.remove()
+            db.engine.dispose()
 
-    # Forcer l'utilisation de l'URL PostgreSQL avec paramètres optimisés
-    database_url = os.environ.get('DATABASE_URL', "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb")
-    # Ajouter les paramètres de connexion optimisés
-    database_url += "?sslmode=require&connect_timeout=15&application_name=smartohada&keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=5"
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_size": 5,  # Réduire la taille du pool
-        "pool_recycle": 280,  # Recycler avant l'expiration du serveur (5 min)
-        "pool_pre_ping": True,
-        "max_overflow": 10,
-        "pool_timeout": 30,
-        "pool_timeout": 30
-    }
-
-    with app.app_context():
-        # Optimiser l'URL pour utiliser le connection pooler de Neon
-        database_url = os.environ.get("DATABASE_URL")
-        if database_url and 'neon.tech' in database_url:
-            # Vérifier si l'URL utilise déjà le connection pooler
-            if '-pooler' not in database_url:
-                try:
-                    url_obj = make_url(database_url)
-                    host = url_obj.host
-                    # Remplacer le host normal par la version pooler
-                    pooler_host = host.replace('.', '-pooler.', 1)
-                    new_url = database_url.replace(host, pooler_host)
-                    logger.info(f"URL de base de données optimisée pour connection pooling")
-                    # Mettre à jour l'URL dans l'application
-                    app.config["SQLALCHEMY_DATABASE_URI"] = new_url
-                except Exception as e:
-                    logger.warning(f"Impossible d'optimiser l'URL pour le connection pooling: {str(e)}")
+            # Tester la connexion
+            with db.engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            logger.info("Connexion à la base de données établie avec succès")
+            return True
+        except Exception as e:
+            retry_count += 1
+            wait_time = 2 ** retry_count  # Backoff exponentiel
+            logger.warning(f"Tentative {retry_count}/{max_retries} - Erreur: {str(e)}")
+            if retry_count < max_retries:
+                time.sleep(wait_time)
             else:
-                logger.info("L'URL utilise déjà le connection pooler Neon")
-
-        # S'assurer que les dossiers nécessaires existent
-        os.makedirs('uploads', exist_ok=True)
-        os.makedirs('examples', exist_ok=True)
-
-        while attempt <= max_attempts:
-            try:
-                # Réinitialiser le pool de connexions
-                db.engine.dispose()
-
-                # Essayer de faire une requête simple pour tester la connexion
-                with db.engine.connect() as conn:
-                    result = conn.execute(text("SELECT 1"))
-                    # Vérifier que la requête a bien retourné un résultat
-                    if result.scalar() == 1:
-                        logger.info("Connexion à la base de données établie avec succès")
-                        return True
-                    else:
-                        logger.warning("La requête de test a retourné une valeur inattendue")
-            except Exception as e:
-                logger.warning(f"Tentative {attempt}/{max_attempts} de connexion à la base de données échouée: {str(e)}")
-
-            # Incrémenter le compteur d'essais
-            attempt += 1
-
-            if attempt <= max_attempts:
-                time.sleep(2)  # Attendre avant de réessayer
-
-        logger.error(f"Impossible d'établir une connexion à la base de données après {max_attempts} tentatives")
-        return False
+                logger.error("Échec de la connexion après plusieurs tentatives")
+                return False
 
 def check_db_connection():
     """Vérifie si la connexion à la base de données est active"""
