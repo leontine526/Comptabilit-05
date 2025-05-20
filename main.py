@@ -163,7 +163,11 @@ if __name__ == '__main__':
         if is_prod:
             # Configuration pour production
             logger.info(f"Démarrage en mode production sur le port {port}")
-            app.run(host='0.0.0.0', port=port, debug=False)
+            socketio.run(app, 
+                        host='0.0.0.0',
+                        port=port,
+                        debug=False,
+                        allow_unsafe_werkzeug=True)
         else:
             # Démarrage avec Eventlet pour Socket.IO en développement
             logger.info(f"Démarrage en mode développement sur le port {port}")

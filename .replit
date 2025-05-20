@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Run SmartOHADA Production"
+runButton = "Run Production"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -76,6 +76,27 @@ args = "python db_initialize.py"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python create_test_data.py"
+
+[[workflows.workflow]]
+name = "Run Production"
+author = 42922772
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "export FLASK_ENV=production"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "export PORT=5000"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python db_initialize.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
 
 [[ports]]
 localPort = 5000

@@ -64,7 +64,7 @@ class DBConnectionManager:
         try:
             # Exécuter une requête simple pour vérifier la connexion
             with self.engine.connect() as conn:
-                conn.execute("SELECT 1")
+                conn.execute(text("SELECT 1"))
             self.is_healthy = True
             self.last_health_check = time.time()
             return True
