@@ -60,14 +60,28 @@ class DBConnectionManager:
             self._start_monitoring()
     
     def check_health(self):
-        """Vérifie l'état de la connexion à la base de données"""
-        try:
-            # Exécuter une requête simple pour vérifier la connexion
-            with self.engine.connect() as conn:
-                conn.execute(text("SELECT 1"))
-            self.is_healthy = True
-            self.last_health_check = time.time()
-            return True
+        """Vérifie l'état de la connexion à la base de données avec retry"""
+        max_retries = 3
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                with self.engine.connect() as conn:
+                    conn.execute(text("SELECT 1"))
+                self.is_healthy = True
+                self.last_health_check = time.time()
+                if retry_count > 0:
+                    logger.info("Reconnexion réussie après la tentative %d", retry_count + 1)
+                return True
+            except Exception as e:
+                retry_count += 1
+                if retry_count < max_retries:
+                    logger.warning(f"Tentative de reconnexion {retry_count}/{max_retries} après erreur: {str(e)}")
+                    time.sleep(1 * retry_count)  # Backoff exponentiel
+                    continue
+                self.is_healthy = False
+                logger.error(f"Échec de la vérification de santé après {max_retries} tentatives: {str(e)}")
+                return False
         except Exception as e:
             self.is_healthy = False
             logger.error(f"Échec de la vérification de santé de la base de données: {str(e)}")

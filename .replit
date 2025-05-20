@@ -92,11 +92,15 @@ args = "export PORT=5000"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
+args = "python -m nltk.downloader punkt stopwords -d nltk_data"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
 args = "python test_db_connection.py"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python db_initialize.py"
+args = "python db_initialize.py --retry 3"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
