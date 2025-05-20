@@ -56,14 +56,7 @@ def main():
     else:
         logger.error("❌ Certains modules requis ne sont pas installés ou fonctionnels.")
         logger.info("Modules manquants: " + ", ".join(missing_modules))
-        logger.info("Dans l'environnement Replit, utilisez 'upm add package_name' pour installer les modules.")
-        
-        # Créer un fichier requirements.txt pour les modules manquants
-        with open('requirements.txt', 'w') as f:
-            for module in missing_modules:
-                f.write(f"{module}\n")
-        
-        logger.info("Un fichier requirements.txt a été créé avec les modules manquants.")
+        logger.info("Utilisez le fichier requirements.txt existant pour installer les modules.")
         return 1
 
 if __name__ == "__main__":

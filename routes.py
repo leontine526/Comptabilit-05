@@ -28,7 +28,11 @@ from forms import (
     WorkgroupForm, MessageForm, NoteForm, MemberInviteForm, WorkgroupExerciseForm, SearchForm,
     CompleteExerciseSolverForm
 )
-from text_processor import process_text
+try:
+    from text_processor import process_text
+except ImportError:
+    # Utiliser la version simplifiée si la version complète n'est pas disponible
+    from text_processor_simplified import process_text
 from exercise_solver import solver, save_example_pdf
 from exercise_resolution import resolve_exercise_completely
 from models import ExerciseExample, ExerciseSolution
