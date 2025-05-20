@@ -51,6 +51,19 @@ args = "export PORT=5000"
 task = "shell.exec"
 args = "python main.py"
 
+[[workflows.workflow]]
+name = "Initialize Database"
+author = 42922772
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python db_initialize.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python create_test_data.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
