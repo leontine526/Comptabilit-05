@@ -19,7 +19,7 @@ REQUIRED_MODULES = [
     "sqlalchemy",
     "flask_socketio",
     "flask_wtf",
-    "python_dotenv", 
+    "dotenv", 
     "xlsxwriter",
     "eventlet",
     "psycopg2",

@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrer Application Corrigée"
+runButton = "Démarrer Application v2"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -427,6 +427,23 @@ args = "upm add flask-wtf flask-login flask-sqlalchemy sqlalchemy flask-socketio
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python check_requirements.py"
+
+[[workflows.workflow]]
+name = "Démarrer Application v2"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_requirements.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python fix_database_connection.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python robust_app_starter.py"
 
 [[ports]]
 localPort = 5000
