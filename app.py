@@ -19,6 +19,7 @@ try:
     from flask_login import LoginManager, current_user
     from werkzeug.middleware.proxy_fix import ProxyFix
     from flask_socketio import SocketIO, emit, join_room, leave_room
+    from flask_caching import Cache
 except ImportError as e:
     logger.error(f"Erreur d'importation: {str(e)}")
     sys.exit(1)
