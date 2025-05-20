@@ -88,8 +88,8 @@ if __name__ == '__main__':
 
     # Initialiser le gestionnaire d'erreurs
     try:
-        from error_interceptor import initialize as init_error_handler
-        init_error_handler()
+        from error_interceptor import ErrorInterceptor
+        ErrorInterceptor.init_app(app)
         logger.info("Gestionnaire d'erreurs initialisé avec succès")
     except ImportError:
         logger.warning("Module error_interceptor non trouvé, les erreurs ne seront pas interceptées")
