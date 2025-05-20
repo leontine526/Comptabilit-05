@@ -287,6 +287,24 @@ args = "python detailed_db_check.py"
 task = "shell.exec"
 args = "python main.py"
 
+[[workflows.workflow]]
+name = "Diagnostic d'erreurs"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python error_diagnostics.py"
+
+[[workflows.workflow]]
+name = "Corriger les erreurs"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python fix_common_errors.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
