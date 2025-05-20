@@ -22,7 +22,8 @@ def init_db_connection(max_retries=3, retry_delay=2):
             # Utiliser un contexte d'application pour la connexion
             with app.app_context():
                 # Exécuter une requête simple pour vérifier la connexion
-                db.session.execute("SELECT 1")
+                from sqlalchemy import text
+                result = db.session.execute(text("SELECT 1")).scalar()
                 db.session.commit()
                 logger.info("Connexion à la base de données établie avec succès")
                 return True
