@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Run Fixed App v2"
+runButton = "Démarrage Robuste"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -375,6 +375,24 @@ args = "python check_db_tables.py"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python main.py"
+
+[[workflows.workflow]]
+name = "Corriger Modules Manquants"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python fix_missing_modules.py"
+
+[[workflows.workflow]]
+name = "Démarrage Robuste"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python robust_app_starter.py"
 
 [[ports]]
 localPort = 5000
