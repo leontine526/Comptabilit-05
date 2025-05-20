@@ -173,6 +173,19 @@ args = "python db_initialize.py --retry 3"
 task = "shell.exec"
 args = "python main.py"
 
+[[workflows.workflow]]
+name = "Initialize New Database"
+author = 42922772
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "export DATABASE_URL=\"postgresql://neondb_owner:npg_APBmGjkT0y1H@ep-rough-truth-a5ntheq6-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python initialize_database.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
