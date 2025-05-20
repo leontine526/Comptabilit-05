@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrer Application v2"
+runButton = "Démarrer Application Simplifiée"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -435,15 +435,20 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python check_requirements.py"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python fix_database_connection.py"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
 args = "python robust_app_starter.py"
+
+[[workflows.workflow]]
+name = "Démarrer Application Simplifiée"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python install_dependencies.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_app.py"
 
 [[ports]]
 localPort = 5000
