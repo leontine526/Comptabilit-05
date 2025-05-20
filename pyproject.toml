@@ -35,4 +35,5 @@ dependencies = [
     "werkzeug",
     "wtforms",
     "flask-caching>=2.3.1",
+    "psutil>=7.0.0",
 ]

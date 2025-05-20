@@ -74,45 +74,99 @@ except Exception as e:
 # en utilisant le workflow configuré dans Replit
 if __name__ == '__main__':
     import logging
-    logging.basicConfig(level=logging.DEBUG)
+    
+    # Configuration du logging améliorée
+    log_level = logging.INFO if os.environ.get('FLASK_ENV') == 'production' else logging.DEBUG
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
+        handlers=[
+            logging.FileHandler('logs/app.log'),
+            logging.StreamHandler()
+        ]
+    )
 
-    # Initialiser la base de données une seule fois
+    # Initialiser le gestionnaire d'erreurs
+    try:
+        from error_interceptor import initialize as init_error_handler
+        init_error_handler()
+        logger.info("Gestionnaire d'erreurs initialisé avec succès")
+    except ImportError:
+        logger.warning("Module error_interceptor non trouvé, les erreurs ne seront pas interceptées")
+    except Exception as e:
+        logger.error(f"Erreur lors de l'initialisation du gestionnaire d'erreurs: {str(e)}")
+
+    # Initialiser la base de données une seule fois avec gestion d'erreurs robuste
     try:
         from db_initialize import initialize_database
-        with app.app_context():
-            if not hasattr(app, 'db_initialized'):
-                if initialize_database():
-                    app.db_initialized = True
-                    logger.info("Base de données initialisée avec succès")
-                else:
-                    logger.warning("Problème lors de l'initialisation de la base de données")
-    except ImportError:
-        logger.warning("Module db_initialize introuvable")
+        from db_helper import init_db_connection
+        
+        # Vérifier d'abord la connexion à la base de données
+        if init_db_connection():
+            logger.info("Connexion à la base de données établie avec succès")
+            
+            # Initialiser les tables si nécessaire
+            with app.app_context():
+                if not hasattr(app, 'db_initialized'):
+                    if initialize_database():
+                        app.db_initialized = True
+                        logger.info("Base de données initialisée avec succès")
+                    else:
+                        logger.warning("Problème lors de l'initialisation de la base de données")
+        else:
+            logger.error("Impossible d'établir une connexion à la base de données. Vérifiez les paramètres de connexion.")
+    except ImportError as e:
+        logger.warning(f"Module manquant: {str(e)}")
     except Exception as e:
         logger.error(f"Erreur lors de l'initialisation de la base de données: {str(e)}")
+        logger.error(traceback.format_exc())
+
+    # Démarrer le moniteur de performances
+    try:
+        from performance_monitor import start_monitoring
+        performance_monitor = start_monitoring()
+        logger.info("Moniteur de performances démarré avec succès")
+    except ImportError:
+        logger.warning("Module performance_monitor non trouvé, le monitoring ne sera pas activé")
+    except Exception as e:
+        logger.error(f"Erreur lors du démarrage du moniteur de performances: {str(e)}")
+
+    # Vérification de l'état avant démarrage
+    try:
+        from health_check import check_database
+        if not check_database():
+            logger.warning("La vérification de la base de données a échoué. L'application peut ne pas fonctionner correctement.")
+    except ImportError:
+        logger.warning("Module health_check non trouvé, la vérification de l'état ne sera pas effectuée")
+    except Exception as e:
+        logger.error(f"Erreur lors de la vérification de l'état: {str(e)}")
 
     try:
-        logger.info("Démarrage du serveur Socket.IO")
+        logger.info("Démarrage du serveur")
         # Optimisation pour la production si l'environnement n'est pas de développement
         import os
         debug_mode = os.environ.get('FLASK_ENV') == 'development'
         
-        # Configurer l'environnement Replit pour la production
-        is_replit_prod = os.environ.get('REPL_SLUG') and not debug_mode
+        # Configurer l'environnement pour la production
+        is_prod = os.environ.get('FLASK_ENV') == 'production'
         
         # Choisir la configuration appropriée
         from config import config
-        config_name = 'production' if is_replit_prod else 'development'
+        config_name = 'production' if is_prod else 'development'
         logger.info(f"Utilisation de la configuration: {config_name}")
         app.config.from_object(config[config_name])
 
+        # Déterminer le port
+        port = int(os.getenv('PORT', 5000))
+        
         # Utiliser gunicorn en production, eventlet sinon
-        if os.environ.get('GUNICORN_WORKERS') or is_replit_prod:
+        if is_prod:
             # Configuration pour production
-            app.run(host='0.0.0.0', port=5000, debug=False)
+            logger.info(f"Démarrage en mode production sur le port {port}")
+            app.run(host='0.0.0.0', port=port, debug=False)
         else:
             # Démarrage avec Eventlet pour Socket.IO en développement
-            port = int(os.getenv('PORT', 5000))
+            logger.info(f"Démarrage en mode développement sur le port {port}")
             socketio.run(app, 
                         host='0.0.0.0',
                         port=port,
@@ -120,7 +174,6 @@ if __name__ == '__main__':
                         allow_unsafe_werkzeug=True,
                         log_output=True)
     except Exception as e:
-        logger.error(f"Erreur lors du démarrage du serveur: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Erreur critique lors du démarrage du serveur: {str(e)}")
+        logger.error(traceback.format_exc())
         sys.exit(1)

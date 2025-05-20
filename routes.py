@@ -54,21 +54,67 @@ def health_check():
     Route pour vérifier l'état de santé de l'application 
     Utile pour les vérifications de déploiement et monitoring
     """
+    import psutil
+    import platform
+    import sys
+    
+    # Vérifier la connexion à la base de données
+    db_start_time = time.time()
     try:
         # Vérifier la connexion à la base de données
         from app import db
-        db.session.execute("SELECT 1")
-        db_status = "ok"
+        result = db.session.execute(text("SELECT 1")).scalar()
+        db_status = "ok" if result == 1 else "error: résultat inattendu"
+        db_response_time = time.time() - db_start_time
     except Exception as e:
         db_status = f"error: {str(e)}"
+        db_response_time = -1
     
-    # Retourner un statut JSON
-    return jsonify({
-        "status": "online",
+    # Collecter des métriques système
+    memory = psutil.virtual_memory()
+    disk = psutil.disk_usage('/')
+    
+    # Collecter les informations du système
+    system_info = {
+        "platform": platform.platform(),
+        "python_version": sys.version,
+        "cpu_count": psutil.cpu_count(),
+        "uptime_seconds": int(time.time() - psutil.boot_time())
+    }
+    
+    # Collecter les métriques du processus
+    process = psutil.Process(os.getpid())
+    process_metrics = {
+        "cpu_percent": process.cpu_percent(interval=0.5),
+        "memory_rss_mb": process.memory_info().rss / (1024 * 1024),
+        "threads": process.num_threads(),
+        "open_files": len(process.open_files()),
+        "connections": len(process.connections())
+    }
+    
+    # Retourner un statut JSON détaillé
+    response = {
+        "status": "online" if db_status == "ok" else "degraded",
         "timestamp": datetime.utcnow().isoformat(),
-        "database": db_status,
-        "version": "1.0.0"
-    })
+        "database": {
+            "status": db_status,
+            "response_time_seconds": round(db_response_time, 3) if db_response_time > 0 else None
+        },
+        "version": "1.1.0",
+        "system": {
+            "memory_used_percent": memory.percent,
+            "disk_used_percent": disk.percent,
+            "cpu_percent": psutil.cpu_percent(interval=0.5)
+        },
+        "process": process_metrics,
+        "info": system_info
+    }
+    
+    # Si le statut est dégradé, logger un avertissement
+    if response["status"] != "online":
+        logger.warning(f"État de santé dégradé: {response}")
+    
+    return jsonify(response)
 
 # About route
 @app.route('/about')
@@ -1963,6 +2009,35 @@ def update_last_seen():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/log-client-error', methods=['POST'])
+def log_client_error():
+    """API pour enregistrer les erreurs JavaScript côté client"""
+    try:
+        error_data = request.json
+        if not error_data:
+            return jsonify({'success': False, 'error': 'Aucune donnée fournie'}), 400
+            
+        # Enrichir les données d'erreur
+        error_data['timestamp'] = datetime.utcnow().isoformat()
+        error_data['user_id'] = current_user.id if not current_user.is_anonymous else None
+        error_data['ip_address'] = request.remote_addr
+        
+        # Journaliser l'erreur
+        logger.error(f"Erreur client: {json.dumps(error_data)}")
+        
+        # Enregistrer dans un fichier dédié
+        try:
+            os.makedirs('logs', exist_ok=True)
+            with open('logs/client_errors.jsonl', 'a') as f:
+                f.write(json.dumps(error_data) + '\n')
+        except Exception as e:
+            logger.error(f"Impossible d'écrire l'erreur client dans le fichier: {str(e)}")
+        
+        return jsonify({'success': True}), 200
+    except Exception as e:
+        logger.error(f"Erreur lors de la journalisation de l'erreur client: {str(e)}")
+        return jsonify({'success': False, 'error': 'Erreur serveur'}), 500
 
 @app.route('/api/get-first-exercise')
 @login_required
