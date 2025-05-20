@@ -19,6 +19,7 @@ def start_app():
         # Créer les dossiers nécessaires
         os.makedirs("logs", exist_ok=True)
         os.makedirs("uploads", exist_ok=True)
+        os.makedirs("static/uploads", exist_ok=True)
         
         # Initialiser la base de données SQLite
         logger.info("Initialisation de la base de données SQLite...")
@@ -30,6 +31,7 @@ def start_app():
         # Démarrer l'application
         logger.info("Démarrage de l'application SmartOHADA avec SQLite...")
         os.environ["FLASK_ENV"] = "development"
+        os.environ["FLASK_APP"] = "app_sqlite.py"
         
         # Exécuter l'application
         os.system("python app_sqlite.py")

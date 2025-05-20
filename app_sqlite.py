@@ -9,7 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.middleware.proxy_fix import ProxyFix
 from db_sqlite_adapter import get_sqlite_uri
 
@@ -17,12 +16,6 @@ from db_sqlite_adapter import get_sqlite_uri
 logging.basicConfig(level=logging.INFO, 
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
-# Base for SQLAlchemy models
-Base = declarative_base()
-
-# Initialize SQLAlchemy
-db = SQLAlchemy(model_class=Base)
 
 # Create Flask app
 app = Flask(__name__)
@@ -35,8 +28,8 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config["SQLALCHEMY_DATABASE_URI"] = get_sqlite_uri()
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Initialize SQLAlchemy with the app
-db.init_app(app)
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
 
 # Login manager setup
 login_manager = LoginManager()
