@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrer avec SQLite"
+runButton = "Démarrer SQLite"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -452,6 +452,15 @@ args = "python start_app.py"
 
 [[workflows.workflow]]
 name = "Démarrer avec SQLite"
+author = 42931312
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_sqlite_app.py"
+
+[[workflows.workflow]]
+name = "Démarrer SQLite"
 author = 42931312
 mode = "sequential"
 
