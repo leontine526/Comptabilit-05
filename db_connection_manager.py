@@ -71,6 +71,7 @@ class DBConnectionManager:
         
         while retry_count < max_retries:
             try:
+                from sqlalchemy import text
                 with self.engine.connect() as conn:
                     conn.execute(text("SELECT 1"))
                 self.is_healthy = True
@@ -87,10 +88,6 @@ class DBConnectionManager:
                 self.is_healthy = False
                 logger.error(f"Échec de la vérification de santé après {max_retries} tentatives: {str(e)}")
                 return False
-        except Exception as e:
-            self.is_healthy = False
-            logger.error(f"Échec de la vérification de santé de la base de données: {str(e)}")
-            return False
     
     @contextmanager
     def get_connection(self):
