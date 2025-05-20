@@ -30,20 +30,20 @@ function initReactionSelectors(targetSelector = '.reaction-button') {
 
     // Sélectionne tous les boutons de réaction
     const reactionButtons = document.querySelectorAll(targetSelector);
-    
+
     reactionButtons.forEach(button => {
         createReactionSelector(button);
-        
+
         // Gestionnaires d'événements pour afficher/masquer le sélecteur
         button.addEventListener('mouseenter', showReactionSelector);
         button.addEventListener('mouseleave', hideReactionSelector);
-        
+
         // Gestionnaire d'événement pour le clic (réaction par défaut - like)
         button.addEventListener('click', function(event) {
             event.preventDefault();
-            
+
             const currentReaction = this.getAttribute('data-current-reaction');
-            
+
             if (currentReaction && currentReaction !== 'like') {
                 // Si déjà une réaction non-like, on utilise like
                 selectReaction(this, 'like');
@@ -66,21 +66,21 @@ function createReactionSelector(button) {
     // Crée le conteneur
     const selector = document.createElement('div');
     selector.className = 'reaction-selector';
-    
+
     // Ajoute les options de réaction
     Object.keys(REACTION_TYPES).forEach(type => {
         const option = document.createElement('div');
         option.className = 'reaction-option';
         option.setAttribute('data-reaction-type', type);
         option.setAttribute('title', REACTION_TYPES[type].text);
-        
+
         const icon = document.createElement('i');
         icon.className = `bi ${REACTION_TYPES[type].icon}`;
         icon.style.color = REACTION_TYPES[type].color;
-        
+
         option.appendChild(icon);
         selector.appendChild(option);
-        
+
         // Gestionnaire d'événement pour la sélection d'une réaction
         option.addEventListener('click', function(event) {
             event.preventDefault();
@@ -88,10 +88,10 @@ function createReactionSelector(button) {
             selectReaction(button, type);
         });
     });
-    
+
     // Ajoute le sélecteur au DOM
     document.body.appendChild(selector);
-    
+
     // Stocke la référence
     button.setAttribute('data-selector-id', reactionSelectors.length);
     reactionSelectors.push(selector);
@@ -104,23 +104,23 @@ function createReactionSelector(button) {
 function showReactionSelector(event) {
     const button = event.currentTarget;
     const selectorId = button.getAttribute('data-selector-id');
-    
+
     if (selectorId !== null) {
         const selector = reactionSelectors[selectorId];
-        
+
         // Positionne le sélecteur
         const buttonRect = button.getBoundingClientRect();
         selector.style.left = buttonRect.left + 'px';
         selector.style.bottom = (window.innerHeight - buttonRect.top + 10) + 'px';
-        
+
         // Affiche le sélecteur
         selector.classList.add('active');
-        
+
         // Gestion de la sortie du sélecteur
         selector.addEventListener('mouseenter', () => {
             clearTimeout(selector.hideTimeout);
         });
-        
+
         selector.addEventListener('mouseleave', () => {
             hideReactionSelector({ currentTarget: button });
         });
@@ -134,10 +134,10 @@ function showReactionSelector(event) {
 function hideReactionSelector(event) {
     const button = event.currentTarget;
     const selectorId = button.getAttribute('data-selector-id');
-    
+
     if (selectorId !== null) {
         const selector = reactionSelectors[selectorId];
-        
+
         // Utilise un timeout pour permettre de déplacer la souris vers le sélecteur
         selector.hideTimeout = setTimeout(() => {
             selector.classList.remove('active');
@@ -157,19 +157,19 @@ function selectReaction(button, reactionType) {
         const selector = reactionSelectors[selectorId];
         selector.classList.remove('active');
     }
-    
+
     // Met à jour l'apparence du bouton
     updateReactionButton(button, reactionType);
-    
+
     // Détermine si c'est une publication ou un commentaire
     const postId = button.getAttribute('data-post-id');
     const commentId = button.getAttribute('data-comment-id');
-    
+
     // Envoie la réaction au serveur
     const data = { reaction_type: reactionType };
     if (postId) data.post_id = postId;
     if (commentId) data.comment_id = commentId;
-    
+
     fetch('/api/toggle-reaction', {
         method: 'POST',
         headers: {
@@ -182,7 +182,7 @@ function selectReaction(button, reactionType) {
         if (data.success) {
             // Met à jour le compteur
             updateReactionsCount(button, data.reactions);
-            
+
             // Met à jour l'attribut de réaction actuelle
             button.setAttribute('data-current-reaction', reactionType || '');
         } else {
@@ -206,7 +206,7 @@ function updateReactionButton(button, reactionType) {
     icon.className = 'bi bi-hand-thumbs-up';
     icon.style.color = '';
     button.querySelector('span').textContent = 'J\'aime';
-    
+
     // Applique la nouvelle réaction
     if (reactionType && REACTION_TYPES[reactionType]) {
         button.classList.add('reacted');
@@ -231,12 +231,12 @@ function updateReactionsCount(button, reactions) {
         const commentId = button.getAttribute('data-comment-id');
         container = document.querySelector(`#comment-${commentId} .reaction-details`);
     }
-    
+
     if (!container) return;
-    
+
     // Récupère le nombre total de réactions
     const total = reactions.total || 0;
-    
+
     // Mise à jour simplifiée avec juste le nombre
     if (total > 0) {
         container.textContent = total;
@@ -269,17 +269,17 @@ function initReactionSelectors() {
     document.querySelectorAll('.reaction-button').forEach(button => {
         // Crée le sélecteur de réactions
         createReactionSelector(button);
-        
+
         // Ajoute l'événement de clic
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            
+
             // Si le bouton a déjà une réaction, l'utiliser directement
             if (this.classList.contains('reacted')) {
                 const postId = this.getAttribute('data-post-id');
                 const commentId = this.getAttribute('data-comment-id');
                 const currentReaction = this.getAttribute('data-current-reaction') || 'like';
-                
+
                 // Envoie la requête pour basculer la réaction
                 toggleReaction(postId, commentId, currentReaction);
             } else {
@@ -290,7 +290,7 @@ function initReactionSelectors() {
                 }
             }
         });
-        
+
         // Ajoute l'événement de survol
         button.addEventListener('mouseenter', function() {
             const selector = this.nextElementSibling;
@@ -298,7 +298,7 @@ function initReactionSelectors() {
                 selector.classList.add('active');
             }
         });
-        
+
         // Cache le sélecteur lorsque la souris quitte la zone
         button.parentElement.addEventListener('mouseleave', function() {
             const selector = this.querySelector('.reaction-selector');
@@ -315,11 +315,11 @@ function createReactionSelector(button) {
     if (button.nextElementSibling && button.nextElementSibling.classList.contains('reaction-selector')) {
         return;
     }
-    
+
     // Crée le sélecteur
     const selector = document.createElement('div');
     selector.className = 'reaction-selector';
-    
+
     // Ajoute les options de réaction
     availableReactions.forEach(reaction => {
         const option = document.createElement('div');
@@ -327,25 +327,25 @@ function createReactionSelector(button) {
         option.setAttribute('data-reaction', reaction.type);
         option.setAttribute('title', reaction.label);
         option.innerHTML = `<i class="bi ${reaction.icon}" style="color: ${reaction.color}"></i>`;
-        
+
         // Ajoute l'événement de clic
         option.addEventListener('click', function(e) {
             e.stopPropagation();
-            
+
             const postId = button.getAttribute('data-post-id');
             const commentId = button.getAttribute('data-comment-id');
             const reactionType = this.getAttribute('data-reaction');
-            
+
             // Envoie la requête pour basculer la réaction
             toggleReaction(postId, commentId, reactionType);
-            
+
             // Cache le sélecteur
             selector.classList.remove('active');
         });
-        
+
         selector.appendChild(option);
     });
-    
+
     // Insère le sélecteur après le bouton
     button.parentNode.insertBefore(selector, button.nextSibling);
 }
@@ -356,7 +356,7 @@ function toggleReaction(postId, commentId, reactionType) {
     const data = {
         reaction_type: reactionType
     };
-    
+
     if (postId) {
         data.post_id = postId;
     } else if (commentId) {
@@ -365,7 +365,7 @@ function toggleReaction(postId, commentId, reactionType) {
         console.error('Aucun ID de post ou de commentaire fourni');
         return;
     }
-    
+
     // Envoie la requête
     fetch('/api/reactions', {
         method: 'POST',
@@ -394,16 +394,16 @@ function updateReactionUI(postId, commentId, reactionType, action, reactions) {
     const button = postId 
         ? document.querySelector(`.reaction-button[data-post-id="${postId}"]`)
         : document.querySelector(`.reaction-button[data-comment-id="${commentId}"]`);
-    
+
     if (!button) return;
-    
+
     // Récupère l'icône et le texte du bouton
     const icon = button.querySelector('i');
     const label = button.querySelector('span');
-    
+
     // Trouve la réaction dans la liste des réactions disponibles
     const reaction = availableReactions.find(r => r.type === reactionType);
-    
+
     if (action === 'removed') {
         // Réinitialise le bouton
         button.classList.remove('reacted');
@@ -418,7 +418,7 @@ function updateReactionUI(postId, commentId, reactionType, action, reactions) {
         icon.style.color = reaction.color;
         if (label) label.textContent = reaction.label;
     }
-    
+
     // Met à jour le compteur et les détails des réactions
     updateReactionDetails(postId, commentId, reactions);
 }
@@ -429,18 +429,18 @@ function updateReactionDetails(postId, commentId, reactions) {
     const detailsContainer = postId 
         ? document.querySelector(`#post-${postId} .reaction-details`)
         : document.querySelector(`#comment-${commentId} .reaction-details`);
-    
+
     if (!detailsContainer) return;
-    
+
     // Si pas de réactions, cache les détails
     if (reactions.count === 0) {
         detailsContainer.innerHTML = '';
         return;
     }
-    
+
     // Crée les détails des réactions
     let detailsHTML = `<i class="bi bi-hand-thumbs-up-fill text-primary me-1"></i>${reactions.count}`;
-    
+
     // Si on a des détails par type de réaction, les afficher
     if (reactions.details && Object.keys(reactions.details).length > 0) {
         const typesHTML = Object.entries(reactions.details)
@@ -451,14 +451,166 @@ function updateReactionDetails(postId, commentId, reactions) {
                 </span>`;
             })
             .join('');
-        
+
         detailsHTML += ` <span class="reaction-types-details">${typesHTML}</span>`;
     }
-    
+
     detailsContainer.innerHTML = detailsHTML;
 }
 
 // Initialise les réactions au chargement du document
 document.addEventListener('DOMContentLoaded', function() {
-    initReactionSelectors();
+    // Gestionnaire pour les boutons de réaction
+    const reactionButtons = document.querySelectorAll('.reaction-button');
+
+    // Types de réactions disponibles
+    const reactionTypes = [
+        { type: 'like', icon: 'fas fa-thumbs-up', label: 'J\'aime' },
+        { type: 'love', icon: 'fas fa-heart', label: 'J\'adore' },
+        { type: 'haha', icon: 'fas fa-laugh', label: 'Haha' },
+        { type: 'wow', icon: 'fas fa-surprise', label: 'Wow' },
+        { type: 'sad', icon: 'fas fa-sad-tear', label: 'Triste' },
+        { type: 'angry', icon: 'fas fa-angry', label: 'Grrr' }
+    ];
+
+    // Générer le menu de réactions
+    function createReactionMenu(button) {
+        const menu = document.createElement('div');
+        menu.classList.add('reaction-menu');
+
+        reactionTypes.forEach(reaction => {
+            const reactionItem = document.createElement('button');
+            reactionItem.classList.add('reaction-item');
+            reactionItem.setAttribute('data-type', reaction.type);
+            reactionItem.innerHTML = `<i class="${reaction.icon}"></i>`;
+            reactionItem.title = reaction.label;
+
+            reactionItem.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const type = this.getAttribute('data-type');
+                sendReaction(button, type);
+                menu.remove();
+            });
+
+            menu.appendChild(reactionItem);
+        });
+
+        return menu;
+    }
+
+    // Afficher le menu de réactions
+    reactionButtons.forEach(button => {
+        button.addEventListener('mouseenter', function(e) {
+            // Vérifier si le menu existe déjà
+            if (!document.querySelector('.reaction-menu')) {
+                const menu = createReactionMenu(this);
+                document.body.appendChild(menu);
+
+                // Positionner le menu au-dessus du bouton
+                const rect = this.getBoundingClientRect();
+                menu.style.position = 'absolute';
+                menu.style.left = `${rect.left}px`;
+                menu.style.top = `${rect.top - menu.offsetHeight - 10}px`;
+
+                // Fermer le menu après un délai si on quitte le menu
+                menu.addEventListener('mouseleave', function() {
+                    setTimeout(() => {
+                        if (!menu.matches(':hover') && !button.matches(':hover')) {
+                            menu.remove();
+                        }
+                    }, 500);
+                });
+            }
+        });
+
+        // Gestion du clic simple (réaction par défaut: like)
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            sendReaction(this, 'like');
+        });
+    });
+
+    // Envoyer la réaction au serveur
+    function sendReaction(button, reactionType) {
+        const postId = button.dataset.postId;
+        const commentId = button.dataset.commentId;
+
+        fetch('/api/reactions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                comment_id: commentId,
+                reaction_type: reactionType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mise à jour de l'interface
+                updateReactionUI(button, data);
+            }
+        })
+        .catch(error => console.error('Erreur:', error));
+    }
+
+    // Mettre à jour l'interface après une réaction
+    function updateReactionUI(button, data) {
+        // Supprimer toutes les classes de réaction
+        reactionTypes.forEach(reaction => {
+            button.classList.remove(reaction.type);
+        });
+
+        // Ajouter la classe pour le type de réaction actuel
+        if (data.action !== 'removed') {
+            button.classList.add(data.reactions.current_type || 'like');
+
+            // Mettre à jour l'icône
+            const currentReaction = reactionTypes.find(r => r.type === (data.reactions.current_type || 'like'));
+            if (currentReaction) {
+                const icon = button.querySelector('i');
+                if (icon) {
+                    icon.className = currentReaction.icon;
+                }
+            }
+        } else {
+            // Réinitialiser à l'icône par défaut
+            const icon = button.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-thumbs-up';
+            }
+        }
+
+        // Mettre à jour le compteur
+        const counter = button.querySelector('.reaction-count');
+        if (counter) {
+            counter.textContent = data.reactions.count;
+        }
+
+        // Afficher un résumé des réactions
+        const summary = button.closest('.post-actions, .comment-actions').querySelector('.reactions-summary');
+        if (summary && data.reactions.details) {
+            let summaryHTML = '';
+            for (const [type, count] of Object.entries(data.reactions.details)) {
+                if (count > 0) {
+                    const reaction = reactionTypes.find(r => r.type === type);
+                    if (reaction) {
+                        summaryHTML += `<span class="reaction-badge" title="${count} ${reaction.label}"><i class="${reaction.icon}"></i> ${count}</span>`;
+                    }
+                }
+            }
+            summary.innerHTML = summaryHTML;
+        }
+    }
+
+    // Fermer le menu si on clique ailleurs
+    document.addEventListener('click', function() {
+        const menu = document.querySelector('.reaction-menu');
+        if (menu) {
+            menu.remove();
+        }
+    });
 });

@@ -1985,3 +1985,109 @@ def get_first_exercise():
     except Exception as e:
         logger.error(f"Erreur lors de la récupération du premier exercice: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/recherche-avancee', methods=['GET', 'POST'])
+@login_required
+def advanced_search():
+    """Recherche avancée avec filtres"""
+    
+    # Récupérer les filtres depuis le formulaire ou les paramètres GET
+    filters = {}
+    if request.method == 'POST':
+        filters = {
+            'type': request.form.get('type', 'all'),
+            'date_from': request.form.get('date_from'),
+            'date_to': request.form.get('date_to'),
+            'keywords': request.form.get('keywords', ''),
+            'tags': request.form.getlist('tags'),
+            'user_id': request.form.get('user_id'),
+            'workgroup_id': request.form.get('workgroup_id')
+        }
+    else:
+        filters = {
+            'type': request.args.get('type', 'all'),
+            'date_from': request.args.get('date_from'),
+            'date_to': request.args.get('date_to'),
+            'keywords': request.args.get('keywords', ''),
+            'tags': request.args.getlist('tags'),
+            'user_id': request.args.get('user_id'),
+            'workgroup_id': request.args.get('workgroup_id')
+        }
+    
+    # Construction des requêtes selon les filtres
+    results = {
+        'users': [],
+        'posts': [],
+        'workgroups': [],
+        'events': [],
+        'exercises': []
+    }
+    
+    # Recherche active seulement si des mots-clés sont fournis
+    if filters.get('keywords'):
+        keywords = filters['keywords'].split()
+        
+        # Construire les conditions de recherche
+        date_filter = []
+        if filters.get('date_from'):
+            try:
+                date_from = datetime.strptime(filters['date_from'], '%Y-%m-%d')
+                date_filter.append(Post.created_at >= date_from)
+            except:
+                pass
+                
+        if filters.get('date_to'):
+            try:
+                date_to = datetime.strptime(filters['date_to'], '%Y-%m-%d')
+                date_filter.append(Post.created_at <= date_to)
+            except:
+                pass
+        
+        # Recherche selon le type
+        if filters['type'] == 'all' or filters['type'] == 'users':
+            # Construction de la requête pour les utilisateurs
+            user_query = User.query
+            for keyword in keywords:
+                user_query = user_query.filter(
+                    db.or_(
+                        User.username.ilike(f'%{keyword}%'),
+                        User.full_name.ilike(f'%{keyword}%'),
+                        User.email.ilike(f'%{keyword}%'),
+                        User.bio.ilike(f'%{keyword}%')
+                    )
+                )
+            results['users'] = user_query.all()
+        
+        if filters['type'] == 'all' or filters['type'] == 'posts':
+            # Construction de la requête pour les publications
+            post_query = Post.query
+            for keyword in keywords:
+                post_query = post_query.filter(Post.content.ilike(f'%{keyword}%'))
+                
+            # Appliquer les filtres de date
+            for date_condition in date_filter:
+                post_query = post_query.filter(date_condition)
+                
+            # Filtrer par utilisateur si spécifié
+            if filters.get('user_id'):
+                post_query = post_query.filter(Post.user_id == int(filters['user_id']))
+                
+            # Filtrer par groupe si spécifié
+            if filters.get('workgroup_id'):
+                post_query = post_query.filter(Post.workgroup_id == int(filters['workgroup_id']))
+                
+            results['posts'] = post_query.order_by(Post.created_at.desc()).all()
+            
+        # Autres types de recherche (workgroups, events, exercises) selon les mêmes principes
+        # ...
+    
+    # Préparation des données pour le formulaire
+    workgroups = current_user.workgroups.all()
+    
+    return render_template(
+        'social/advanced_search.html',
+        title='Recherche avancée',
+        filters=filters,
+        results=results,
+        workgroups=workgroups
+    )

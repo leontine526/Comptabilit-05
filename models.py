@@ -607,3 +607,169 @@ class Notification(db.Model):
         elif self.source_type == 'exercise':
             return f'/exercises/{self.source_id}'
         return '#'  # Default URL
+
+class GroupConversation(db.Model):
+    """Modèle pour les conversations de groupe."""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Relationships
+    creator = db.relationship('User', backref='created_group_conversations')
+    
+    def __repr__(self):
+        return f'<GroupConversation {self.name}>'
+
+# Table d'association pour les membres de la conversation de groupe
+group_conversation_members = db.Table('group_conversation_members',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('conversation_id', db.Integer, db.ForeignKey('group_conversation.id'), primary_key=True),
+    db.Column('joined_at', db.DateTime, default=datetime.utcnow)
+)
+
+class GroupMessage(db.Model):
+    """Modèle pour les messages dans les conversations de groupe."""
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    conversation_id = db.Column(db.Integer, db.ForeignKey('group_conversation.id'), nullable=False)
+    
+    # Relationships
+    sender = db.relationship('User', backref='sent_group_messages')
+    conversation = db.relationship('GroupConversation', backref=db.backref('messages', lazy='dynamic', cascade='all, delete-orphan'))
+    
+    # Qui a lu ce message
+    read_by = db.relationship('User', secondary='group_message_reads', backref='read_group_messages')
+    
+    def __repr__(self):
+        return f'<GroupMessage {self.id} in {self.conversation.name}>'
+
+# Table d'association pour les lectures de messages de groupe
+group_message_reads = db.Table('group_message_reads',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('message_id', db.Integer, db.ForeignKey('group_message.id'), primary_key=True),
+    db.Column('read_at', db.DateTime, default=datetime.utcnow)
+)
+
+
+class Poll(db.Model):
+    """Modèle pour les sondages dans les publications"""
+    id = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=True)  # Date d'expiration optionnelle
+    is_multiple_choice = db.Column(db.Boolean, default=False)  # Si plusieurs choix sont autorisés
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    
+    # Relations
+    options = db.relationship('PollOption', backref='poll', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def __repr__(self):
+        return f'<Poll {self.id}: {self.question}>'
+    
+    @property
+    def total_votes(self):
+        """Retourne le nombre total de votes pour ce sondage"""
+        return sum(option.votes_count for option in self.options)
+    
+    @property
+    def is_expired(self):
+        """Vérifie si le sondage est expiré"""
+        return self.expires_at and datetime.utcnow() > self.expires_at
+
+class PollOption(db.Model):
+    """Modèle pour les options de sondage"""
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(255), nullable=False)
+    poll_id = db.Column(db.Integer, db.ForeignKey('poll.id'), nullable=False)
+    
+    # Relation avec les votes
+    votes = db.relationship('PollVote', backref='option', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def __repr__(self):
+        return f'<PollOption {self.id}: {self.text}>'
+    
+    @property
+    def votes_count(self):
+        """Retourne le nombre de votes pour cette option"""
+        return self.votes.count()
+    
+    @property
+    def percentage(self):
+        """Retourne le pourcentage de votes pour cette option"""
+        total = self.poll.total_votes
+        if total > 0:
+            return round((self.votes_count / total) * 100, 1)
+        return 0
+
+class PollVote(db.Model):
+    """Modèle pour les votes des utilisateurs"""
+    id = db.Column(db.Integer, primary_key=True)
+    option_id = db.Column(db.Integer, db.ForeignKey('poll_option.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Contrainte unique pour éviter les votes multiples (sauf si multiple choice)
+    __table_args__ = (db.UniqueConstraint('option_id', 'user_id', name='unique_vote'),)
+    
+    def __repr__(self):
+        return f'<PollVote {self.id} by user {self.user_id}>'
+
+
+class Event(db.Model):
+    """Modèle pour les événements sociaux"""
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=True)
+    location = db.Column(db.String(255))
+    location_details = db.Column(db.Text)  # Description supplémentaire du lieu
+    cover_image = db.Column(db.String(255))  # URL de l'image de couverture
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    workgroup_id = db.Column(db.Integer, db.ForeignKey('workgroup.id'), nullable=True)
+    is_public = db.Column(db.Boolean, default=True)
+    
+    # Relations
+    creator = db.relationship('User', backref='created_events')
+    attendees = db.relationship('EventAttendee', backref='event', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def __repr__(self):
+        return f'<Event {self.id}: {self.title}>'
+    
+    @property
+    def going_count(self):
+        """Nombre de personnes qui ont confirmé leur présence"""
+        return self.attendees.filter_by(status='going').count()
+    
+    @property
+    def interested_count(self):
+        """Nombre de personnes intéressées"""
+        return self.attendees.filter_by(status='interested').count()
+    
+    @property
+    def invited_count(self):
+        """Nombre de personnes invitées"""
+        return self.attendees.filter_by(status='invited').count()
+
+class EventAttendee(db.Model):
+    """Modèle pour les participants aux événements"""
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.String(20), default='invited')  # invited, going, interested, declined
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Contrainte unique pour éviter les duplications
+    __table_args__ = (db.UniqueConstraint('event_id', 'user_id', name='unique_event_attendee'),)
+    
+    # Relations
+    user = db.relationship('User', backref='event_attendances')
+    
+    def __repr__(self):
+        return f'<EventAttendee {self.id}: {self.user.username} - {self.status}>'

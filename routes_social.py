@@ -846,3 +846,49 @@ def get_reaction_details(post_id=None, comment_id=None):
     reactions['details'] = reaction_counts
 
     return reactions
+
+@app.route('/api/posts/schedule', methods=['POST'])
+@login_required
+def schedule_post():
+    """Planifie une publication pour une date ultérieure"""
+    data = request.json
+    
+    if not data or 'content' not in data or 'scheduled_for' not in data:
+        return jsonify({'success': False, 'message': 'Contenu et date de publication requis'})
+    
+    try:
+        # Convertir la date de publication
+        scheduled_for = datetime.fromisoformat(data['scheduled_for'])
+        
+        # Vérifier que la date est dans le futur
+        if scheduled_for <= datetime.utcnow():
+            return jsonify({'success': False, 'message': 'La date de publication doit être dans le futur'})
+        
+        # Créer la publication
+        post = Post(
+            content=data['content'],
+            user_id=current_user.id,
+            workgroup_id=data.get('workgroup_id'),
+            image_url=data.get('image_url'),
+            file_url=data.get('file_url'),
+            background_color=data.get('background_color'),
+            privacy_level=data.get('privacy_level', 'public'),
+            is_published=False,  # Non publié car c'est programmé
+            scheduled_for=scheduled_for
+        )
+        
+        db.session.add(post)
+        db.session.commit()
+        
+        # Ajouter une tâche planifiée pour publier le post
+        # Note: Ceci nécessiterait une implémentation de tâches planifiées comme APScheduler
+        # scheduler.add_job(publish_scheduled_post, 'date', run_date=scheduled_for, args=[post.id])
+        
+        return jsonify({
+            'success': True, 
+            'post_id': post.id,
+            'message': f'Publication programmée pour le {scheduled_for.strftime("%d/%m/%Y à %H:%M")}'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Erreur: {str(e)}'})
