@@ -416,10 +416,19 @@ class Post(db.Model):
     workgroup_id = db.Column(db.Integer, db.ForeignKey('workgroup.id'), nullable=True)  # Peut être null si publication générale
     image_url = db.Column(db.String(255))  # URL de l'image attachée (optionnel)
     file_url = db.Column(db.String(255))  # URL du fichier attaché (optionnel)
+    background_color = db.Column(db.String(50))  # Couleur d'arrière-plan (optionnel)
+    privacy_level = db.Column(db.String(20), default='public')  # public, friends, private
+    is_edited = db.Column(db.Boolean, default=False)  # Indique si le post a été édité
+    is_pinned = db.Column(db.Boolean, default=False)  # Post épinglé en haut du profil/groupe
+    location = db.Column(db.String(255))  # Localisation optionnelle
+    feeling = db.Column(db.String(100))  # Sentiment/activité (ex: "se sent heureux")
+    tags = db.Column(db.Text)  # Utilisateurs tagués (JSON array d'IDs)
+    exercise_solution_id = db.Column(db.Integer, db.ForeignKey('exercise_solution.id'), nullable=True)
     
     # Relationships
     comments = db.relationship('Comment', backref='post', lazy='dynamic', cascade='all, delete-orphan')
     likes = db.relationship('Like', backref='post', lazy='dynamic', cascade='all, delete-orphan')
+    shares = db.relationship('Share', backref='post', lazy='dynamic', cascade='all, delete-orphan')
     
     @property
     def like_count(self):
@@ -428,6 +437,21 @@ class Post(db.Model):
     @property
     def comment_count(self):
         return self.comments.count()
+    
+    @property
+    def share_count(self):
+        return self.shares.count()
+    
+    @property
+    def tagged_users(self):
+        """Retourne la liste des utilisateurs tagués"""
+        if not self.tags:
+            return []
+        try:
+            user_ids = json.loads(self.tags)
+            return User.query.filter(User.id.in_(user_ids)).all()
+        except:
+            return []
     
     def __repr__(self):
         return f'<Post {self.id} by {self.author.username}>'
@@ -483,9 +507,42 @@ class Story(db.Model):
     # Relations
     user = db.relationship('User', backref=db.backref('stories', lazy='dynamic'))
     views = db.relationship('StoryView', backref='story', lazy='dynamic', cascade='all, delete-orphan')
+
+class Share(db.Model):
+    """Modèle pour les partages de publications."""
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    comment = db.Column(db.Text)  # Commentaire optionnel lors du partage
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    workgroup_id = db.Column(db.Integer, db.ForeignKey('workgroup.id'), nullable=True)  # Si partagé dans un groupe
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('shares', lazy='dynamic'))
+    
+    def __repr__(self):
+        return f'<Share {self.id} of Post {self.post_id} by {self.user.username}>'
+
     
     def __repr__(self):
         return f'<Story {self.id} by {self.user.username}>'
+
+class PrivateMessage(db.Model):
+    """Modèle pour les messages privés entre utilisateurs."""
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Relationships
+    sender = db.relationship('User', foreign_keys=[sender_id], backref=db.backref('sent_private_messages', lazy='dynamic'))
+    recipient = db.relationship('User', foreign_keys=[recipient_id], backref=db.backref('received_private_messages', lazy='dynamic'))
+    
+    def __repr__(self):
+        return f'<PrivateMessage {self.id} from {self.sender.username} to {self.recipient.username}>'
+
     
     @property
     def view_count(self):

@@ -249,3 +249,216 @@ function updateReactionsCount(button, reactions) {
 document.addEventListener('DOMContentLoaded', function() {
     initReactionSelectors();
 });
+/**
+ * Script pour la gestion des réactions personnalisées
+ */
+
+// Initialisation des réactions disponibles
+const availableReactions = [
+    { type: 'like', icon: 'bi-hand-thumbs-up-fill', label: 'J\'aime', color: '#2078f4' },
+    { type: 'love', icon: 'bi-heart-fill', label: 'J\'adore', color: '#f33e58' },
+    { type: 'haha', icon: 'bi-emoji-laughing-fill', label: 'Haha', color: '#f7b125' },
+    { type: 'wow', icon: 'bi-emoji-surprise-fill', label: 'Wouah', color: '#f7b125' },
+    { type: 'sad', icon: 'bi-emoji-frown-fill', label: 'Triste', color: '#f7b125' },
+    { type: 'angry', icon: 'bi-emoji-angry-fill', label: 'Grrr', color: '#e9710f' }
+];
+
+// Initialise les sélecteurs de réaction
+function initReactionSelectors() {
+    // Pour chaque bouton de réaction
+    document.querySelectorAll('.reaction-button').forEach(button => {
+        // Crée le sélecteur de réactions
+        createReactionSelector(button);
+        
+        // Ajoute l'événement de clic
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Si le bouton a déjà une réaction, l'utiliser directement
+            if (this.classList.contains('reacted')) {
+                const postId = this.getAttribute('data-post-id');
+                const commentId = this.getAttribute('data-comment-id');
+                const currentReaction = this.getAttribute('data-current-reaction') || 'like';
+                
+                // Envoie la requête pour basculer la réaction
+                toggleReaction(postId, commentId, currentReaction);
+            } else {
+                // Sinon, affiche le sélecteur
+                const selector = this.nextElementSibling;
+                if (selector && selector.classList.contains('reaction-selector')) {
+                    selector.classList.toggle('active');
+                }
+            }
+        });
+        
+        // Ajoute l'événement de survol
+        button.addEventListener('mouseenter', function() {
+            const selector = this.nextElementSibling;
+            if (selector && selector.classList.contains('reaction-selector')) {
+                selector.classList.add('active');
+            }
+        });
+        
+        // Cache le sélecteur lorsque la souris quitte la zone
+        button.parentElement.addEventListener('mouseleave', function() {
+            const selector = this.querySelector('.reaction-selector');
+            if (selector) {
+                selector.classList.remove('active');
+            }
+        });
+    });
+}
+
+// Crée un sélecteur de réactions pour un bouton
+function createReactionSelector(button) {
+    // Vérifie si le sélecteur existe déjà
+    if (button.nextElementSibling && button.nextElementSibling.classList.contains('reaction-selector')) {
+        return;
+    }
+    
+    // Crée le sélecteur
+    const selector = document.createElement('div');
+    selector.className = 'reaction-selector';
+    
+    // Ajoute les options de réaction
+    availableReactions.forEach(reaction => {
+        const option = document.createElement('div');
+        option.className = 'reaction-option';
+        option.setAttribute('data-reaction', reaction.type);
+        option.setAttribute('title', reaction.label);
+        option.innerHTML = `<i class="bi ${reaction.icon}" style="color: ${reaction.color}"></i>`;
+        
+        // Ajoute l'événement de clic
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const postId = button.getAttribute('data-post-id');
+            const commentId = button.getAttribute('data-comment-id');
+            const reactionType = this.getAttribute('data-reaction');
+            
+            // Envoie la requête pour basculer la réaction
+            toggleReaction(postId, commentId, reactionType);
+            
+            // Cache le sélecteur
+            selector.classList.remove('active');
+        });
+        
+        selector.appendChild(option);
+    });
+    
+    // Insère le sélecteur après le bouton
+    button.parentNode.insertBefore(selector, button.nextSibling);
+}
+
+// Fonction pour basculer une réaction
+function toggleReaction(postId, commentId, reactionType) {
+    // Prépare les données de la requête
+    const data = {
+        reaction_type: reactionType
+    };
+    
+    if (postId) {
+        data.post_id = postId;
+    } else if (commentId) {
+        data.comment_id = commentId;
+    } else {
+        console.error('Aucun ID de post ou de commentaire fourni');
+        return;
+    }
+    
+    // Envoie la requête
+    fetch('/api/reactions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Met à jour l'interface
+            updateReactionUI(postId, commentId, reactionType, data.action, data.reactions);
+        } else {
+            console.error('Erreur lors de la réaction:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
+}
+
+// Fonction pour mettre à jour l'interface après une réaction
+function updateReactionUI(postId, commentId, reactionType, action, reactions) {
+    // Récupère le bouton de réaction
+    const button = postId 
+        ? document.querySelector(`.reaction-button[data-post-id="${postId}"]`)
+        : document.querySelector(`.reaction-button[data-comment-id="${commentId}"]`);
+    
+    if (!button) return;
+    
+    // Récupère l'icône et le texte du bouton
+    const icon = button.querySelector('i');
+    const label = button.querySelector('span');
+    
+    // Trouve la réaction dans la liste des réactions disponibles
+    const reaction = availableReactions.find(r => r.type === reactionType);
+    
+    if (action === 'removed') {
+        // Réinitialise le bouton
+        button.classList.remove('reacted');
+        button.removeAttribute('data-current-reaction');
+        icon.className = 'bi bi-hand-thumbs-up';
+        if (label) label.textContent = 'J\'aime';
+    } else {
+        // Met à jour le bouton avec la nouvelle réaction
+        button.classList.add('reacted');
+        button.setAttribute('data-current-reaction', reactionType);
+        icon.className = `bi ${reaction.icon}`;
+        icon.style.color = reaction.color;
+        if (label) label.textContent = reaction.label;
+    }
+    
+    // Met à jour le compteur et les détails des réactions
+    updateReactionDetails(postId, commentId, reactions);
+}
+
+// Fonction pour mettre à jour les détails des réactions
+function updateReactionDetails(postId, commentId, reactions) {
+    // Identifie le conteneur des détails
+    const detailsContainer = postId 
+        ? document.querySelector(`#post-${postId} .reaction-details`)
+        : document.querySelector(`#comment-${commentId} .reaction-details`);
+    
+    if (!detailsContainer) return;
+    
+    // Si pas de réactions, cache les détails
+    if (reactions.count === 0) {
+        detailsContainer.innerHTML = '';
+        return;
+    }
+    
+    // Crée les détails des réactions
+    let detailsHTML = `<i class="bi bi-hand-thumbs-up-fill text-primary me-1"></i>${reactions.count}`;
+    
+    // Si on a des détails par type de réaction, les afficher
+    if (reactions.details && Object.keys(reactions.details).length > 0) {
+        const typesHTML = Object.entries(reactions.details)
+            .map(([type, count]) => {
+                const reaction = availableReactions.find(r => r.type === type);
+                return `<span class="reaction-type-detail" title="${reaction.label}">
+                    <i class="bi ${reaction.icon}" style="color: ${reaction.color}"></i> ${count}
+                </span>`;
+            })
+            .join('');
+        
+        detailsHTML += ` <span class="reaction-types-details">${typesHTML}</span>`;
+    }
+    
+    detailsContainer.innerHTML = detailsHTML;
+}
+
+// Initialise les réactions au chargement du document
+document.addEventListener('DOMContentLoaded', function() {
+    initReactionSelectors();
+});

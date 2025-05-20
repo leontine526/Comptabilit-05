@@ -547,6 +547,124 @@ def api_create_comment():
 # Routes pour les réactions personnalisées
 
 @app.route('/api/reactions', methods=['POST'])
+
+# Routes pour la messagerie privée
+@app.route('/messages')
+@login_required
+def messages_list():
+    """Affiche la liste des conversations de l'utilisateur"""
+    # Récupère les utilisateurs avec qui l'utilisateur actuel a échangé des messages
+    sent_to = db.session.query(User).join(
+        PrivateMessage, User.id == PrivateMessage.recipient_id
+    ).filter(PrivateMessage.sender_id == current_user.id).distinct().all()
+    
+    received_from = db.session.query(User).join(
+        PrivateMessage, User.id == PrivateMessage.sender_id
+    ).filter(PrivateMessage.recipient_id == current_user.id).distinct().all()
+    
+    # Combine les deux listes sans doublons
+    conversation_users = list(set(sent_to + received_from))
+    
+    # Pour chaque utilisateur, récupère le dernier message
+    conversations = []
+    for user in conversation_users:
+        last_message = PrivateMessage.query.filter(
+            ((PrivateMessage.sender_id == current_user.id) & (PrivateMessage.recipient_id == user.id)) |
+            ((PrivateMessage.sender_id == user.id) & (PrivateMessage.recipient_id == current_user.id))
+        ).order_by(PrivateMessage.sent_at.desc()).first()
+        
+        unread_count = PrivateMessage.query.filter_by(
+            sender_id=user.id,
+            recipient_id=current_user.id,
+            is_read=False
+        ).count()
+        
+        conversations.append({
+            'user': user,
+            'last_message': last_message,
+            'unread_count': unread_count
+        })
+    
+    # Trie les conversations par date du dernier message (plus récent en premier)
+    conversations.sort(key=lambda x: x['last_message'].sent_at if x['last_message'] else datetime.min, reverse=True)
+    
+    return render_template('social/messages_list.html', conversations=conversations)
+
+@app.route('/messages/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def messages_conversation(user_id):
+    """Affiche et permet d'envoyer des messages dans une conversation"""
+    other_user = User.query.get_or_404(user_id)
+    
+    # Si c'est une requête POST, c'est un nouveau message
+    if request.method == 'POST':
+        content = request.form.get('content', '').strip()
+        if content:
+            message = PrivateMessage(
+                content=content,
+                sender_id=current_user.id,
+                recipient_id=user_id
+            )
+            db.session.add(message)
+            db.session.commit()
+            
+            # Émission d'un événement Socket.IO pour informer le destinataire
+            socketio.emit('private_message', {
+                'sender_id': current_user.id,
+                'sender_username': current_user.username,
+                'message': content,
+                'timestamp': message.sent_at.strftime('%H:%M')
+            }, room=f'user_{user_id}')
+            
+            # Notification pour le destinataire
+            recipient = User.query.get(user_id)
+            if recipient:
+                notification = Notification(
+                    user_id=user_id,
+                    title="Nouveau message privé",
+                    content=f"{current_user.username} vous a envoyé un message.",
+                    notification_type="private_message",
+                    source_id=message.id,
+                    source_type="private_message"
+                )
+                db.session.add(notification)
+                db.session.commit()
+    
+    # Récupérer tous les messages entre les deux utilisateurs
+    messages = PrivateMessage.query.filter(
+        ((PrivateMessage.sender_id == current_user.id) & (PrivateMessage.recipient_id == user_id)) |
+        ((PrivateMessage.sender_id == user_id) & (PrivateMessage.recipient_id == current_user.id))
+    ).order_by(PrivateMessage.sent_at).all()
+    
+    # Marquer les messages non lus comme lus
+    unread_messages = PrivateMessage.query.filter_by(
+        sender_id=user_id,
+        recipient_id=current_user.id,
+        is_read=False
+    ).all()
+    
+    for msg in unread_messages:
+        msg.is_read = True
+    
+    db.session.commit()
+    
+    return render_template(
+        'social/messages_conversation.html',
+        other_user=other_user,
+        messages=messages
+    )
+
+@app.route('/api/messages/unread-count')
+@login_required
+def unread_messages_count():
+    """Retourne le nombre de messages non lus"""
+    count = PrivateMessage.query.filter_by(
+        recipient_id=current_user.id,
+        is_read=False
+    ).count()
+    
+    return jsonify({'count': count})
+
 @login_required
 def toggle_reaction():
     """Bascule une réaction sur un post ou un commentaire"""
