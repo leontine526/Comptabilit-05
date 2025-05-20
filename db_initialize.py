@@ -18,7 +18,8 @@ def initialize_database():
             db.create_all()
             
             # Vérifier les tables créées
-            tables = db.engine.table_names()
+            inspector = db.inspect(db.engine)
+            tables = inspector.get_table_names()
             logger.info(f"Tables créées: {', '.join(tables)}")
             
             # Créer un utilisateur admin par défaut
