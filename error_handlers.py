@@ -99,6 +99,14 @@ def handle_db_error(e):
     
     # Log détaillé de l'erreur DB
     error_id = log_error(e, 'DB')
+    
+    # Tenter de rétablir la connexion à la base de données
+    try:
+        from db_helper import init_db_connection
+        init_db_connection()
+        logger.info("Tentative de reconnexion à la base de données après erreur")
+    except Exception as reconnect_error:
+        logger.error(f"Échec de la tentative de reconnexion à la base de données: {str(reconnect_error)}")
 
     # En mode de débogage, montrer plus de détails
     if current_app.config.get('DEBUG', False):

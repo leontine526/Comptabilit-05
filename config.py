@@ -4,11 +4,14 @@ from datetime import timedelta
 class Config:
     """Base configuration"""
     SECRET_KEY = os.environ.get("SESSION_SECRET", "ohada_comptabilit_secret_key")
-    # Configuration optimisée pour Neon PostgreSQL
-    database_url = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb")
-    if database_url and '-pooler' not in database_url:
-        database_url = database_url.replace('.us-east-2', '-pooler.us-east-2')
-    database_url += "?sslmode=require&connect_timeout=10&application_name=smartohada&keepalives=1&keepalives_idle=30&keepalives_interval=10"
+    # Nouvelle configuration pour Neon PostgreSQL
+    database_url = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_APBmGjkT0y1H@ep-rough-truth-a5ntheq6-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require")
+    
+    # Ajouter des paramètres de connexion optimisés si nécessaire
+    if "?" not in database_url:
+        database_url += "?sslmode=require"
+    if "connect_timeout" not in database_url:
+        database_url += "&connect_timeout=10&application_name=smartohada&keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=3"
 
     SQLALCHEMY_DATABASE_URI = database_url
     SQLALCHEMY_ENGINE_OPTIONS = {
