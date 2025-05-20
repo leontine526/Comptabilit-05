@@ -115,15 +115,22 @@ def handle_exception(e):
 
 # Initialiser Socket.IO avec gestion d'erreur
 try:
-    socketio = SocketIO(app, async_mode="eventlet", 
+    import eventlet
+    socketio = SocketIO(app, async_mode='eventlet', 
                        logger=True, engineio_logger=False,
-                       ping_timeout=60, ping_interval=25)
-    logger.info("Socket.IO initialisé avec succès")
-except Exception as e:
-    logger.error(f"Erreur lors de l'initialisation de Socket.IO: {str(e)}")
-    # Fallback sans WebSockets si nécessaire
-    socketio = SocketIO(app, async_mode=None)
-    logger.warning("Socket.IO initialisé en mode de secours sans WebSockets")
+                       ping_timeout=60, ping_interval=25,
+                       cors_allowed_origins="*")
+    logger.info("Socket.IO initialisé avec succès (mode eventlet)")
+except ImportError:
+    try:
+        socketio = SocketIO(app, async_mode=None, 
+                           logger=True, 
+                           cors_allowed_origins="*")
+        logger.info("Socket.IO initialisé avec succès (mode threading)")
+    except Exception as e:
+        logger.error(f"Erreur lors de l'initialisation de Socket.IO: {str(e)}")
+        socketio = SocketIO(app)
+        logger.warning("Socket.IO initialisé en mode de secours")
 
 # Configurer le gestionnaire de connexion
 login_manager = LoginManager()
