@@ -6,108 +6,98 @@ import psutil
 import threading
 from datetime import datetime
 import json
+from cache_manager import get_cache_stats
 
-# Configuration du logging
 logging.basicConfig(level=logging.INFO, 
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class PerformanceMonitor:
     def __init__(self, interval=60):
-        """
-        Initialise le moniteur de performances
-        
-        Args:
-            interval (int): Intervalle en secondes entre chaque mesure
-        """
         self.interval = interval
         self.running = False
         self.thread = None
         self.stats_history = []
-        self.max_history = 60  # Garder 1 heure de données (avec intervalle de 60s)
+        self.max_history = 60
+        self.alert_thresholds = {
+            'cpu_percent': 80,
+            'memory_percent': 80,
+            'disk_percent': 85
+        }
         
-        # Créer le dossier de logs s'il n'existe pas
         os.makedirs('logs', exist_ok=True)
     
     def start(self):
-        """Démarre le moniteur de performances dans un thread séparé"""
         if self.running:
-            logger.warning("Le moniteur de performances est déjà en cours d'exécution")
+            logger.warning("Le moniteur est déjà en cours d'exécution")
             return
             
         self.running = True
         self.thread = threading.Thread(target=self._monitor_loop, daemon=True)
         self.thread.start()
-        logger.info(f"Moniteur de performances démarré (intervalle: {self.interval}s)")
+        logger.info(f"Moniteur démarré (intervalle: {self.interval}s)")
     
     def stop(self):
-        """Arrête le moniteur de performances"""
         self.running = False
         if self.thread:
             self.thread.join(timeout=5)
-        logger.info("Moniteur de performances arrêté")
+        logger.info("Moniteur arrêté")
     
     def _monitor_loop(self):
-        """Boucle principale du moniteur"""
         while self.running:
             try:
                 stats = self._collect_stats()
                 self._save_stats(stats)
                 self.stats_history.append(stats)
                 
-                # Limiter la taille de l'historique
                 if len(self.stats_history) > self.max_history:
                     self.stats_history.pop(0)
                     
-                # Vérifier les seuils critiques
                 self._check_thresholds(stats)
                 
             except Exception as e:
-                logger.error(f"Erreur lors de la collecte des métriques: {str(e)}")
+                logger.error(f"Erreur lors de la collecte: {str(e)}")
                 
             time.sleep(self.interval)
     
     def _collect_stats(self):
-        """Collecte les statistiques système et application"""
         process = psutil.Process(os.getpid())
         
-        # Statistiques de mémoire
+        # Statistiques système
         mem = psutil.virtual_memory()
-        process_mem = process.memory_info()
-        
-        # Statistiques CPU
-        cpu_percent = psutil.cpu_percent(interval=1)
-        process_cpu = process.cpu_percent(interval=1)
-        
-        # Statistiques disque
         disk = psutil.disk_usage('/')
+        
+        # Statistiques de cache
+        cache_stats = get_cache_stats()
         
         # Construire l'objet de statistiques
         stats = {
             'timestamp': datetime.now().isoformat(),
             'system': {
-                'cpu_percent': cpu_percent,
+                'cpu_percent': psutil.cpu_percent(interval=1),
                 'memory_total': mem.total,
                 'memory_available': mem.available,
                 'memory_percent': mem.percent,
                 'disk_total': disk.total,
                 'disk_free': disk.free,
-                'disk_percent': disk.percent
+                'disk_percent': disk.percent,
+                'load_avg': psutil.getloadavg()
             },
             'process': {
-                'cpu_percent': process_cpu,
-                'memory_rss': process_mem.rss,
-                'memory_vms': process_mem.vms,
+                'cpu_percent': process.cpu_percent(interval=1),
+                'memory_rss': process.memory_info().rss,
+                'memory_vms': process.memory_vms,
                 'threads': process.num_threads(),
                 'open_files': len(process.open_files()),
-                'connections': len(process.connections())
-            }
+                'connections': len(process.connections()),
+                'io_counters': process.io_counters()._asdict()
+            },
+            'cache': cache_stats
         }
         
         return stats
     
     def _save_stats(self, stats):
-        """Sauvegarde les statistiques dans un fichier"""
         date_str = datetime.now().strftime('%Y%m%d')
         filename = f"logs/performance_{date_str}.jsonl"
         
@@ -115,28 +105,27 @@ class PerformanceMonitor:
             with open(filename, 'a') as f:
                 f.write(json.dumps(stats) + '\n')
         except Exception as e:
-            logger.error(f"Erreur lors de la sauvegarde des métriques: {str(e)}")
+            logger.error(f"Erreur lors de la sauvegarde: {str(e)}")
     
     def _check_thresholds(self, stats):
-        """Vérifie si les métriques dépassent des seuils critiques"""
-        # Vérifier la mémoire système
-        if stats['system']['memory_percent'] > 90:
-            logger.warning(f"ALERTE: Utilisation mémoire système élevée: {stats['system']['memory_percent']}%")
+        # Vérifier CPU
+        if stats['system']['cpu_percent'] > self.alert_thresholds['cpu_percent']:
+            logger.warning(f"ALERTE: CPU système élevé: {stats['system']['cpu_percent']}%")
             
-        # Vérifier le CPU système
-        if stats['system']['cpu_percent'] > 90:
-            logger.warning(f"ALERTE: Utilisation CPU système élevée: {stats['system']['cpu_percent']}%")
+        # Vérifier mémoire  
+        if stats['system']['memory_percent'] > self.alert_thresholds['memory_percent']:
+            logger.warning(f"ALERTE: Mémoire système élevée: {stats['system']['memory_percent']}%")
             
-        # Vérifier l'espace disque
-        if stats['system']['disk_percent'] > 90:
+        # Vérifier disque
+        if stats['system']['disk_percent'] > self.alert_thresholds['disk_percent']:
             logger.warning(f"ALERTE: Espace disque faible: {stats['system']['disk_percent']}%")
             
-        # Vérifier la mémoire du processus (>1GB)
+        # Vérifier mémoire process (>1GB)
         if stats['process']['memory_rss'] > 1_000_000_000:
-            logger.warning(f"ALERTE: Utilisation mémoire du processus élevée: {stats['process']['memory_rss'] / 1_000_000:.2f} MB")
+            logger.warning(f"ALERTE: Mémoire processus élevée: {stats['process']['memory_rss'] / 1_000_000:.2f} MB")
 
-# Fonction pour initialiser le moniteur dans main.py
-def start_monitoring():
-    monitor = PerformanceMonitor(interval=60)
+# Fonction pour initialiser le moniteur
+def start_monitoring(interval=60):
+    monitor = PerformanceMonitor(interval=interval)
     monitor.start()
     return monitor
