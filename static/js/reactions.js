@@ -568,6 +568,65 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.action !== 'removed') {
             button.classList.add(data.reactions.current_type || 'like');
 
+/**
+ * Affiche une fenêtre modale avec les détails des réactions
+ * @param {number} postId - ID de la publication
+ */
+function showReactions(postId) {
+    // Récupère les réactions depuis l'API
+    fetch(`/api/posts/${postId}/reactions`)
+        .then(response => response.json())
+        .then(data => {
+            // Créer une modal Bootstrap temporaire
+            const modalHtml = `
+                <div class="modal fade" id="reactionsModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Réactions</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="list-group list-group-flush">
+                                    ${data.reactions.map(reaction => `
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="bi ${REACTION_TYPES[reaction.type].icon}" style="color: ${REACTION_TYPES[reaction.type].color}"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">${reaction.username}</div>
+                                                <small class="text-muted">${reaction.created_at}</small>
+                                            </div>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                ${data.reactions.length === 0 ? '<p class="text-center my-3">Aucune réaction pour le moment</p>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Ajoute la modal au body
+            const modalElement = document.createElement('div');
+            modalElement.innerHTML = modalHtml;
+            document.body.appendChild(modalElement.firstElementChild);
+            
+            // Affiche la modal
+            const modal = new bootstrap.Modal(document.getElementById('reactionsModal'));
+            modal.show();
+            
+            // Supprime la modal quand elle est fermée
+            document.getElementById('reactionsModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
+            });
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération des réactions:', error);
+        });
+}
+
+
             // Mettre à jour l'icône
             const currentReaction = reactionTypes.find(r => r.type === (data.reactions.current_type || 'like'));
             if (currentReaction) {

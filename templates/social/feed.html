@@ -193,19 +193,50 @@
                                     </div>
                                 
                                 <div class="reaction-details mt-2 mb-2 small text-muted"></div>
-                                <div class="post-actions mt-2 d-flex border-top border-bottom py-2">
-                                    <button class="btn btn-sm btn-link text-primary me-2 reaction-button {% if post.id in liked_posts %}reacted{% endif %}" 
-                                            data-post-id="{{ post.id }}" data-current-reaction="{{ post.user_reaction }}">
-                                        <i class="bi bi-hand-thumbs-up{% if post.id in liked_posts %}-fill{% endif %}"></i>
-                                        <span>J'aime</span>
-                                    </button>
-                                    <button class="btn btn-sm btn-link text-primary me-2" onclick="focusCommentBox({{ post.id }})">
-                                        <i class="bi bi-chat"></i> Commenter
-                                    </button>
-                                    <button class="btn btn-sm btn-link text-primary me-2" onclick="sharePost({{ post.id }})">
-                                        <i class="bi bi-share"></i> Partager
-                                    </button>
-                                </div>
+                                <!-- Compteurs de réactions (comme Facebook) -->
+                <div class="reaction-counters">
+                    {% if post.like_count > 0 %}
+                    <div class="reaction-count-item" onclick="showReactions({{ post.id }})">
+                        <i class="bi bi-hand-thumbs-up-fill text-primary"></i>
+                        <span>{{ post.like_count }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="reaction-counter-divider"></div>
+                    
+                    <div class="d-flex">
+                        {% if post.comment_count > 0 %}
+                        <div class="reaction-count-item me-3" onclick="focusCommentBox({{ post.id }})">
+                            <span>{{ post.comment_count }} commentaire{% if post.comment_count > 1 %}s{% endif %}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if post.share_count > 0 %}
+                        <div class="reaction-count-item" onclick="sharePost({{ post.id }})">
+                            <span>{{ post.share_count }} partage{% if post.share_count > 1 %}s{% endif %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Boutons d'action (comme Facebook) -->
+                <div class="post-actions">
+                    <div class="post-action-btn reaction-button {% if post.id in liked_posts %}reacted{% endif %}" 
+                         data-post-id="{{ post.id }}" data-current-reaction="{{ post.user_reaction }}">
+                        <i class="bi bi-hand-thumbs-up{% if post.id in liked_posts %}-fill{% endif %}"></i>
+                        <span>J'aime</span>
+                    </div>
+                    
+                    <div class="post-action-btn" onclick="focusCommentBox({{ post.id }})">
+                        <i class="bi bi-chat"></i>
+                        <span>Commenter</span>
+                    </div>
+                    
+                    <div class="post-action-btn" onclick="sharePost({{ post.id }})">
+                        <i class="bi bi-share"></i>
+                        <span>Partager</span>
+                    </div>
+                </div>
                             </div>
                             <div class="card-footer bg-white">
                                 <div class="comments-container" id="comments-{{ post.id }}">

@@ -138,6 +138,70 @@
     gap: 0.2rem;
 }
 
+/* Styles pour les compteurs de réactions */
+.reaction-counters {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    color: #65676b;
+    font-size: 0.9rem;
+}
+
+.reaction-count-item {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.reaction-count-item:hover {
+    text-decoration: underline;
+}
+
+.reaction-count-item i {
+    margin-right: 5px;
+    font-size: 1.1rem;
+}
+
+.reaction-counter-divider {
+    flex-grow: 1;
+}
+
+.post-actions {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+}
+
+.post-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    padding: 8px 0;
+    border-radius: 4px;
+    color: #65676b;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.post-action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.post-action-btn i {
+    margin-right: 5px;
+    font-size: 1.2rem;
+}
+
+.post-action-btn.reacted {
+    color: #1877f2;
+}
+
+
 /* Réactions */
 .reaction-selector {
     position: absolute;

@@ -454,6 +454,37 @@ def delete_story(story_id):
     db.session.delete(story)
     db.session.commit()
 
+
+@app.route('/api/posts/<int:post_id>/reactions')
+@login_required
+def get_post_reactions(post_id):
+    """Récupère les détails des réactions pour une publication"""
+    post = Post.query.get_or_404(post_id)
+    
+    # Vérifie l'accès si le post est dans un groupe privé
+    if post.workgroup_id:
+        workgroup = Workgroup.query.get(post.workgroup_id)
+        if workgroup.is_private and current_user not in workgroup.members and current_user != workgroup.owner:
+            abort(403)
+    
+    # Récupère toutes les réactions avec les détails des utilisateurs
+    likes = Like.query.filter_by(post_id=post_id).order_by(Like.created_at.desc()).all()
+    
+    reactions_data = []
+    for like in likes:
+        reactions_data.append({
+            'user_id': like.user_id,
+            'username': like.user.username,
+            'type': like.reaction_type,
+            'created_at': like.created_at.strftime('%d/%m/%Y %H:%M')
+        })
+    
+    return jsonify({
+        'post_id': post_id,
+        'total_count': len(reactions_data),
+        'reactions': reactions_data
+    })
+
     return jsonify({'success': True})
 
 # Routes API pour les posts et commentaires
