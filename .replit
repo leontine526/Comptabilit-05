@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Run New DB"
+runButton = "Run App Robust"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -185,6 +185,44 @@ args = "export DATABASE_URL=\"postgresql://neondb_owner:npg_APBmGjkT0y1H@ep-roug
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python initialize_database.py"
+
+[[workflows.workflow]]
+name = "DB Initialize Complete"
+author = 42922772
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "export DATABASE_URL=\"postgresql://neondb_owner:npg_APBmGjkT0y1H@ep-rough-truth-a5ntheq6-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python init_db_complete.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python create_test_data.py"
+
+[[workflows.workflow]]
+name = "Run App Robust"
+author = 42922772
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "export DATABASE_URL=\"postgresql://neondb_owner:npg_APBmGjkT0y1H@ep-rough-truth-a5ntheq6-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python test_new_db.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python init_db_complete.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
 
 [[ports]]
 localPort = 5000
