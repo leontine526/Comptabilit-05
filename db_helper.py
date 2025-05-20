@@ -87,14 +87,17 @@ def init_db_connection():
     connect_timeout = 10  # Augmenter le timeout de connexion
 
     # Forcer l'utilisation de l'URL PostgreSQL avec paramètres optimisés
-    database_url = "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&connect_timeout=10&application_name=smartohada&keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=5"
+    database_url = os.environ.get('DATABASE_URL', "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb")
+    # Ajouter les paramètres de connexion optimisés
+    database_url += "?sslmode=require&connect_timeout=15&application_name=smartohada&keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=5"
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_size": 10,
-        "pool_recycle": 300,  # Recycler les connexions après 5 minutes
+        "pool_size": 5,  # Réduire la taille du pool
+        "pool_recycle": 280,  # Recycler avant l'expiration du serveur (5 min)
         "pool_pre_ping": True,
-        "max_overflow": 20,
+        "max_overflow": 10,
+        "pool_timeout": 30,
         "pool_timeout": 30
     }
 
