@@ -184,6 +184,11 @@ def new_exercise():
     
     return render_template('exercises/form.html')
 
+@app.route('/about')
+def about():
+    """Route pour la page à propos"""
+    return render_template('about.html', title="À propos")
+
 @app.route('/health')
 def health_check():
     """Route pour vérifier l'état de l'application"""

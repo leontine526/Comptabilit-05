@@ -140,3 +140,30 @@
     }
 </style>
 {% endblock %}
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">À propos de SmartOHADA</h1>
+            <p class="lead">
+                SmartOHADA est une application de gestion comptable basée sur le référentiel OHADA, conçue pour simplifier la comptabilité des entreprises dans les pays membres de l'OHADA.
+            </p>
+            <div class="card my-4">
+                <div class="card-body">
+                    <h3>Version SQLite</h3>
+                    <p>
+                        Cette version de l'application utilise SQLite comme base de données, ce qui la rend plus légère et facile à déployer.
+                        Elle comprend toutes les fonctionnalités essentielles pour la gestion comptable.
+                    </p>
+                </div>
+            </div>
+            <h3 class="mt-5">Contactez-nous</h3>
+            <p>
+                Pour toute question ou assistance, n'hésitez pas à nous contacter.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
