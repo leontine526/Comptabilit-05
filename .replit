@@ -64,6 +64,19 @@ args = "python db_initialize.py"
 task = "shell.exec"
 args = "python create_test_data.py"
 
+[[workflows.workflow]]
+name = "Database Setup"
+author = 42922772
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python db_initialize.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python create_test_data.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
