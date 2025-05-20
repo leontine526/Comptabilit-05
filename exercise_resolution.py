@@ -35,25 +35,41 @@ def resolve_exercise_completely(exercise_id, problem_text):
     }
     
     try:
-        # 1. Résoudre l'exercice avec le solveur d'exercices existant
-        solution_result = solver.solve_exercise(problem_text)
-        
-        if not solution_result['success']:
-            results['errors'].append("Impossible de résoudre l'exercice: " + solution_result.get('message', 'Erreur inconnue'))
-            return results
-            
-        # Récupérer l'exercice
+        # 1. Vérifier si l'exercice existe
         exercise = Exercise.query.get(exercise_id)
         if not exercise:
             results['errors'].append(f"Exercice avec ID {exercise_id} non trouvé")
             return results
             
-        # Créer une solution dans la base de données
-        solution = ExerciseSolution(
-            title=f"Résolution automatique de {exercise.name}",
-            problem_text=problem_text,
-            solution_text=solution_result['solution'],
-            confidence=solution_result['confidence'],
+        # 2. Générer une solution simple en utilisant ComptableIA
+        from ecriture_generator import ComptableIA
+        comptable_ia = ComptableIA()
+        solution_text = comptable_ia.generer_ecriture(problem_text)
+        
+        if not solution_text:
+            # Fallback au solveur traditionnel si ComptableIA échoue
+            solution_result = solver.solve_exercise(problem_text)
+            if not solution_result['success']:
+                results['errors'].append("Impossible de résoudre l'exercice: " + solution_result.get('message', 'Erreur inconnue'))
+                return results
+            solution_text = solution_result['solution']
+            
+        # 3. Mettre à jour les résultats
+        results['success'] = True
+        results['solution'] = solution_text
+            
+        # 4. Générer les documents (à implémenter plus tard)
+        # results['journal'] = generate_journal_document(exercise_id, solution_text)
+        # results['grand_livre'] = generate_ledger_document(exercise_id, solution_text)
+        # results['bilan'] = generate_balance_sheet_document(exercise_id, solution_text)
+        
+        return results
+            
+    except Exception as e:
+        import traceback
+        logger.error(f"Erreur lors de la résolution complète: {str(e)}\n{traceback.format_exc()}")
+        results['errors'].append(f"Une erreur est survenue: {str(e)}")
+        return resultsult['confidence'],
             examples_used=json.dumps(solution_result.get('similar_examples', [])),
             user_id=exercise.user_id
         )

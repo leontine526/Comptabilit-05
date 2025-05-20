@@ -72,35 +72,53 @@ def resoudre_exercice():
         return redirect(url_for('exercise_new'))
     
     if request.method == 'POST':
-        enonce = request.form.get('enonce')
-        exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
-        
-        if not exercise_id:
-            flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
-            return redirect(url_for('exercise_new'))
-        
-        if not enonce:
-            flash("Veuillez saisir un énoncé pour résoudre l'exercice.", "warning")
-            return redirect(url_for('resoudre_exercice'))
-        
-        # Utiliser le module exercise_resolution pour générer la solution complète
-        result = resolve_exercise_completely(exercise_id, enonce)
-        
-        if result['success']:
-            flash("Exercice résolu avec succès!", "success")
-            return render_template(
-                'exercise_solver/complete_solution.html',
-                solution=result['solution'],
-                documents={
-                    'journal': result.get('journal'),
-                    'grand_livre': result.get('grand_livre'),
-                    'bilan': result.get('bilan')
-                },
-                title="Résolution complète"
-            )
-        else:
-            flash("Erreur lors de la résolution: " + " ".join(result.get('errors', ['Une erreur est survenue'])), "danger")
-
+        try:
+            enonce = request.form.get('enonce')
+            exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
+            
+            if not exercise_id:
+                flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
+                return redirect(url_for('exercise_new'))
+            
+            if not enonce:
+                flash("Veuillez saisir un énoncé pour résoudre l'exercice.", "warning")
+                return redirect(url_for('resoudre_exercice'))
+            
+            # Utiliser le module exercise_resolution pour générer la solution complète
+            result = resolve_exercise_completely(int(exercise_id), enonce)
+            
+            if result['success']:
+                # Créer une entrée de solution dans la base de données pour l'historique
+                solution_entry = ExerciseSolution(
+                    title=f"Résolution de {last_exercise.name}",
+                    problem_text=enonce,
+                    solution_text=result['solution'],
+                    confidence=0.95,  # Valeur par défaut
+                    examples_used=json.dumps([]),
+                    user_id=current_user.id
+                )
+                db.session.add(solution_entry)
+                db.session.commit()
+                
+                flash("Exercice résolu avec succès!", "success")
+                return render_template(
+                    'exercise_solver/complete_solution.html',
+                    solution=result['solution'],
+                    solution_id=solution_entry.id,
+                    exercise=last_exercise,
+                    documents={
+                        'journal': result.get('journal'),
+                        'grand_livre': result.get('grand_livre'),
+                        'bilan': result.get('bilan')
+                    },
+                    title="Résolution complète"
+                )
+            else:
+                flash("Erreur lors de la résolution: " + " ".join(result.get('errors', ['Une erreur est survenue'])), "danger")
+        except Exception as e:
+            flash(f"Une erreur est survenue lors du traitement: {str(e)}", "danger")
+            logger.error(f"Erreur dans resoudre_exercice: {str(e)}\n{traceback.format_exc()}")
+            
     return render_template(
         'formulaire.html', 
         exercise=last_exercise,
@@ -204,7 +222,7 @@ def register():
             # Connecter automatiquement l'utilisateur
             login_user(user)
             flash('Votre compte a été créé avec succès! Bienvenue sur SmartOHADA.', 'success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard'))  # Redirection déjà effective vers le tableau de bord
         except Exception as e:
             db.session.rollback()
             import logging
@@ -1194,6 +1212,48 @@ def exercise_solution_view(solution_id):
     # Vérifier que l'utilisateur a le droit de voir cette solution
     if solution.user_id != current_user.id:
         abort(403)
+
+@app.route('/exercise-solutions/<int:solution_id>/delete', methods=['POST'])
+@login_required
+def delete_exercise_solution(solution_id):
+    """Supprimer une solution d'exercice"""
+    solution = ExerciseSolution.query.get_or_404(solution_id)
+    
+    # Vérifier que l'utilisateur a le droit de supprimer cette solution
+    if solution.user_id != current_user.id:
+        abort(403)
+        
+    db.session.delete(solution)
+    db.session.commit()
+    
+    flash('Solution supprimée avec succès!', 'success')
+    return redirect(url_for('exercise_solutions_list'))
+
+@app.route('/exercise-solutions/<int:solution_id>/publish')
+@login_required
+def publish_exercise_solution(solution_id):
+    """Publier une solution d'exercice dans le fil social"""
+    solution = ExerciseSolution.query.get_or_404(solution_id)
+    
+    # Vérifier que l'utilisateur a le droit de publier cette solution
+    if solution.user_id != current_user.id:
+        abort(403)
+    
+    # Créer un post social avec la solution
+    try:
+        post = Post(
+            content=f"J'ai résolu l'exercice: '{solution.title}'\n\nSolution:\n{solution.solution_text[:500]}...",
+            user_id=current_user.id
+        )
+        db.session.add(post)
+        db.session.commit()
+        
+        flash('Solution publiée avec succès sur votre fil social!', 'success')
+        return redirect(url_for('feed'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Erreur lors de la publication: {str(e)}", 'danger')
+        return redirect(url_for('exercise_solution_view', solution_id=solution_id))
 
     # Récupérer les exemples utilisés pour la solution
     examples_used = []

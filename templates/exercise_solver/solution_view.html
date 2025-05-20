@@ -48,10 +48,20 @@
                 </div>
                 {% endif %}
             </div>
-            <div class="card-footer">
+            <div class="card-footer d-flex justify-content-between">
                 <a href="{{ url_for('exercises_list') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-1"></i>Retour aux exercices
                 </a>
+                <div>
+                    <a href="{{ url_for('publish_exercise_solution', solution_id=solution.id) }}" class="btn btn-success me-2">
+                        <i class="fas fa-share-alt me-1"></i>Publier
+                    </a>
+                    <form action="{{ url_for('delete_exercise_solution', solution_id=solution.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette solution?');">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-1"></i>Supprimer
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

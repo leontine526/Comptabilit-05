@@ -131,3 +131,92 @@
     </div>
 </div>
 {% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="col-md-10 mx-auto">
+        <div class="dashboard-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>{{ title }}</h5>
+                <a href="{{ url_for('exercise_solver_form') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nouvelle résolution
+                </a>
+            </div>
+            <div class="card-body">
+                <h3>Solution</h3>
+                <div class="p-3 mb-4 bg-light rounded">
+                    <pre class="mb-0">{{ solution }}</pre>
+                </div>
+
+                {% if documents %}
+                <div class="mt-4">
+                    <h3>Documents générés</h3>
+                    <div class="row mt-3">
+                        {% if documents.journal %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Journal</h5>
+                                    <p class="card-text">Le journal des écritures comptables</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ documents.journal }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-file-alt me-1"></i>Ouvrir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if documents.grand_livre %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Grand Livre</h5>
+                                    <p class="card-text">Le grand livre des comptes</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ documents.grand_livre }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-book me-1"></i>Ouvrir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if documents.bilan %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Bilan</h5>
+                                    <p class="card-text">Le bilan comptable</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ documents.bilan }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-balance-scale me-1"></i>Ouvrir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('resoudre_exercice') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour
+                </a>
+                <div>
+                    {% if solution_id %}
+                    <a href="{{ url_for('publish_exercise_solution', solution_id=solution_id) }}" class="btn btn-success">
+                        <i class="fas fa-share-alt me-1"></i>Publier
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
