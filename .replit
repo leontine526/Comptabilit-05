@@ -96,6 +96,10 @@ args = "python db_initialize.py"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
+args = "python -m nltk.downloader punkt stopwords -d nltk_data"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
 args = "python main.py"
 
 [[ports]]

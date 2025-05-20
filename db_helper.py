@@ -153,9 +153,11 @@ def check_db_connection():
     from app import db
 
     try:
-        # Test the connection with a simple query
-        db.session.execute(text("SELECT 1"))
+        # Exécuter une requête simple pour vérifier la connexion
+        with db.engine.connect() as conn:
+            conn.execute(db.text("SELECT 1"))
         return True
     except Exception as e:
         logger.error(f"Erreur de connexion à la base de données: {str(e)}")
+        db.session.rollback()
         return False

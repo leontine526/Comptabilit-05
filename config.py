@@ -64,11 +64,12 @@ class ProductionConfig(Config):
     
     # Optimisation de la base de données pour la production
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_size": 20,
-        "pool_recycle": 300,
+        "pool_size": 10,
+        "pool_recycle": 280,
         "pool_pre_ping": True,
-        "max_overflow": 30,
-        "pool_timeout": 30
+        "max_overflow": 20,
+        "pool_timeout": 20,
+        "connect_args": {"connect_timeout": 10}
     }
     
     # Configuration de sécurité
