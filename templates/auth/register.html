@@ -1,100 +1,54 @@
-
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow">
-                <div class="card-header bg-gradient-primary text-light">
+                <div class="card-header bg-primary text-white">
                     <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Inscription</h4>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('register') }}" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form.username.label(class="form-label") }}
-                                {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Choisissez un nom d'utilisateur") }}
-                                {% for error in form.username.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                                <div class="form-text">Minimum 4 caractères, lettres et chiffres uniquement.</div>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                {{ form.full_name.label(class="form-label") }}
-                                {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else ""), placeholder="Votre nom complet") }}
-                                {% for error in form.full_name.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            </div>
+
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control") }}
                         </div>
-                        
+
                         <div class="mb-3">
                             {{ form.email.label(class="form-label") }}
-                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Votre adresse email") }}
-                            {% for error in form.email.errors %}
-                                <div class="invalid-feedback">{{ error }}</div>
-                            {% endfor %}
+                            {{ form.email(class="form-control") }}
                         </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form.password.label(class="form-label") }}
-                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Choisissez un mot de passe sécurisé") }}
-                                {% for error in form.password.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                                <div class="form-text">Minimum 8 caractères.</div>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                {{ form.confirm_password.label(class="form-label") }}
-                                {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), placeholder="Confirmez votre mot de passe") }}
-                                {% for error in form.confirm_password.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            </div>
+
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control") }}
                         </div>
-                        
-                        <div class="mb-3 form-check">
-                            {{ form.show_password(class="form-check-input") }}
-                            {{ form.show_password.label(class="form-check-label") }}
+
+                        <div class="mb-3">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {{ form.confirm_password(class="form-control") }}
                         </div>
-                        
+
                         <div class="mb-3">
                             {{ form.profile_picture.label(class="form-label") }}
-                            {{ form.profile_picture(class="form-control", accept="image/*") }}
-                            <div class="form-text">Sélectionnez une image pour votre profil (JPG, PNG).</div>
-                            <div class="mt-2" id="profile-image-preview"></div>
+                            {{ form.profile_picture(class="form-control") }}
                         </div>
-                        
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-user-plus me-2"></i>Créer un compte
+                                <i class="fas fa-user-plus me-2"></i>S'inscrire
                             </button>
                         </div>
                     </form>
                 </div>
-                <div class="card-footer">
-                    <div class="text-center">
-                        <p class="mb-0">
-                            Déjà inscrit ?
-                            <a href="{{ url_for('login') }}" class="text-decoration-none">
-                                Se connecter
-                            </a>
-                        </p>
-                    </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">Déjà inscrit? <a href="{{ url_for('login') }}">Connectez-vous</a></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/password_toggle.js') }}"></script>
-<script src="{{ url_for('static', filename='js/profile_image_preview.js') }}"></script>
 {% endblock %}
