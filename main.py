@@ -61,8 +61,16 @@ except Exception as e:
     logger.error(f"Erreur lors du chargement des gestionnaires Socket.IO: {str(e)}")
 
 # Importer toutes les routes nécessaires
-from routes import *
-logger.info("Routes chargées avec succès")
+try:
+    # Importation explicite de toutes les routes
+    from routes import index, about, welcome, health_check, resoudre_exercice
+    from routes import text_processing, login, logout, register, profile
+    from routes import uploaded_file, forgot_password, reset_password, dashboard
+    # Les autres routes seront automatiquement importées
+    from routes import *
+    logger.info("Routes chargées avec succès")
+except ImportError as e:
+    logger.error(f"Erreur lors du chargement des routes: {str(e)}")
 
 # Importe les gestionnaires d'erreurs
 try:
