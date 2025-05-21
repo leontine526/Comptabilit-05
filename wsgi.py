@@ -4,6 +4,7 @@ Point d'entrée WSGI pour l'application en production
 Prend en charge l'initialisation et les configurations spécifiques au déploiement
 """
 import os
+from error_handlers import register_error_handlers
 import sys
 import logging
 from logging.handlers import RotatingFileHandler
