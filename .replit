@@ -10,6 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
+runButton = "Corriger et Démarrer"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
@@ -31,6 +32,19 @@ args = "python check_templates.py"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python check_routes.py"
+
+[[workflows.workflow]]
+name = "Corriger et Démarrer"
+author = 42935253
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python fix_errors.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_simple.py"
 
 [[ports]]
 localPort = 5000
