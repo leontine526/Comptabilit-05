@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Run App Robust"
+runButton = "Démarrer Application Corrigée"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
