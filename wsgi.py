@@ -37,6 +37,10 @@ root_logger.addHandler(console_handler)
 
 # Import de l'application
 from main import app as application
+from error_handlers import register_error_handlers
+
+# Enregistrer les gestionnaires d'erreur
+register_error_handlers(application)
 
 # Initialisation des variables d'environnement de production
 os.environ['FLASK_ENV'] = 'production'
