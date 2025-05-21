@@ -47,7 +47,7 @@
     function handleAjaxError(jqXHR, requestUrl) {
         // Détecter les erreurs de réseau ou de serveur
         if (jqXHR.status === 0) {
-            showErrorToast("Impossible de se connecter au serveur. Vérifiez votre connexion.");
+            showErrorToast("Impossible de se connecter au serveur. Vérifiez votre connexion Internet.");
         } else if (jqXHR.status === 401) {
             showErrorToast("Votre session a expiré. Veuillez vous reconnecter.");
             setTimeout(function() {
@@ -127,5 +127,5 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
     `;
-    document.head.appendChild(style);Child(style);
+    document.head.appendChild(style);
 })();

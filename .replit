@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Redémarrer Application Corrigée"
+runButton = "Redémarrer Application"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
@@ -63,6 +63,15 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python health_quick_check.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_simple.py"
+
+[[workflows.workflow]]
+name = "Redémarrer Application"
+author = 42935253
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
