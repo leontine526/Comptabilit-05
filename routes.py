@@ -120,6 +120,7 @@ def health_check():
 # About route
 @app.route('/about')
 def about():
+    """Route pour la page à propos"""
     return render_template('about.html', title="À propos")
 
 @app.route('/welcome')
