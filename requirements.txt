@@ -18,3 +18,12 @@ nltk==3.8.1
 spacy==3.7.2
 email_validator==2.1.0
 WTForms==3.1.2
+flask-wtf
+flask-login
+flask-sqlalchemy
+eventlet
+sqlalchemy
+pymysql
+python-dotenv
+flask-socketio
+psycopg2-binary

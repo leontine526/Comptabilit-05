@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrer SQLite"
+runButton = "Démarrer App Sécurisé"
 
 [[workflows.workflow]]
 name = "Run SmartOHADA"
@@ -467,6 +467,31 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python start_sqlite_app.py"
+
+[[workflows.workflow]]
+name = "Démarrer App Sécurisé"
+author = 42935253
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python fix_missing_modules.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_requirements.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python enable_file_logging.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_db_tables.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
 
 [[ports]]
 localPort = 5000
