@@ -57,6 +57,31 @@ def process_text(text, summarize=True, split_paragraphs=True, analyze=True, comp
         logger.error(f"Erreur lors de la réparation de text_processor.py: {str(e)}")
         return False
 
+def check_error_handlers():
+    """Vérifie et corrige les gestionnaires d'erreurs"""
+    try:
+        if os.path.exists("app.py"):
+            with open("app.py", "r") as f:
+                content = f.read()
+            
+            # Vérifier s'il y a une référence à handle_standard_exception
+            if "handle_standard_exception" in content:
+                logger.info("Correction du gestionnaire d'erreurs dans app.py...")
+                corrected_content = content.replace(
+                    "return app.handle_standard_exception(e)",
+                    "return render_template('errors/500.html', error=str(e)), 500"
+                )
+                
+                with open("app.py", "w") as f:
+                    f.write(corrected_content)
+                
+                logger.info("✅ Gestionnaire d'erreurs dans app.py corrigé")
+                return True
+    except Exception as e:
+        logger.error(f"Erreur lors de la vérification des gestionnaires d'erreurs: {str(e)}")
+    
+    return False
+
 def initialize_sqlite_database():
     """Initialise la base de données SQLite locale"""
     try:
@@ -65,9 +90,19 @@ def initialize_sqlite_database():
         os.environ["DATABASE_URL"] = "sqlite:///smartohada.db"
         
         # Exécuter le script d'initialisation
-        subprocess.run([sys.executable, "db_initialize.py", "--retry", "3"], check=True)
-        logger.info("✅ Base de données SQLite initialisée avec succès")
-        return True
+        try:
+            subprocess.run([sys.executable, "db_initialize.py", "--retry", "3"], check=True)
+            logger.info("✅ Base de données SQLite initialisée avec succès")
+            return True
+        except subprocess.CalledProcessError:
+            # Essayer avec l'initialisation complète
+            try:
+                subprocess.run([sys.executable, "init_db_complete.py"], check=True)
+                logger.info("✅ Base de données SQLite initialisée avec succès (méthode alternative)")
+                return True
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Échec de l'initialisation de la base de données: {str(e)}")
+                return False
     except Exception as e:
         logger.error(f"Erreur lors de l'initialisation de la base de données: {str(e)}")
         return False
@@ -82,6 +117,9 @@ def start_app_with_retry(max_retries=3):
             os.environ["DATABASE_URL"] = "sqlite:///smartohada.db"
             os.environ["FLASK_ENV"] = "development"
             os.environ["PORT"] = "5000"
+            
+            # Vérifier les gestionnaires d'erreurs avant de démarrer
+            check_error_handlers()
             
             # Importer l'application
             from app import app, socketio

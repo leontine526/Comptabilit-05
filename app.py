@@ -111,7 +111,8 @@ def handle_exception(e):
         pass
 
     # Laisser les autres gestionnaires d'erreurs traiter l'exception
-    return app.handle_standard_exception(e)
+    # Correction du gestionnaire d'erreurs
+    return render_template('errors/500.html', error=str(e)), 500
 
 # Initialiser Socket.IO avec gestion d'erreur
 try:
