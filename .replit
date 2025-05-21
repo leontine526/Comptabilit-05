@@ -46,6 +46,15 @@ args = "python fix_errors.py"
 task = "shell.exec"
 args = "python start_simple.py"
 
+[[workflows.workflow]]
+name = "Vérification rapide"
+author = 42935253
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python health_quick_check.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80

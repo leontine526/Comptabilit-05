@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 # Imports de Flask et ses extensions
 try:
-    from flask import Flask, request, session
+    from flask import Flask, request, session, render_template, jsonify
     from flask_sqlalchemy import SQLAlchemy
     from sqlalchemy.orm import DeclarativeBase
     from flask_login import LoginManager, current_user

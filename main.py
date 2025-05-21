@@ -19,9 +19,9 @@ if not DATABASE_URL:
 
 # Importe l'application Flask et l'instance SocketIO
 try:
-    from app import app
-# Enregistrer les gestionnaires d'erreur
-register_error_handlers(app), socketio
+    from app import app, socketio
+    # Enregistrer les gestionnaires d'erreur
+    register_error_handlers(app)
     logger.info("Application Flask et Socket.IO importés avec succès")
 except Exception as e:
     logger.critical(f"Erreur critique lors de l'importation de l'application: {str(e)}")
