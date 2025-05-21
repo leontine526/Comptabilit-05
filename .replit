@@ -498,6 +498,33 @@ mode = "sequential"
 task = "shell.exec"
 args = "python start_simple.py"
 
+[[workflows.workflow]]
+name = "Diagnostic Complet"
+author = 42935253
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python app_diagnostics.py"
+
+[[workflows.workflow]]
+name = "Vérifier Templates"
+author = 42935253
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_templates.py"
+
+[[workflows.workflow]]
+name = "Vérifier Routes"
+author = 42935253
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python route_inspector.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
