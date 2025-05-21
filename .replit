@@ -479,11 +479,7 @@ args = "python fix_missing_modules.py"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python check_requirements.py"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python enable_file_logging.py"
+args = "python enable_file_logging.py "
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

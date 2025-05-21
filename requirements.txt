@@ -27,3 +27,12 @@ pymysql
 python-dotenv
 flask-socketio
 psycopg2-binary
+fitz
+flask-caching
+jinja2
+numpy
+opencv-python
+psutil
+requests
+scikit-learn
+scipy
