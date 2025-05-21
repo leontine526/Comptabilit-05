@@ -62,11 +62,10 @@ except Exception as e:
 
 # Importer toutes les routes nécessaires
 try:
-    # Importation explicite de toutes les routes
-    from routes import index, about, welcome, health_check, resoudre_exercice
-    from routes import text_processing, login, logout, register, profile
-    from routes import uploaded_file, forgot_password, reset_password, dashboard
-    # Les autres routes seront automatiquement importées
+    # Importation explicite de la route principale pour s'assurer qu'elle est correctement enregistrée
+    from routes import index
+    # Puis importer toutes les autres routes
+    from routes import about, welcome, health_check, login, logout, register, dashboard
     from routes import *
     logger.info("Routes chargées avec succès")
 except ImportError as e:

@@ -132,7 +132,7 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link nav-main-item {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                            <a class="nav-link nav-main-item {% if request.path == '/' %}active{% endif %}" href="/">
                                 <i class="fas fa-home me-1"></i>Accueil
                             </a>
                         </li>
@@ -282,7 +282,7 @@
                     <h5 class="mb-3">Navigation Rapide</h5>
                     <ul class="list-unstyled footer-links">
                         <li class="mb-2">
-                            <a href="{{ url_for('index') }}" class="text-decoration-none">
+                            <a href="/" class="text-decoration-none">
                                 <i class="fas fa-home me-2 text-primary"></i>Page d'accueil
                             </a>
                         </li>
