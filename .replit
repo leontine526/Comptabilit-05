@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Redémarrer Application Corrigée"
+runButton = "Redémarrer Application Après Fixes"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
@@ -83,6 +83,36 @@ args = "python start_simple.py"
 
 [[workflows.workflow]]
 name = "Vérification Installation"
+author = 42989439
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python health_quick_check.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_simple.py"
+
+[[workflows.workflow]]
+name = "Vérification des erreurs"
+author = 42989439
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python check_error_handlers.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python health_quick_check.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_simple.py"
+
+[[workflows.workflow]]
+name = "Redémarrer Application Après Fixes"
 author = 42989439
 mode = "sequential"
 

@@ -20,7 +20,11 @@ def register_error_handlers(app):
         if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(error="Page non trouvée", message=str(e)), 404
 
-        return render_template('errors/404.html', error=str(e)), 404
+        try:
+            return render_template('errors/404.html', error=str(e)), 404
+        except Exception as template_error:
+            logger.error(f"Erreur lors du rendu du template 404: {str(template_error)}")
+            return f"Page non trouvée (404): {str(e)}", 404
 
     @app.errorhandler(403)
     def forbidden_error(e):

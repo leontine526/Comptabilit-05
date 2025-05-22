@@ -102,6 +102,10 @@ def teardown_request(exception=None):
 from error_handlers import register_error_handlers
 register_error_handlers(app)
 
+# Importer et appliquer le middleware d'erreur
+from error_middleware import register_middleware
+app.wsgi_app = register_middleware(app.wsgi_app)
+
 from flask import Flask, request, session, render_template, jsonify
 
 # Le gestionnaire d'erreur global est maintenant géré par error_handlers.py
