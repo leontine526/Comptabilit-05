@@ -1,6 +1,7 @@
 import os
 import logging
 import sys
+import traceback
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
