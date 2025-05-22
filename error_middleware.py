@@ -1,3 +1,4 @@
+
 from flask import request, jsonify, render_template
 import traceback
 import logging
@@ -34,14 +35,14 @@ class ErrorMiddleware:
                 else:
                     # Pour les requêtes HTML, renvoyer une page d'erreur
                     try:
-                        response = render_template('errors/500.html', 
+                        html_response = render_template('errors/500.html', 
                                                   error=str(e) if self.app.debug else 'Une erreur inattendue s\'est produite')
-                        status = 500
+                        response = self.app.make_response((html_response, 500))
                     except Exception as template_error:
                         # Si le rendu du template échoue, envoyer une réponse simple
                         logger.error(f"Erreur de rendu du template d'erreur: {str(template_error)}")
-                        response = "Erreur serveur 500: " + (str(e) if self.app.debug else 'Une erreur inattendue s\'est produite')
-                        status = 500
+                        response = self.app.make_response(("Erreur serveur 500: " + 
+                                             (str(e) if self.app.debug else 'Une erreur inattendue s\'est produite'), 500))
 
                 return response(environ, start_response)
 
