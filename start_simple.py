@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 """
 Script de démarrage simplifié et robuste
@@ -29,7 +28,7 @@ def check_and_repair_text_processor():
     try:
         with open('text_processor.py', 'r') as f:
             content = f.read()
-        
+
         # Vérifier si le problème de la chaîne non terminée est présent
         if "text.split('\n\n')" not in content and "text.split('\\n\\n')" not in content:
             logger.info("Réparation du fichier text_processor.py...")
@@ -63,7 +62,7 @@ def check_error_handlers():
         if os.path.exists("app.py"):
             with open("app.py", "r") as f:
                 content = f.read()
-            
+
             # Vérifier s'il y a une référence à handle_standard_exception
             if "handle_standard_exception" in content:
                 logger.info("Correction du gestionnaire d'erreurs dans app.py...")
@@ -71,15 +70,15 @@ def check_error_handlers():
                     "return app.handle_standard_exception(e)",
                     "return render_template('errors/500.html', error=str(e)), 500"
                 )
-                
+
                 with open("app.py", "w") as f:
                     f.write(corrected_content)
-                
+
                 logger.info("✅ Gestionnaire d'erreurs dans app.py corrigé")
                 return True
     except Exception as e:
         logger.error(f"Erreur lors de la vérification des gestionnaires d'erreurs: {str(e)}")
-    
+
     return False
 
 def initialize_sqlite_database():
@@ -88,7 +87,7 @@ def initialize_sqlite_database():
         logger.info("Initialisation de la base de données SQLite...")
         # Définir la variable d'environnement pour utiliser SQLite
         os.environ["DATABASE_URL"] = "sqlite:///smartohada.db"
-        
+
         # Exécuter le script d'initialisation
         try:
             subprocess.run([sys.executable, "db_initialize.py", "--retry", "3"], check=True)
@@ -112,24 +111,24 @@ def start_app_with_retry(max_retries=3):
     for attempt in range(1, max_retries + 1):
         try:
             logger.info(f"Tentative de démarrage {attempt}/{max_retries}...")
-            
+
             # Utiliser SQLite comme base de données
             os.environ["DATABASE_URL"] = "sqlite:///smartohada.db"
             os.environ["FLASK_ENV"] = "development"
             os.environ["PORT"] = "5000"
-            
+
             # Vérifier les gestionnaires d'erreurs avant de démarrer
             check_error_handlers()
-            
+
             # Importer l'application
             from app import app, socketio
-            
+
             # Vérifier si l'application a été correctement importée
             if app and socketio:
                 logger.info("✅ Application importée avec succès")
-                
-                # Démarrer l'application
-                logger.info("Démarrage du serveur...")
+
+            # Démarrer l'application
+                logger.info("Démarrage du serveur sur port 5000...")
                 socketio.run(app, 
                           host='0.0.0.0',
                           port=5000,
@@ -144,7 +143,7 @@ def start_app_with_retry(max_retries=3):
             logger.error(f"Erreur lors du démarrage: {str(e)}")
             logger.error(traceback.format_exc())
             time.sleep(2)
-    
+
     logger.error(f"Échec du démarrage après {max_retries} tentatives")
     return False
 
@@ -152,16 +151,16 @@ if __name__ == "__main__":
     print("\n" + "="*50)
     print(" DÉMARRAGE SIMPLIFIÉ SMARTOHADA ".center(50, "="))
     print("="*50 + "\n")
-    
+
     # Étape 1: Réparer text_processor.py
     if not check_and_repair_text_processor():
         logger.error("Impossible de réparer text_processor.py. Arrêt du script.")
         sys.exit(1)
-    
+
     # Étape 2: Initialiser la base de données SQLite
     if not initialize_sqlite_database():
         logger.warning("Problème lors de l'initialisation de la base de données. Tentative de démarrage quand même...")
-    
+
     # Étape 3: Démarrer l'application
     if not start_app_with_retry(max_retries=3):
         logger.error("Impossible de démarrer l'application. Veuillez consulter les logs pour plus de détails.")

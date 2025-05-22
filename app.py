@@ -106,6 +106,9 @@ register_error_handlers(app)
 from error_middleware import register_middleware
 app.wsgi_app = register_middleware(app.wsgi_app)
 
+# Importer les routes directement pour s'assurer qu'elles sont enregistrées
+from routes import *
+
 from flask import Flask, request, session, render_template, jsonify
 
 # Le gestionnaire d'erreur global est maintenant géré par error_handlers.py
