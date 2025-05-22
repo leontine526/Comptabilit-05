@@ -98,20 +98,13 @@ def teardown_request(exception=None):
     # Toujours nettoyer la session DB à la fin de la requête
     db.session.remove()
 
-# Ajouter le middleware de gestion globale des erreurs
-from error_middleware import ErrorMiddleware
-app.wsgi_app = ErrorMiddleware(app.wsgi_app)
+# Importer le gestionnaire d'erreurs
+from error_handlers import register_error_handlers
+register_error_handlers(app)
 
 from flask import Flask, request, session, render_template, jsonify
 
-# Gestionnaire d'erreur global
-@app.errorhandler(Exception)
-def handle_exception(e):
-    try:
-        db.session.rollback()
-    except:
-        pass
-    return render_template('errors/500.html', error=str(e)), 500
+# Le gestionnaire d'erreur global est maintenant géré par error_handlers.py
 
 # Initialiser Socket.IO avec gestion d'erreur
 try:

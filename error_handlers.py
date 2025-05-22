@@ -1,11 +1,11 @@
-import os
-import traceback
-import logging
-from flask import render_template, jsonify, request
-from werkzeug.exceptions import HTTPException, NotFound, Forbidden, InternalServerError
-from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
-# Configuration du logging
+import os
+import logging
+import traceback
+from flask import request, render_template, jsonify
+from sqlalchemy.exc import SQLAlchemyError, OperationalError, DisconnectionError
+from app import db
+
 logger = logging.getLogger(__name__)
 
 def register_error_handlers(app):
@@ -33,11 +33,28 @@ def register_error_handlers(app):
 
         return render_template('errors/403.html', error=str(e)), 403
 
+    @app.errorhandler(400)
+    def bad_request(e):
+        """Gestionnaire pour les erreurs 400 (requête invalide)"""
+        logger.warning(f"Requête invalide: {request.path}")
+
+        # Vérifier si la requête attend du JSON
+        if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
+            return jsonify(error="Requête invalide", message=str(e)), 400
+
+        return render_template('errors/400.html', error=str(e)), 400
+
     @app.errorhandler(500)
     def internal_server_error(e):
         """Gestionnaire pour les erreurs 500 (erreur interne du serveur)"""
         logger.error(f"Erreur 500: {str(e)}")
         logger.error(traceback.format_exc())
+
+        # Essayer de faire un rollback sur la session SQLAlchemy
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
 
         # Vérifier si la requête attend du JSON
         if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
@@ -53,9 +70,8 @@ def register_error_handlers(app):
 
         # Essayer de faire un rollback sur la session SQLAlchemy si possible
         try:
-            if hasattr(app, 'db') and hasattr(app.db, 'session'):
-                app.db.session.rollback()
-                logger.info("Transaction annulée automatiquement après une erreur de base de données")
+            db.session.rollback()
+            logger.info("Transaction annulée automatiquement après une erreur de base de données")
         except Exception as rollback_error:
             logger.error(f"Erreur lors de l'annulation de la transaction: {str(rollback_error)}")
 
@@ -72,6 +88,12 @@ def register_error_handlers(app):
         logger.error(f"Erreur non gérée: {str(e)}")
         logger.error(traceback.format_exc())
 
+        # Essayer de faire un rollback sur la session SQLAlchemy
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+
         # Vérifier si l'environnement est en développement
         is_debug = os.environ.get('FLASK_ENV') == 'development'
 
@@ -80,14 +102,4 @@ def register_error_handlers(app):
             return jsonify(error="Erreur non gérée", 
                           message=str(e) if is_debug else "Une erreur inattendue s'est produite"), 500
 
-        return render_template('errors/500.html', 
-                              error=str(e) if is_debug else "Une erreur inattendue s'est produite"), 500
-@app.errorhandler(400)
-def bad_request_error(e):
-    """Gestionnaire pour les erreurs 400 (mauvaise requête)"""
-    logger.warning(f"Erreur 400: {request.path}")
-    
-    if request.headers.get('Content-Type') == 'application/json':
-        return jsonify(error="Requête invalide", message=str(e)), 400
-        
-    return render_template('errors/400.html', error=str(e)), 400
+        return render_template('errors/500.html', error=str(e) if is_debug else "Une erreur inattendue s'est produite"), 500
