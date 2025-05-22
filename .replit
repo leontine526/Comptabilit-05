@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Redémarrer Application"
+runButton = "Redémarrer Application Corrigée"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
