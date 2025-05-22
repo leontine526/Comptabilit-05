@@ -36,3 +36,14 @@ psutil
 requests
 scikit-learn
 scipy
+eventlet
+flask
+flask-login
+flask-socketio
+flask-sqlalchemy
+nltk
+psycopg2-binary
+pymysql
+python-dotenv
+spacy
+sqlalchemy

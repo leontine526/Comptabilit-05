@@ -77,6 +77,19 @@ mode = "sequential"
 task = "shell.exec"
 args = "python start_simple.py"
 
+[[workflows.workflow]]
+name = "Vérification Installation"
+author = 42989439
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python health_quick_check.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_simple.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
