@@ -102,26 +102,16 @@ def teardown_request(exception=None):
 from error_middleware import ErrorMiddleware
 app.wsgi_app = ErrorMiddleware(app.wsgi_app)
 
+from flask import Flask, request, session, render_template, jsonify
+
+# Gestionnaire d'erreur global
 @app.errorhandler(Exception)
 def handle_exception(e):
-    """Gestionnaire global d'exceptions"""
-    # Tentative d'annulation de toute transaction en cours
     try:
         db.session.rollback()
     except:
         pass
-        
-    # Logger l'erreur
-    logger.error(f"Erreur non gérée: {str(e)}")
-    logger.error(traceback.format_exc())
-    
-    # Vérifier si c'est une requête API
-    if request.path.startswith('/api/'):
-        return jsonify({'error': 'Une erreur serveur est survenue'}), 500
-        
-    # Pour les autres requêtes, afficher la page d'erreur
-    return render_template('errors/500.html', 
-                         error=str(e) if app.debug else "Une erreur inattendue s'est produite"), 500
+    return render_template('errors/500.html', error=str(e)), 500
 
 # Initialiser Socket.IO avec gestion d'erreur
 try:
