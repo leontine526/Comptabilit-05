@@ -16,8 +16,8 @@ def register_error_handlers(app):
         """Gestionnaire pour les erreurs 404 (page non trouvée)"""
         logger.warning(f"Page non trouvée: {request.path}")
 
-        # Vérifier si la requête attend du JSON
-        if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
+        # Vérifier si la requête attend du JSON 
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(error="Page non trouvée", message=str(e)), 404
 
         return render_template('errors/404.html', error=str(e)), 404
@@ -28,7 +28,7 @@ def register_error_handlers(app):
         logger.warning(f"Accès interdit: {request.path}")
 
         # Vérifier si la requête attend du JSON
-        if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(error="Accès interdit", message=str(e)), 403
 
         return render_template('errors/403.html', error=str(e)), 403
@@ -39,7 +39,7 @@ def register_error_handlers(app):
         logger.warning(f"Requête invalide: {request.path}")
 
         # Vérifier si la requête attend du JSON
-        if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(error="Requête invalide", message=str(e)), 400
 
         return render_template('errors/400.html', error=str(e)), 400
@@ -57,7 +57,7 @@ def register_error_handlers(app):
             pass
 
         # Vérifier si la requête attend du JSON
-        if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(error="Erreur interne du serveur", message="Une erreur inattendue s'est produite"), 500
 
         return render_template('errors/500.html', error=str(e)), 500
@@ -76,7 +76,7 @@ def register_error_handlers(app):
             logger.error(f"Erreur lors de l'annulation de la transaction: {str(rollback_error)}")
 
         # Vérifier si la requête attend du JSON
-        if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(error="Erreur de base de données", 
                           message="Une erreur de connexion à la base de données s'est produite"), 500
 
@@ -98,7 +98,7 @@ def register_error_handlers(app):
         is_debug = os.environ.get('FLASK_ENV') == 'development'
 
         # Vérifier si la requête attend du JSON
-        if request.headers.get('Content-Type') == 'application/json' or request.is_xhr:
+        if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(error="Erreur non gérée", 
                           message=str(e) if is_debug else "Une erreur inattendue s'est produite"), 500
 
