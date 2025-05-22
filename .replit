@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrer Application"
+runButton = "Démarrer Application Corrigée"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
@@ -126,6 +126,15 @@ args = "python start_simple.py"
 
 [[workflows.workflow]]
 name = "Démarrer Application"
+author = 42989439
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_simple.py"
+
+[[workflows.workflow]]
+name = "Démarrer Application Corrigée"
 author = 42989439
 mode = "sequential"
 
