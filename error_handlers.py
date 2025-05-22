@@ -82,3 +82,12 @@ def register_error_handlers(app):
 
         return render_template('errors/500.html', 
                               error=str(e) if is_debug else "Une erreur inattendue s'est produite"), 500
+@app.errorhandler(400)
+def bad_request_error(e):
+    """Gestionnaire pour les erreurs 400 (mauvaise requête)"""
+    logger.warning(f"Erreur 400: {request.path}")
+    
+    if request.headers.get('Content-Type') == 'application/json':
+        return jsonify(error="Requête invalide", message=str(e)), 400
+        
+    return render_template('errors/400.html', error=str(e)), 400

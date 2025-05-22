@@ -109,10 +109,18 @@ def handle_exception(e):
         db.session.rollback()
     except:
         pass
-
-    # Laisser les autres gestionnaires d'erreurs traiter l'exception
-    # Correction du gestionnaire d'erreurs
-    return render_template('errors/500.html', error=str(e)), 500
+        
+    # Logger l'erreur
+    logger.error(f"Erreur non gérée: {str(e)}")
+    logger.error(traceback.format_exc())
+    
+    # Vérifier si c'est une requête API
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Une erreur serveur est survenue'}), 500
+        
+    # Pour les autres requêtes, afficher la page d'erreur
+    return render_template('errors/500.html', 
+                         error=str(e) if app.debug else "Une erreur inattendue s'est produite"), 500
 
 # Initialiser Socket.IO avec gestion d'erreur
 try:
