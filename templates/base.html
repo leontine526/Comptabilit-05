@@ -214,12 +214,12 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">
+                            <a class="nav-link" href="/login">
                                 <i class="fas fa-sign-in-alt me-1"></i>Connexion
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('register') }}">
+                            <a class="nav-link" href="/register">
                                 <i class="fas fa-user-plus me-1"></i>Inscription
                             </a>
                         </li>
@@ -314,12 +314,12 @@
                             </li>
                         {% else %}
                             <li class="mb-2">
-                                <a href="{{ url_for('login') }}" class="text-decoration-none">
+                                <a href="/login" class="text-decoration-none">
                                     <i class="fas fa-sign-in-alt me-2 text-primary"></i>Se connecter
                                 </a>
                             </li>
                             <li class="mb-2">
-                                <a href="{{ url_for('register') }}" class="text-decoration-none">
+                                <a href="/register" class="text-decoration-none">
                                     <i class="fas fa-user-plus me-2 text-primary"></i>Créer un compte
                             </a>
                         </li>
