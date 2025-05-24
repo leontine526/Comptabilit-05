@@ -32,7 +32,13 @@ try:
 except ImportError:
     # Utiliser la version simplifiée si la version complète n'est pas disponible
     from text_processor_simplified import process_text
-from exercise_solver import solver, save_example_pdf
+try:
+    # Essayer d'importer le module original
+    from exercise_solver import solver, save_example_pdf
+except ImportError:
+    # Utiliser la version simplifiée en cas d'erreur
+    from exercise_solver_dummy import solver, save_example_pdf
+    logger.warning("Utilisation de la version simplifiée du solveur d'exercices")
 from exercise_resolution import resolve_exercise_completely
 from models import ExerciseExample, ExerciseSolution
 import json

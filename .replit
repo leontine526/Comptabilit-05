@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrer Application Corrigée"
+runButton = "Démarrer Sans PyMuPDF"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
@@ -135,6 +135,15 @@ args = "python start_simple.py"
 
 [[workflows.workflow]]
 name = "Démarrer Application Corrigée"
+author = 42989439
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_simple.py"
+
+[[workflows.workflow]]
+name = "Démarrer Sans PyMuPDF"
 author = 42989439
 mode = "sequential"
 
