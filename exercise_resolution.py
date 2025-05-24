@@ -68,19 +68,26 @@ def resolve_exercise_completely(exercise_id, problem_text):
         # Générer l'écriture avec les paramètres extraits
         solution_result = comptable_ia.generer_ecriture(problem_text, montant_ht, taux_tva)
 
+        # Initialiser la confiance par défaut
+        confidence = 0.85
+
         # Convertir le résultat en chaîne JSON si c'est un dictionnaire
         if isinstance(solution_result, dict):
             solution_text = json.dumps(solution_result, ensure_ascii=False)
+            if 'confidence' in solution_result:
+                confidence = solution_result['confidence']
         else:
             solution_text = solution_result
 
         if not solution_text:
             # Fallback au solveur traditionnel si ComptableIA échoue
-            solution_result = solver.solve_exercise(problem_text)
-            if not solution_result['success']:
-                results['errors'].append("Impossible de résoudre l'exercice: " + solution_result.get('message', 'Erreur inconnue'))
+            solver_result = solver.solve_exercise(problem_text)
+            if not solver_result['success']:
+                results['errors'].append("Impossible de résoudre l'exercice: " + solver_result.get('message', 'Erreur inconnue'))
                 return results
-            solution_text = solution_result['solution']
+            solution_text = solver_result['solution']
+            confidence = solver_result['confidence']
+            solution_result = solver_result
 
         # 3. Mettre à jour les résultats
         results['success'] = True
@@ -93,8 +100,10 @@ def resolve_exercise_completely(exercise_id, problem_text):
 
         solution = ExerciseSolution(
             exercise_id=exercise_id,
+            title=f"Résolution de {exercise.name}",
+            problem_text=problem_text,
             solution_text=solution_text,
-            confidence=solution_result['confidence'],
+            confidence=confidence,
             examples_used=json.dumps(solution_result.get('similar_examples', [])),
             user_id=exercise.user_id
         )
