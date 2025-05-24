@@ -122,6 +122,9 @@ def start_app_with_retry(max_retries=3):
 
             # Importer l'application
             from app import app, socketio
+            
+            # Importer les routes après avoir créé l'application et socketio
+            import routes
 
             # Vérifier si l'application a été correctement importée
             if app and socketio:

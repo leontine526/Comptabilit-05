@@ -62,10 +62,7 @@ except Exception as e:
 
 # Importer toutes les routes nécessaires
 try:
-    # Importation explicite de la route principale pour s'assurer qu'elle est correctement enregistrée
-    from routes import index
-    # Puis importer toutes les autres routes
-    from routes import about, welcome, health_check, login, logout, register, dashboard
+    # Importer les routes après avoir créé l'application et socketio
     from routes import *
     logger.info("Routes chargées avec succès")
 except ImportError as e:

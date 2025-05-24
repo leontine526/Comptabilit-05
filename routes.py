@@ -12,7 +12,9 @@ from ecriture_generator import ComptableIA
 
 compta = ComptableIA()
 
-from app import app, db, socketio
+from app import app, db
+# Import socketio separately to avoid circular imports
+from app import socketio
 from db_helper import safe_db_operation, init_db_connection
 from models import User, Exercise, Account, Transaction, TransactionItem, Document, ExerciseExample, ExerciseSolution, Workgroup, Message, Note, Notification, Post, Comment, Like
 

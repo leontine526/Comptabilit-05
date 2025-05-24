@@ -107,7 +107,7 @@ from error_middleware import register_middleware
 app.wsgi_app = register_middleware(app.wsgi_app)
 
 # Importer les routes directement pour s'assurer qu'elles sont enregistrées
-from routes import *
+# Import routes will be done in main.py to avoid circular imports
 
 from flask import Flask, request, session, render_template, jsonify
 
