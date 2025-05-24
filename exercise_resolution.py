@@ -99,7 +99,6 @@ def resolve_exercise_completely(exercise_id, problem_text):
         # results['bilan'] = generate_balance_sheet_document(exercise_id, solution_text)
 
         solution = ExerciseSolution(
-            exercise_id=exercise_id,
             title=f"Résolution de {exercise.name}",
             problem_text=problem_text,
             solution_text=solution_text,
