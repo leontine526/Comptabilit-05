@@ -62,13 +62,10 @@ def resolve_exercise_completely(exercise_id, problem_text):
         # results['grand_livre'] = generate_ledger_document(exercise_id, solution_text)
         # results['bilan'] = generate_balance_sheet_document(exercise_id, solution_text)
 
-        return results
-
-    except Exception as e:
-        import traceback
-        logger.error(f"Erreur lors de la résolution complète: {str(e)}\n{traceback.format_exc()}")
-        results['errors'].append(f"Une erreur est survenue: {str(e)}")
-        return resultsult['confidence'],
+        solution = ExerciseSolution(
+            exercise_id=exercise_id,
+            solution_text=solution_text,
+            confidence=solution_result['confidence'],
             examples_used=json.dumps(solution_result.get('similar_examples', [])),
             user_id=exercise.user_id
         )

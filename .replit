@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrer Sans PyMuPDF"
+runButton = "Démarrer Application Corrigée"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
