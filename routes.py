@@ -463,15 +463,9 @@ def view_exercise(exercise_id):
     # Vérifier que l'utilisateur a les droits
     if exercise.user_id != current_user.id:
         abort(403)
-        
-    transactions = Transaction.query.filter_by(exercise_id=exercise_id).order_by(Transaction.transaction_date.desc()).all()
-    documents = Document.query.filter_by(exercise_id=exercise_id).order_by(Document.upload_date.desc()).all()
     
-    return render_template('exercises/view.html', 
-                          title=f'Exercice: {exercise.name}', 
-                          exercise=exercise,
-                          transactions=transactions,
-                          documents=documents)
+    # Rediriger directement vers la résolution complète de l'exercice
+    return redirect(url_for('resoudre_exercice'))
 
 @app.route('/exercises/new', methods=['GET', 'POST'])
 @login_required

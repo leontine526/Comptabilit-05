@@ -42,7 +42,7 @@
                     {% for exercise in exercises %}
                     <tr>
                         <td>
-                            <a href="{{ url_for('view_exercise', exercise_id=exercise.id) }}" class="fw-bold text-decoration-none">
+                            <a href="{{ url_for('resoudre_exercice', exercise_id=exercise.id) }}" class="fw-bold text-decoration-none">
                                 {{ exercise.name }}
                             </a>
                         </td>
@@ -63,8 +63,8 @@
                         <td>{{ exercise.created_at.strftime('%d/%m/%Y') }}</td>
                         <td class="text-end">
                             <div class="btn-group">
-                                <a href="{{ url_for('view_exercise', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-primary">
-                                    <i data-feather="eye"></i>
+                                <a href="{{ url_for('resoudre_exercice', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i data-feather="calculator"></i>
                                 </a>
                                 {% if not exercise.is_closed %}
                                 <a href="{{ url_for('exercise_edit', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-secondary">
