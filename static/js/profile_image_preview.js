@@ -1,49 +1,38 @@
-// Fonction pour prévisualiser l'image de profil avant upload
+// Script pour prévisualiser l'image de profil lors de l'inscription ou de la modification du profil
 document.addEventListener('DOMContentLoaded', function() {
-    const profilePictureInput = document.querySelector('input[name="profile_picture"]');
+    const profileImageInput = document.querySelector('input[name="profile_picture"]');
 
-    if (profilePictureInput) {
-        // Créer la div de prévisualisation si elle n'existe pas déjà
-        let previewContainer = document.getElementById('profile-preview-container');
+    if (profileImageInput) {
+        // Créer un conteneur pour la prévisualisation s'il n'existe pas déjà
+        let previewContainer = document.querySelector('.profile-image-preview');
         if (!previewContainer) {
             previewContainer = document.createElement('div');
-            previewContainer.id = 'profile-preview-container';
-            previewContainer.className = 'text-center mb-3 mt-2';
-            profilePictureInput.parentNode.appendChild(previewContainer);
+            previewContainer.className = 'profile-image-preview mt-3';
+            profileImageInput.parentNode.appendChild(previewContainer);
         }
 
-        // Ajouter un texte d'aide
-        const helpText = document.createElement('small');
-        helpText.className = 'form-text text-muted mt-1';
-        helpText.textContent = 'Formats acceptés: JPG, PNG, JPEG. Taille max: 5MB';
-        profilePictureInput.parentNode.appendChild(helpText);
-
-        // Prévisualiser l'image sélectionnée
-        profilePictureInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
+        // Fonction pour afficher la prévisualisation
+        function handleImagePreview(e) {
+            const file = e.target.files[0];
             if (file) {
-                // Vérifier si c'est une image
-                if (!file.type.match('image.*')) {
-                    alert('Veuillez sélectionner une image valide.');
-                    return;
-                }
-
-                // Créer la prévisualisation
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewContainer.innerHTML = '';
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'img-thumbnail rounded-circle';
-                    img.style.width = '150px';
-                    img.style.height = '150px';
-                    img.style.objectFit = 'cover';
-                    previewContainer.appendChild(img);
+                reader.onload = function(event) {
+                    previewContainer.innerHTML = `
+                        <div class="card mb-3">
+                            <div class="card-body text-center">
+                                <img src="${event.target.result}" alt="Prévisualisation" class="img-fluid rounded-circle" style="max-height: 150px; max-width: 150px;">
+                                <p class="mt-2 mb-0 text-muted">Prévisualisation de votre photo de profil</p>
+                            </div>
+                        </div>
+                    `;
                 };
                 reader.readAsDataURL(file);
             } else {
                 previewContainer.innerHTML = '';
             }
-        });
+        }
+
+        // Écouter les changements de fichier
+        profileImageInput.addEventListener('change', handleImagePreview);
     }
 });

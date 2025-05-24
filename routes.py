@@ -265,18 +265,22 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
+        logger.info(f"Utilisateur déjà authentifié, redirection vers dashboard: {current_user.username}")
         return redirect(url_for('dashboard'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
+        logger.info("Formulaire d'inscription validé, traitement en cours")
         try:
             # Vérifier que les mots de passe correspondent
             if form.password.data != form.confirm_password.data:
+                logger.warning("Inscription échouée: les mots de passe ne correspondent pas")
                 flash("Les mots de passe ne correspondent pas.", "danger")
                 return render_template('auth/register.html', title='Inscription', form=form)
                 
             # Vérifier la longueur minimale du mot de passe
             if len(form.password.data) < 6:
+                logger.warning("Inscription échouée: mot de passe trop court")
                 flash("Le mot de passe doit contenir au moins 6 caractères.", "danger")
                 return render_template('auth/register.html', title='Inscription', form=form)
                 
@@ -288,7 +292,7 @@ def register():
             user.set_password(form.password.data)
 
             # Gérer l'upload de la photo de profil
-            if form.profile_picture.data and hasattr(form.profile_picture.data, 'filename'):
+            if form.profile_picture.data and hasattr(form.profile_picture.data, 'filename') and form.profile_picture.data.filename:
                 # Assurer que le dossier d'upload existe
                 upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'profile_pics')
                 os.makedirs(upload_folder, exist_ok=True)
@@ -303,20 +307,29 @@ def register():
 
                 # Mettre à jour le chemin dans la base de données
                 user.profile_picture = os.path.join('profile_pics', unique_filename)
+                logger.info(f"Photo de profil enregistrée: {user.profile_picture}")
 
             db.session.add(user)
             db.session.commit()
+            logger.info(f"Nouvel utilisateur créé avec succès: {user.username} (ID: {user.id})")
             
             # Connecter automatiquement l'utilisateur
             login_user(user)
+            logger.info(f"Utilisateur connecté automatiquement: {user.username}")
+            
             flash('Votre compte a été créé avec succès! Bienvenue sur SmartOHADA.', 'success')
+            logger.info(f"Redirection vers le tableau de bord pour: {user.username}")
             return redirect(url_for('dashboard'))
         except Exception as e:
             db.session.rollback()
-            import logging
-            logging.error(f"Erreur lors de l'inscription: {str(e)}")
+            logger.error(f"Erreur lors de l'inscription: {str(e)}")
+            logger.error(traceback.format_exc())
             flash(f"Une erreur s'est produite lors de la création de votre compte. Veuillez réessayer.", 'danger')
 
+    # Si on arrive ici, soit c'est une requête GET, soit le formulaire n'est pas valide
+    if request.method == 'POST' and not form.validate():
+        logger.warning(f"Formulaire d'inscription invalide. Erreurs: {form.errors}")
+        
     return render_template('auth/register.html', title='Inscription', form=form)
 
 @app.route('/profile', methods=['GET', 'POST'])
