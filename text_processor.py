@@ -4,9 +4,7 @@ def process_text(text, summarize=True, split_paragraphs=True, analyze=True, comp
     return {
         'original': text,
         'summary': "La fonctionnalité de résumé n'est pas disponible pour le moment.",
-        'paragraphs': text.split('
-
-'),
+        'paragraphs': text.split('\n\n'),
         'analysis': {
             'complexity': 'Non disponible',
             'sentiment': 'Non disponible',
