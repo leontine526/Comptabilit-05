@@ -1,147 +1,6 @@
 {% extends "base.html" %}
-
-{% block content %}
-<div class="about-section">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h1 class="display-4 mb-4">À Propos</h1>
-                <p class="lead text-muted">Découvrez l'auteur de cette application de comptabilité OHADA</p>
-            </div>
-        </div>
-        
-        <div class="row align-items-center mb-5">
-            <div class="col-lg-4 text-center mb-4 mb-lg-0">
-                <div class="profile-img-container">
-                    <div class="profile-img bg-gradient-primary d-flex align-items-center justify-content-center text-light">
-                        <span class="display-4">MK</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-8">
-                <div class="card about-card">
-                    <div class="card-body">
-                        <h2 class="section-title">Informations Personnelles</h2>
-                        <ul class="info-list">
-                            <li>
-                                <i class="fas fa-user"></i>
-                                <div>
-                                    <strong>Nom Complet:</strong> KIRIZA Mushaga
-                                </div>
-                            </li>
-                            <li>
-                                <i class="fas fa-calendar-alt"></i>
-                                <div>
-                                    <strong>Date de Naissance:</strong> 13 Octobre 2008
-                                </div>
-                            </li>
-                            <li>
-                                <i class="fas fa-map-marker-alt"></i>
-                                <div>
-                                    <strong>Lieu de Naissance:</strong> Bumba
-                                </div>
-                            </li>
-                            <li>
-                                <i class="fas fa-envelope"></i>
-                                <div>
-                                    <strong>Email:</strong> kirizamushaga@gmail.com
-                                </div>
-                            </li>
-                            <li>
-                                <i class="fas fa-phone"></i>
-                                <div>
-                                    <strong>Contact:</strong> +243 820 740 027
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mb-5">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="section-title">Parcours Éducatif</h2>
-                        <div class="timeline">
-                            <div class="timeline-item">
-                                <div class="timeline-date">École Primaire</div>
-                                <h4 class="timeline-title">École Primaire Notre Dame</h4>
-                                <p>Éducation fondamentale avec excellence académique et développement personnel.</p>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-date">Humanités</div>
-                                <h4 class="timeline-title">Lycée Hélène de Chappotin</h4>
-                                <p>Formation secondaire avec un accent particulier sur les sciences et la gestion.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h2 class="section-title">À Propos de Moi</h2>
-                        <p>Passionné par l'informatique et la comptabilité, je combine ces deux domaines pour créer des solutions innovantes pour la gestion financière. Mon parcours académique et mes centres d'intérêt m'ont permis de développer une expertise dans l'application des systèmes comptables, particulièrement le référentiel OHADA.</p>
-                        
-                        <p>Mon intérêt pour la technologie m'a poussé à explorer comment l'intelligence artificielle et l'automatisation peuvent révolutionner le domaine de la comptabilité, rendant les processus plus efficaces et précis.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h2 class="section-title">Passions & Compétences</h2>
-                        <p>Ma passion pour la technologie et la comptabilité m'a poussé à développer cette application qui combine le référentiel OHADA avec des technologies modernes comme l'OCR et le NLP pour automatiser les processus comptables.</p>
-                        
-                        <p>En dehors du développement de logiciels comptables, j'apprécie également:</p>
-                        <div class="skill-tags">
-                            <span class="skill-tag"><i class="fas fa-laptop-code me-1"></i> Programmation</span>
-                            <span class="skill-tag"><i class="fas fa-calculator me-1"></i> Analyse financière</span>
-                            <span class="skill-tag"><i class="fas fa-robot me-1"></i> Intelligence artificielle</span>
-                            <span class="skill-tag"><i class="fas fa-chart-line me-1"></i> Visualisation de données</span>
-                            <span class="skill-tag"><i class="fas fa-book me-1"></i> Normes comptables</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mt-5">
-            <div class="col-md-12 text-center">
-                <h3 class="mb-4">Comptabilité <span class="accent-text">OHADA</span></h3>
-                <p class="lead">Cette application a été développée pour faciliter la gestion comptable selon les normes OHADA, 
-                    en intégrant des technologies modernes pour automatiser la saisie et l'analyse des données.</p>
-                <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">
-                    <i class="fas fa-arrow-left me-2"></i>Retour à l'accueil
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block styles %}
-<style>
-    .profile-img {
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
-        margin: 0 auto;
-        font-weight: bold;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        border: 3px solid var(--accent);
-    }
-</style>
-{% endblock %}
-{% extends 'base.html' %}
-
+```
+```html
 {% block content %}
 <div class="container py-5">
     <div class="row">
@@ -159,6 +18,45 @@
                     </p>
                 </div>
             </div>
+
+            <div class="card my-4">
+                <div class="card-body">
+                    <h3>Informations Personnelles</h3>
+                    <ul class="info-list">
+                        <li>
+                            <i class="fas fa-user"></i>
+                            <div>
+                                <strong>Nom Complet:</strong> KIRIZA Mushaga
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-calendar-alt"></i>
+                            <div>
+                                <strong>Date de Naissance:</strong> 13 Octobre 2008
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Lieu de Naissance:</strong> Bumba
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <strong>Email:</strong> kirizamushaga@gmail.com
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <strong>Contact:</strong> +243 820 740 027
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
             <h3 class="mt-5">Contactez-nous</h3>
             <p>
                 Pour toute question ou assistance, n'hésitez pas à nous contacter.
@@ -166,4 +64,36 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .profile-img {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        margin: 0 auto;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        border: 3px solid var(--accent);
+    }
+
+    .info-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .info-list li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .info-list i {
+        font-size: 1.2rem;
+        width: 30px;
+        color: var(--primary);
+        margin-right: 15px;
+    }
+</style>
 {% endblock %}

@@ -19,7 +19,7 @@ class RegistrationForm(FlaskForm):
     username = StringField('Nom d\'utilisateur', validators=[DataRequired(), Length(min=4, max=64)])
     email = StringField('Adresse email', validators=[DataRequired(), Email(), Length(max=120)])
     full_name = StringField('Nom complet', validators=[DataRequired(), Length(max=100)])
-    password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=8)])
+    password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=6, message="Le mot de passe doit contenir au moins 6 caractères")])
     confirm_password = PasswordField('Confirmer le mot de passe', validators=[
         DataRequired(), EqualTo('password', message='Les mots de passe doivent correspondre')
     ])

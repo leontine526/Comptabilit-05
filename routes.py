@@ -270,6 +270,16 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
+            # Vérifier que les mots de passe correspondent
+            if form.password.data != form.confirm_password.data:
+                flash("Les mots de passe ne correspondent pas.", "danger")
+                return render_template('auth/register.html', title='Inscription', form=form)
+                
+            # Vérifier la longueur minimale du mot de passe
+            if len(form.password.data) < 6:
+                flash("Le mot de passe doit contenir au moins 6 caractères.", "danger")
+                return render_template('auth/register.html', title='Inscription', form=form)
+                
             user = User(
                 username=form.username.data,
                 email=form.email.data,
@@ -300,7 +310,7 @@ def register():
             # Connecter automatiquement l'utilisateur
             login_user(user)
             flash('Votre compte a été créé avec succès! Bienvenue sur SmartOHADA.', 'success')
-            return redirect(url_for('dashboard'))  # Redirection déjà effective vers le tableau de bord
+            return redirect(url_for('dashboard'))
         except Exception as e:
             db.session.rollback()
             import logging
