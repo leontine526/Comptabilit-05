@@ -108,6 +108,7 @@ def resolve_exercise_completely(exercise_id, problem_text):
         return results
 
     except Exception as e:
+        import traceback
         logger.error(f"Erreur lors de la résolution complète de l'exercice: {str(e)}")
         results['errors'].append(f"Erreur système: {str(e)}")
         return results
