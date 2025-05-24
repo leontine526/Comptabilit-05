@@ -32,6 +32,11 @@
                             {{ form.confirm_password(class="form-control") }}
                         </div>
 
+                        <div class="mb-3 form-check">
+                            {{ form.show_password(class="form-check-input") }}
+                            {{ form.show_password.label(class="form-check-label") }}
+                        </div>
+
                         <div class="mb-3">
                             {{ form.profile_picture.label(class="form-label") }}
                             {{ form.profile_picture(class="form-control") }}
@@ -51,4 +56,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/password_toggle.js') }}"></script>
 {% endblock %}
