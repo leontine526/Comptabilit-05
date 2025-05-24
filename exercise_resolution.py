@@ -42,8 +42,31 @@ def resolve_exercise_completely(exercise_id, problem_text):
 
         # 2. Générer une solution simple en utilisant ComptableIA
         from ecriture_generator import ComptableIA
+        import re
         comptable_ia = ComptableIA()
-        solution_text = comptable_ia.generer_ecriture(problem_text)
+        
+        # Extraire le montant de l'énoncé
+        montant_match = re.search(r'(\d+[\s\d]*(?:,\d+)?)\s*(?:FC|F|francs?)', problem_text)
+        montant_ht = 0
+        if montant_match:
+            # Nettoyer le montant trouvé (enlever les espaces, remplacer virgule par point)
+            montant_str = montant_match.group(1).replace(' ', '').replace(',', '.')
+            try:
+                montant_ht = float(montant_str)
+            except ValueError:
+                montant_ht = 0
+        
+        # Extraire le taux de TVA si mentionné
+        tva_match = re.search(r'TVA\s*:?\s*(\d+)(?:\s*%)?', problem_text)
+        taux_tva = 0
+        if tva_match:
+            try:
+                taux_tva = float(tva_match.group(1))
+            except ValueError:
+                taux_tva = 0
+        
+        # Générer l'écriture avec les paramètres extraits
+        solution_text = comptable_ia.generer_ecriture(problem_text, montant_ht, taux_tva)
 
         if not solution_text:
             # Fallback au solveur traditionnel si ComptableIA échoue
