@@ -66,7 +66,13 @@ def resolve_exercise_completely(exercise_id, problem_text):
                 taux_tva = 0
         
         # Générer l'écriture avec les paramètres extraits
-        solution_text = comptable_ia.generer_ecriture(problem_text, montant_ht, taux_tva)
+        solution_result = comptable_ia.generer_ecriture(problem_text, montant_ht, taux_tva)
+
+        # Convertir le résultat en chaîne JSON si c'est un dictionnaire
+        if isinstance(solution_result, dict):
+            solution_text = json.dumps(solution_result, ensure_ascii=False)
+        else:
+            solution_text = solution_result
 
         if not solution_text:
             # Fallback au solveur traditionnel si ComptableIA échoue

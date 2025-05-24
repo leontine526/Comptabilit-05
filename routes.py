@@ -166,11 +166,16 @@ def resoudre_exercice():
             result = resolve_exercise_completely(int(exercise_id), enonce)
             
             if result['success']:
+                # S'assurer que solution_text est une chaîne de caractères
+                solution_text = result['solution']
+                if isinstance(solution_text, dict):
+                    solution_text = json.dumps(solution_text, ensure_ascii=False)
+                
                 # Créer une entrée de solution dans la base de données pour l'historique
                 solution_entry = ExerciseSolution(
                     title=f"Résolution de {last_exercise.name}",
                     problem_text=enonce,
-                    solution_text=result['solution'],
+                    solution_text=solution_text,
                     confidence=0.95,  # Valeur par défaut
                     examples_used=json.dumps([]),
                     user_id=current_user.id
