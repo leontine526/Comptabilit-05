@@ -1,4 +1,5 @@
 
+import os
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, current_user, login_required
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -8,6 +9,18 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.secret_key = "ohada_comptabilite_secret_key"
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# Configuration de la base de données
+database_uri = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require")
+app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_size": 10,
+    "pool_recycle": 60,
+    "pool_pre_ping": True,
+    "max_overflow": 15,
+    "pool_timeout": 10
+}
 
 # Initialiser la base de données
 from app import db
