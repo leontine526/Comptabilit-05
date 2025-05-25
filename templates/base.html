@@ -29,7 +29,7 @@
 
     {% block styles %}{% endblock %}
 </head>
-<body class="{% if current_user.is_authenticated|default(false) %}user-authenticated{% endif %}">
+<body class="{% if current_user.is_authenticated %}user-authenticated{% endif %}">
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
@@ -41,7 +41,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 main-nav">
-                    {% if current_user.is_authenticated|default(false) %}
+                    {% if current_user.is_authenticated %}
                         <!-- Navigation principale avec onglets majeurs -->
                         <li class="nav-item">
                             <a class="nav-link nav-main-item {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
@@ -145,7 +145,7 @@
                 </ul>
 
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    {% if current_user.is_authenticated|default(false) %}
+                    {% if current_user.is_authenticated %}
                         <!-- Notifications Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle position-relative" href="#" role="button" data-bs-toggle="dropdown">
@@ -291,7 +291,7 @@
                                 <i class="fas fa-info-circle me-2 text-primary"></i>À propos de Mushaga
                             </a>
                         </li>
-                        {% if current_user.is_authenticated|default(false) %}
+                        {% if current_user.is_authenticated %}
                             <li class="mb-2">
                                 <a href="{{ url_for('dashboard') }}" class="text-decoration-none">
                                     <i class="fas fa-tachometer-alt me-2 text-primary"></i>Accéder au tableau de bord

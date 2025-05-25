@@ -2,11 +2,16 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, current_user, login_required
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_sqlalchemy import SQLAlchemy
 
 # Créer l'application Flask
 app = Flask(__name__)
 app.secret_key = "ohada_comptabilite_secret_key"
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# Initialiser la base de données
+from app import db
+db.init_app(app)
 
 # Configurer le gestionnaire de connexion
 login_manager = LoginManager()
@@ -14,10 +19,6 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
 login_manager.login_message_category = "warning"
-
-# Initialiser la base de données
-from app import db
-db.init_app(app)
 
 # Importer le modèle User après l'initialisation de login_manager
 from models import User
