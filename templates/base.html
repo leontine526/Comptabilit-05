@@ -29,7 +29,7 @@
 
     {% block styles %}{% endblock %}
 </head>
-<body class="{% if current_user.is_authenticated %}user-authenticated{% endif %}">
+<body class="{% if current_user is defined and current_user.is_authenticated %}user-authenticated{% endif %}">
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">

@@ -24,7 +24,7 @@
                     Une solution complète de gestion comptable basée sur le référentiel OHADA, avec traitement automatisé des documents et analyse intelligente.
                 </p>
                 <div class="d-flex justify-content-center gap-3 mt-4">
-                    {% if current_user.is_authenticated %}
+                    {% if current_user is defined and current_user.is_authenticated %}
                         <a href="{{ url_for('dashboard') }}" class="btn btn-module-comptabilite btn-lg">
                             <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
                         </a>
@@ -67,7 +67,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4 mb-4">
             <div class="card feature-card h-100" style="background: linear-gradient(135deg, #F0F7FF 0%, #E6F0FF 100%); border-left: 4px solid #0C4DA2; box-shadow: 0 15px 30px rgba(12, 77, 162, 0.15);">
                 <div class="card-body text-center">
@@ -81,7 +81,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4 mb-4">
             <div class="card feature-card h-100" style="background: linear-gradient(135deg, #F0FFF4 0%, #DCFCE7 100%); border-left: 4px solid #166534; box-shadow: 0 15px 30px rgba(22, 101, 52, 0.15);">
                 <div class="card-body text-center">
@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-body">
@@ -155,7 +155,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-4 mb-4">
                     <div class="card h-100" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
                         <div class="card-body text-center">
@@ -169,7 +169,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-4 mb-4">
                     <div class="card h-100" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
                         <div class="card-body text-center">
@@ -232,7 +232,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-6 mb-4">
                     <div class="card h-100" style="background: linear-gradient(to bottom right, #F0FDF9 0%, #ECFDF5 100%); border-left: 4px solid #0B4619; box-shadow: 0 10px 30px rgba(11, 70, 25, 0.1);">
                         <div class="card-body">
@@ -280,7 +280,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Question 2 -->
                         <div class="accordion-item faq-item">
                             <h2 class="accordion-header" id="headingTwo">
@@ -294,7 +294,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Question 3 -->
                         <div class="accordion-item faq-item">
                             <h2 class="accordion-header" id="headingThree">
@@ -308,7 +308,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Question 4 -->
                         <div class="accordion-item faq-item">
                             <h2 class="accordion-header" id="headingFour">
@@ -322,7 +322,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Question 5 -->
                         <div class="accordion-item faq-item">
                             <h2 class="accordion-header" id="headingFive">
@@ -348,7 +348,7 @@
                 <h2 class="text-white mb-4">Prêt à révolutionner votre gestion comptable ?</h2>
                 <p class="text-light mb-4">Créez votre compte dès aujourd'hui et découvrez comment SmartOHADA peut transformer vos processus comptables.</p>
                 <div class="d-flex justify-content-center gap-3">
-                    {% if current_user.is_authenticated %}
+                    {% if current_user is defined and current_user.is_authenticated %}
                         <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg shadow">
                             <i class="fas fa-tachometer-alt me-2"></i>Accéder à mon tableau de bord
                         </a>
