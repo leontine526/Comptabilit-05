@@ -1,135 +1,107 @@
-
 {% extends "base.html" %}
+
+{% block title %}Solution complète{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Résolution complète</h1>
-    
-    <div class="alert alert-success">
-        <i class="fas fa-check-circle"></i> Exercice résolu avec succès!
-    </div>
-    
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-calculator"></i> Solution de l'exercice
-                    </h5>
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                    <h4 class="mb-0">Exercice résolu : {{ exercise.name }}</h4>
+                    <span class="badge bg-light text-primary">ID: {{ solution_id }}</span>
                 </div>
                 <div class="card-body">
-                    {% if solution %}
-                        <div class="solution-content">
-                            {% if solution is string %}
-                                <pre class="bg-light p-3 rounded">{{ solution }}</pre>
-                            {% else %}
-                                <h4>Écritures comptables:</h4>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Compte</th>
-                                                <th>Libellé</th>
-                                                <th>Débit</th>
-                                                <th>Crédit</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for ecriture in solution.ecritures %}
-                                                <tr>
-                                                    <td>{{ ecriture.compte }}</td>
-                                                    <td>{{ ecriture.libelle }}</td>
-                                                    <td class="text-right">
-                                                        {% if ecriture.debit %}
-                                                            {{ ecriture.debit }} FC
-                                                        {% endif %}
-                                                    </td>
-                                                    <td class="text-right">
-                                                        {% if ecriture.credit %}
-                                                            {{ ecriture.credit }} FC
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i> L'exercice a été résolu avec succès!
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Énoncé de l'exercice</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="p-3 border rounded bg-light">
+                                {{ problem_text|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Solution</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="solution-content p-3 border rounded bg-light">
+                                {{ solution|safe }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if documents %}
+                    <div class="card mt-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Documents comptables générés</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="documentTabs" role="tablist">
+                                {% if documents.journal %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="journal-tab" data-bs-toggle="tab" data-bs-target="#journal" type="button" role="tab" aria-controls="journal" aria-selected="true">Journal</button>
+                                </li>
+                                {% endif %}
+
+                                {% if documents.grand_livre %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="grand-livre-tab" data-bs-toggle="tab" data-bs-target="#grand-livre" type="button" role="tab" aria-controls="grand-livre" aria-selected="false">Grand Livre</button>
+                                </li>
+                                {% endif %}
+
+                                {% if documents.bilan %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="bilan-tab" data-bs-toggle="tab" data-bs-target="#bilan" type="button" role="tab" aria-controls="bilan" aria-selected="false">Bilan</button>
+                                </li>
+                                {% endif %}
+                            </ul>
+
+                            <div class="tab-content mt-3" id="documentTabsContent">
+                                {% if documents.journal %}
+                                <div class="tab-pane fade show active" id="journal" role="tabpanel" aria-labelledby="journal-tab">
+                                    <pre class="small bg-light p-3 border rounded">{{ documents.journal }}</pre>
                                 </div>
-                            {% endif %}
+                                {% endif %}
+
+                                {% if documents.grand_livre %}
+                                <div class="tab-pane fade" id="grand-livre" role="tabpanel" aria-labelledby="grand-livre-tab">
+                                    <pre class="small bg-light p-3 border rounded">{{ documents.grand_livre }}</pre>
+                                </div>
+                                {% endif %}
+
+                                {% if documents.bilan %}
+                                <div class="tab-pane fade" id="bilan" role="tabpanel" aria-labelledby="bilan-tab">
+                                    <pre class="small bg-light p-3 border rounded">{{ documents.bilan }}</pre>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
-                    {% else %}
-                        <div class="alert alert-warning">
-                            Aucune donnée de solution disponible.
-                        </div>
+                    </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-info-circle"></i> Informations
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Exercice:
-                            <span class="font-weight-bold">{{ exercise.name }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Date de résolution:
-                            <span>{{ solution.created_at|default(now().strftime('%Y-%m-%d %H:%M')) }}</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-file-alt"></i> Documents générés
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        {% if documents.journal %}
-                            <a href="{{ url_for('static', filename='reports/' + documents.journal) }}" class="list-group-item list-group-item-action" target="_blank">
-                                <i class="fas fa-book mr-2"></i> Journal comptable
-                            </a>
-                        {% endif %}
-                        
-                        {% if documents.grand_livre %}
-                            <a href="{{ url_for('static', filename='reports/' + documents.grand_livre) }}" class="list-group-item list-group-item-action" target="_blank">
-                                <i class="fas fa-list-alt mr-2"></i> Grand livre
-                            </a>
-                        {% endif %}
-                        
-                        {% if documents.bilan %}
-                            <a href="{{ url_for('static', filename='reports/' + documents.bilan) }}" class="list-group-item list-group-item-action" target="_blank">
-                                <i class="fas fa-balance-scale mr-2"></i> Bilan
-                            </a>
-                        {% endif %}
-                        
-                        {% if not documents.journal and not documents.grand_livre and not documents.bilan %}
-                            <div class="alert alert-info mb-0">
-                                <i class="fas fa-info-circle"></i> Aucun document n'a été généré.
-                            </div>
-                        {% endif %}
+                <div class="card-footer d-flex justify-content-between bg-light">
+                    <a href="{{ url_for('exercises_list') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour aux exercices
+                    </a>
+                    <div>
+                        <a href="{{ url_for('exercise_solutions_list') }}" class="btn btn-info me-2">
+                            <i class="fas fa-history me-2"></i>Historique des solutions
+                        </a>
+                        <a href="{{ url_for('resoudre_exercice') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nouvel exercice
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="mt-4">
-        <a href="{{ url_for('resoudre_exercice') }}" class="btn btn-outline-primary">
-            <i class="fas fa-calculator"></i> Résoudre un autre exercice
-        </a>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary ml-2">
-            <i class="fas fa-home"></i> Retour au tableau de bord
-        </a>
     </div>
 </div>
 {% endblock %}

@@ -157,6 +157,23 @@ class Exercise(db.Model):
     
     def __repr__(self):
         return f'<Exercise {self.name}>'
+    
+    def get_latest_solution(self):
+        """Récupère la dernière solution de l'exercice s'il a été résolu"""
+        from app import db
+        from models import ExerciseSolution
+        
+        # Chercher une solution liée à cet exercice
+        solution = ExerciseSolution.query.filter_by(
+            user_id=self.user_id,
+            title=f"Résolution de {self.name}"
+        ).order_by(ExerciseSolution.created_at.desc()).first()
+        
+        return solution
+    
+    def is_resolved(self):
+        """Vérifie si l'exercice a été résolu"""
+        return self.get_latest_solution() is not None
 
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -140,19 +140,70 @@ def welcome():
 @login_required
 def resoudre_exercice():
     # Récupérer le dernier exercice créé par l'utilisateur
-    last_exercise = Exercise.query.filter_by(
-        user_id=current_user.id
-    ).order_by(Exercise.created_at.desc()).first()
+    exercise_id = request.args.get('exercise_id')
+    
+    if exercise_id:
+        # Si un ID d'exercice est fourni, utiliser cet exercice
+        current_exercise = Exercise.query.get_or_404(int(exercise_id))
+        if current_exercise.user_id != current_user.id:
+            abort(403)  # Interdire l'accès si l'exercice n'appartient pas à l'utilisateur
+    else:
+        # Sinon, utiliser le dernier exercice créé
+        current_exercise = Exercise.query.filter_by(
+            user_id=current_user.id
+        ).order_by(Exercise.created_at.desc()).first()
     
     # Si aucun exercice n'existe, rediriger vers la création d'exercice
-    if not last_exercise:
+    if not current_exercise:
         flash("Veuillez d'abord créer un exercice comptable.", "warning")
         return redirect(url_for('exercise_new'))
+    
+    # Vérifier si l'exercice est déjà résolu
+    latest_solution = current_exercise.get_latest_solution()
+    if latest_solution and request.method == 'GET':
+        # Si l'exercice est déjà résolu et c'est une requête GET, rediriger vers la solution
+        try:
+            # Charger les données de solution
+            solution_text = latest_solution.solution_text
+            
+            # Récupérer les données des documents (supposons qu'ils sont stockés dans la solution)
+            # Cette partie pourrait nécessiter des ajustements selon votre implémentation
+            documents = {
+                'journal': None,
+                'grand_livre': None,
+                'bilan': None
+            }
+            
+            # Essayer de parser les données JSON si disponibles
+            try:
+                import json
+                solution_data = json.loads(solution_text)
+                if isinstance(solution_data, dict):
+                    documents = {
+                        'journal': solution_data.get('journal'),
+                        'grand_livre': solution_data.get('grand_livre'),
+                        'bilan': solution_data.get('bilan')
+                    }
+            except:
+                pass
+            
+            return render_template(
+                'exercise_solver/complete_solution.html',
+                solution=solution_text,
+                solution_id=latest_solution.id,
+                exercise=current_exercise,
+                problem_text=latest_solution.problem_text,
+                documents=documents,
+                title="Résolution complète"
+            )
+        except Exception as e:
+            logger.error(f"Erreur lors de l'affichage de la solution existante: {str(e)}\n{traceback.format_exc()}")
+            # En cas d'erreur, continuer avec le formulaire normal
     
     if request.method == 'POST':
         try:
             enonce = request.form.get('enonce')
-            exercise_id = request.form.get('exercise_id', last_exercise.id if last_exercise else None)
+            exercise_id = request.form.get('exercise_id', current_exercise.id if current_exercise else None)
             
             if not exercise_id:
                 flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
@@ -173,7 +224,7 @@ def resoudre_exercice():
                 
                 # Créer une entrée de solution dans la base de données pour l'historique
                 solution_entry = ExerciseSolution(
-                    title=f"Résolution de {last_exercise.name}",
+                    title=f"Résolution de {current_exercise.name}",
                     problem_text=enonce,
                     solution_text=solution_text,
                     confidence=0.95,  # Valeur par défaut
@@ -188,7 +239,8 @@ def resoudre_exercice():
                     'exercise_solver/complete_solution.html',
                     solution=result['solution'],
                     solution_id=solution_entry.id,
-                    exercise=last_exercise,
+                    exercise=current_exercise,
+                    problem_text=enonce,
                     documents={
                         'journal': result.get('journal'),
                         'grand_livre': result.get('grand_livre'),
@@ -204,7 +256,7 @@ def resoudre_exercice():
             
     return render_template(
         'formulaire.html', 
-        exercise=last_exercise,
+        exercise=current_exercise,
         title="Résoudre un exercice comptable"
     )
 
@@ -553,6 +605,34 @@ def delete_exercise(exercise_id):
     db.session.commit()
 
     flash('Exercice supprimé avec succès!', 'success')
+    return redirect(url_for('exercises_list'))
+
+@app.route('/exercises/<int:exercise_id>/rename', methods=['POST'])
+@login_required
+def exercise_rename(exercise_id):
+    exercise = Exercise.query.get_or_404(exercise_id)
+    
+    # Check if user has permission
+    if exercise.user_id != current_user.id:
+        abort(403)
+    
+    # Check if exercise is closed
+    if exercise.is_closed:
+        flash('Impossible de renommer un exercice clôturé.', 'danger')
+        return redirect(url_for('exercises_list'))
+    
+    # Get new name from form
+    new_name = request.form.get('name', '').strip()
+    
+    if not new_name:
+        flash('Le nom de l\'exercice ne peut pas être vide.', 'danger')
+        return redirect(url_for('exercises_list'))
+    
+    # Update exercise name
+    exercise.name = new_name
+    db.session.commit()
+    
+    flash('Exercice renommé avec succès!', 'success')
     return redirect(url_for('exercises_list'))
 
 @app.route('/exercises/<int:exercise_id>/publish', methods=['POST'])

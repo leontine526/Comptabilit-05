@@ -16,6 +16,11 @@
             <i class="fas fa-plus"></i> Nouvel exercice
         </a>
     </div>
+    
+    <!-- Bouton flottant "+" pour créer un nouvel exercice -->
+    <a href="{{ url_for('exercise_new') }}" class="btn btn-primary rounded-circle position-fixed" style="bottom: 30px; right: 30px; width: 60px; height: 60px; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;">
+        <i class="fas fa-plus"></i>
+    </a>
 
     {% if exercises|length == 0 %}
     <div class="alert alert-info">
@@ -55,37 +60,71 @@
                             {% endif %}
                         </td>
                         <td>
-                            <span class="badge bg-{{ 'danger' if exercise.is_closed else 'success' }} rounded-pill px-3 py-2">
-                                {{ 'Clôturé' if exercise.is_closed else 'En cours' }}
-                            </span>
+                            {% if exercise.is_closed %}
+                                <span class="badge bg-danger rounded-pill px-3 py-2">Clôturé</span>
+                            {% else %}
+                                {% set solution = exercise.get_latest_solution() %}
+                                {% if solution %}
+                                    <span class="badge bg-primary rounded-pill px-3 py-2">Résolu</span>
+                                {% else %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2">En cours</span>
+                                {% endif %}
+                            {% endif %}
                         </td>
                         <td>{{ exercise.transactions.count() }}</td>
                         <td>{{ exercise.created_at.strftime('%d/%m/%Y') }}</td>
                         <td class="text-end">
                             <div class="btn-group">
-                                <a href="{{ url_for('resoudre_exercice', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-primary">
-                                    <i data-feather="calculator"></i>
+                                <a href="{{ url_for('resoudre_exercice', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-primary" title="Ouvrir l'exercice">
+                                    <i data-feather="eye"></i>
                                 </a>
                                 {% if not exercise.is_closed %}
-                                <a href="{{ url_for('exercise_edit', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-secondary">
+                                <a href="{{ url_for('exercise_edit', exercise_id=exercise.id) }}" class="btn btn-sm btn-outline-secondary" title="Modifier l'exercice">
                                     <i data-feather="edit"></i>
                                 </a>
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#renameExerciseModal{{ exercise.id }}" title="Renommer l'exercice">
+                                    <i data-feather="edit-2"></i>
+                                </button>
                                 <form action="{{ url_for('exercise_close', exercise_id=exercise.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir clôturer cet exercice ? Cette action est irréversible.');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Clôturer l'exercice">
                                         <i data-feather="lock"></i>
                                     </button>
                                 </form>
                                 <form action="{{ url_for('delete_exercise', exercise_id=exercise.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet exercice ? Cette action est irréversible.');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer l'exercice">
                                         <i data-feather="trash"></i>
                                     </button>
                                 </form>
                                 <form action="{{ url_for('publish_exercise', exercise_id=exercise.id) }}" method="POST" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Partager l'exercice">
                                         <i data-feather="share-2"></i>
                                     </button>
                                 </form>
                                 {% endif %}
+                            </div>
+                            
+                            <!-- Modal pour renommer l'exercice -->
+                            <div class="modal fade" id="renameExerciseModal{{ exercise.id }}" tabindex="-1" aria-labelledby="renameExerciseModalLabel{{ exercise.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="renameExerciseModalLabel{{ exercise.id }}">Renommer l'exercice</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{ url_for('exercise_rename', exercise_id=exercise.id) }}" method="POST">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="exerciseName{{ exercise.id }}" class="form-label">Nouveau nom</label>
+                                                    <input type="text" class="form-control" id="exerciseName{{ exercise.id }}" name="name" value="{{ exercise.name }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
