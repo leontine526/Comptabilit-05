@@ -22,13 +22,12 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_timeout": 10
 }
 
+# Initialiser SQLAlchemy
+db = SQLAlchemy(app)
+
 # Assurez-vous que la configuration est définie avant d'initialiser l'application
 if not app.config.get("SQLALCHEMY_DATABASE_URI"):
     raise RuntimeError("La configuration SQLALCHEMY_DATABASE_URI n'est pas définie!")
-
-# Initialiser la base de données
-from app import db
-db.init_app(app)
 
 # Configurer le gestionnaire de connexion
 login_manager = LoginManager()
