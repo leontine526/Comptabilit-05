@@ -63,3 +63,9 @@ spacy
 sqlalchemy
 werkzeug
 xlsxwriter
+flask-wtf
+flask-login
+flask-sqlalchemy
+eventlet
+sqlalchemy
+pymysql
