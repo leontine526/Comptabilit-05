@@ -139,12 +139,11 @@ login_manager.login_view = 'login'
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
 login_manager.login_message_category = "warning"
 
-# Importer le modèle d'utilisateur après l'initialisation de db pour éviter les imports circulaires
-from models import User
-
 @login_manager.user_loader
 def load_user(user_id):
     try:
+        # Import local pour éviter l'import circulaire
+        from models import User
         return User.query.get(int(user_id))
     except Exception as e:
         logger.error(f"Erreur lors du chargement de l'utilisateur: {str(e)}")
