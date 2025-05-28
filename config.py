@@ -5,7 +5,7 @@ class Config:
     """Base configuration"""
     SECRET_KEY = os.environ.get("SESSION_SECRET", "ohada_comptabilit_secret_key")
     # Nouvelle configuration pour Neon PostgreSQL
-    database_url = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_APBmGjkT0y1H@ep-rough-truth-a5ntheq6-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require")
+    database_url = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_kOmlE4KW5tJw@ep-twilight-boat-a89ewfq2-pooler.eastus2.azure.neon.tech/neondb?sslmode=require")
     
     # Ajouter des paramètres de connexion optimisés si nécessaire
     if "?" not in database_url:

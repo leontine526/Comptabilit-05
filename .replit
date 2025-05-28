@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrage SQLite"
+runButton = "Démarrage Neon DB"
 
 [[workflows.workflow]]
 name = "Démarrage Robuste"
@@ -47,6 +47,24 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python start_sqlite_direct.py"
+
+[[workflows.workflow]]
+name = "Initialiser Nouvelle DB"
+author = 43234391
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python init_new_neon_db.py"
+
+[[workflows.workflow]]
+name = "Démarrage Neon DB"
+author = 43234391
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python init_new_neon_db.py && python main.py"
 
 [[ports]]
 localPort = 5000
