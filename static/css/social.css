@@ -474,3 +474,42 @@
     color: #65676B;
     display: block;
 }
+
+/* Styles pour les messages privés */
+.messages-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Bouton d'envoi de message */
+#message-form .input-group button[type="submit"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#message-form .input-group button[type="submit"]:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+}
+
+#message-form .input-group button[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* S'assurer que le bouton est toujours visible */
+.input-group {
+    display: flex !important;
+}
+
+.input-group button {
+    flex-shrink: 0 !important;
+    z-index: 10;
+}
