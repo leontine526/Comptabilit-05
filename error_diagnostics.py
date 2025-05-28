@@ -268,8 +268,10 @@ class ErrorDiagnostics:
                     self.error_count += 1
                     self.error_summary["logging"].append(error_msg)
                     self.issues_found.append("Format de logging incorrect dans app.py")
-                else:
+                elif "%(message)s" in content:
                     logger.info("✅ Format de logging correct dans app.py")
+                else:
+                    logger.warning("⚠️ Format de logging non détecté dans app.py")
                 
                 # Vérifier la création du dossier de logs
                 if "os.makedirs" in content and "logs" in content:

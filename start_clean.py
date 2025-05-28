@@ -47,12 +47,16 @@ def start_application():
         logger.info("Arrêt demandé par l'utilisateur")
     except Exception as e:
         logger.error(f"Erreur de démarrage: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         logger.info("Tentative avec start_simple.py...")
         try:
             import start_simple
             start_simple.start_app_with_retry()
         except Exception as fallback_error:
             logger.error(f"Échec du fallback: {fallback_error}")
+            import traceback
+            logger.error(traceback.format_exc())
             sys.exit(1)
 
 if __name__ == "__main__":

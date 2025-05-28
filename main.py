@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 """
 Point d'entrée principal pour l'application SmartOHADA
@@ -7,7 +6,7 @@ import os
 import sys
 import logging
 
-# Configuration du logging AVANT toute utilisation
+# Configuration du logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -18,18 +17,18 @@ def main():
     """Fonction principale de démarrage"""
     try:
         logger.info("Démarrage de l'application SmartOHADA...")
-        
+
         # Importer l'application depuis app.py
         from app import app, socketio
-        
+
         # Importer les routes après avoir créé l'application
         import routes
-        
+
         # Obtenir le port depuis l'environnement
         port = int(os.environ.get('PORT', 5000))
-        
+
         logger.info(f"Démarrage de SmartOHADA sur le port {port}")
-        
+
         # Démarrer l'application avec SocketIO
         socketio.run(
             app,
@@ -38,7 +37,7 @@ def main():
             debug=True,
             allow_unsafe_werkzeug=True
         )
-        
+
     except ImportError as e:
         logger.error(f"Erreur d'importation: {e}")
         sys.exit(1)
