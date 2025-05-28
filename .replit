@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Redémarrer Application Corrigée"
+runButton = "Démarrage Propre"
 
 [[workflows.workflow]]
 name = "Diagnostic des Erreurs Complet"
@@ -163,6 +163,15 @@ args = "python check_requirements.py"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python start_simple.py"
+
+[[workflows.workflow]]
+name = "Démarrage Propre"
+author = 43114514
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_clean.py"
 
 [[ports]]
 localPort = 5000
