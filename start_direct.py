@@ -22,7 +22,7 @@ def main():
     
     try:
         print("Importation de l'application...")
-        from app import app, socketio
+        from app_sqlite import app, socketio
         
         print("Importation des routes...")
         import routes

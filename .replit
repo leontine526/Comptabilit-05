@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrage Direct"
+runButton = "Démarrage SQLite"
 
 [[workflows.workflow]]
 name = "Démarrage Robuste"
@@ -38,6 +38,15 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python start_direct.py"
+
+[[workflows.workflow]]
+name = "Démarrage SQLite"
+author = 43114514
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_sqlite_direct.py"
 
 [[ports]]
 localPort = 5000

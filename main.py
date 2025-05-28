@@ -20,7 +20,7 @@ def main():
         logger.info("Démarrage de l'application SmartOHADA...")
 
         # Importer l'application depuis app.py
-        from app import app, socketio
+        from app_sqlite import app, socketio
 
         # Importer les routes après avoir créé l'application
         import routes

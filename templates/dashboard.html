@@ -225,3 +225,105 @@
   });
 </script>
 {% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord - SmartOHADA{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <h2>Tableau de bord</h2>
+            <p class="text-muted">Bienvenue {{ current_user.full_name }}</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-book"></i> Mes Exercices
+                    </h5>
+                    <p class="card-text">Gérez vos exercices comptables</p>
+                    <span class="badge badge-primary">{{ exercises|length }} exercice(s)</span>
+                    <div class="mt-3">
+                        <a href="{{ url_for('exercises') }}" class="btn btn-primary btn-sm">
+                            Voir tous
+                        </a>
+                        <a href="{{ url_for('new_exercise') }}" class="btn btn-success btn-sm">
+                            Nouveau
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> À propos
+                    </h5>
+                    <p class="card-text">En savoir plus sur SmartOHADA</p>
+                    <a href="{{ url_for('about') }}" class="btn btn-info btn-sm">
+                        En savoir plus
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-heart"></i> État de l'application
+                    </h5>
+                    <p class="card-text">Vérifier l'état du système</p>
+                    <a href="{{ url_for('health_check') }}" class="btn btn-warning btn-sm">
+                        Vérifier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if exercises %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4>Exercices récents</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Période</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exercise in exercises[:5] %}
+                        <tr>
+                            <td>{{ exercise.name }}</td>
+                            <td>{{ exercise.start_date }} - {{ exercise.end_date }}</td>
+                            <td>
+                                {% if exercise.is_closed %}
+                                    <span class="badge badge-secondary">Fermé</span>
+                                {% else %}
+                                    <span class="badge badge-success">Ouvert</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Voir</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
