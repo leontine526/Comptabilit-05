@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrage Neon DB"
+runButton = "Démarrage Neon"
 
 [[workflows.workflow]]
 name = "Démarrage Robuste"
@@ -65,6 +65,15 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python init_new_neon_db.py && python main.py"
+
+[[workflows.workflow]]
+name = "Démarrage Neon"
+author = 43234391
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_neon_app.py"
 
 [[ports]]
 localPort = 5000
