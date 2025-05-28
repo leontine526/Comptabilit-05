@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 def main():
     """Fonction principale de démarrage"""
     try:
-        logger.info("Démarrage de l'application SmartOHADA...")
-        
         # Importer l'application depuis app.py
         from app import app, socketio
+        
+        logger.info("Démarrage de l'application SmartOHADA...")
         
         # Importer les routes après avoir créé l'application
         import routes
