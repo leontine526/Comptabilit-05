@@ -5,6 +5,7 @@ Point d'entrée principal pour l'application SmartOHADA
 import os
 import sys
 import logging
+import traceback
 
 # Configuration du logging
 logging.basicConfig(
@@ -40,9 +41,11 @@ def main():
 
     except ImportError as e:
         logger.error(f"Erreur d'importation: {e}")
+        logger.error(traceback.format_exc())
         sys.exit(1)
     except Exception as e:
         logger.error(f"Erreur de démarrage: {e}")
+        logger.error(traceback.format_exc())
         sys.exit(1)
 
 if __name__ == "__main__":

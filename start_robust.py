@@ -90,6 +90,9 @@ def start_application():
         except Exception as e:
             logger.error(f"Erreur avec main.py: {e}")
             logger.error(traceback.format_exc())
+            # Si c'est une erreur de logger, on essaie de la corriger
+            if "logger" in str(e) and "not defined" in str(e):
+                logger.error("Erreur de logger détectée dans main.py")
         
         # Fallback avec start_simple.py
         logger.info("Tentative de démarrage avec start_simple.py...")

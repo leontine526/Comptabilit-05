@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrage Robuste"
+runButton = "Démarrage Direct"
 
 [[workflows.workflow]]
 name = "Démarrage Robuste"
@@ -29,6 +29,15 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python start_robust.py"
+
+[[workflows.workflow]]
+name = "Démarrage Direct"
+author = 43114514
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_direct.py"
 
 [[ports]]
 localPort = 5000
