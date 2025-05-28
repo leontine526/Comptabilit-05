@@ -66,7 +66,7 @@ def health_check():
     import psutil
     import platform
     import sys
-    
+
     # Vérifier la connexion à la base de données
     db_start_time = time.time()
     try:
@@ -78,11 +78,11 @@ def health_check():
     except Exception as e:
         db_status = f"error: {str(e)}"
         db_response_time = -1
-    
+
     # Collecter des métriques système
     memory = psutil.virtual_memory()
     disk = psutil.disk_usage('/')
-    
+
     # Collecter les informations du système
     system_info = {
         "platform": platform.platform(),
@@ -90,7 +90,7 @@ def health_check():
         "cpu_count": psutil.cpu_count(),
         "uptime_seconds": int(time.time() - psutil.boot_time())
     }
-    
+
     # Collecter les métriques du processus
     process = psutil.Process(os.getpid())
     process_metrics = {
@@ -100,7 +100,7 @@ def health_check():
         "open_files": len(process.open_files()),
         "connections": len(process.connections())
     }
-    
+
     # Retourner un statut JSON détaillé
     response = {
         "status": "online" if db_status == "ok" else "degraded",
@@ -118,11 +118,11 @@ def health_check():
         "process": process_metrics,
         "info": system_info
     }
-    
+
     # Si le statut est dégradé, logger un avertissement
     if response["status"] != "online":
         logger.warning(f"État de santé dégradé: {response}")
-    
+
     return jsonify(response)
 
 # About route
@@ -141,7 +141,7 @@ def welcome():
 def resoudre_exercice():
     # Récupérer le dernier exercice créé par l'utilisateur
     exercise_id = request.args.get('exercise_id')
-    
+
     if exercise_id:
         # Si un ID d'exercice est fourni, utiliser cet exercice
         current_exercise = Exercise.query.get_or_404(int(exercise_id))
@@ -152,12 +152,12 @@ def resoudre_exercice():
         current_exercise = Exercise.query.filter_by(
             user_id=current_user.id
         ).order_by(Exercise.created_at.desc()).first()
-    
+
     # Si aucun exercice n'existe, rediriger vers la création d'exercice
     if not current_exercise:
         flash("Veuillez d'abord créer un exercice comptable.", "warning")
         return redirect(url_for('exercise_new'))
-    
+
     # Vérifier si l'exercice est déjà résolu
     latest_solution = current_exercise.get_latest_solution()
     if latest_solution and request.method == 'GET':
@@ -165,7 +165,7 @@ def resoudre_exercice():
         try:
             # Charger les données de solution
             solution_text = latest_solution.solution_text
-            
+
             # Récupérer les données des documents (supposons qu'ils sont stockés dans la solution)
             # Cette partie pourrait nécessiter des ajustements selon votre implémentation
             documents = {
@@ -173,7 +173,7 @@ def resoudre_exercice():
                 'grand_livre': None,
                 'bilan': None
             }
-            
+
             # Essayer de parser les données JSON si disponibles
             try:
                 import json
@@ -186,7 +186,7 @@ def resoudre_exercice():
                     }
             except:
                 pass
-            
+
             return render_template(
                 'exercise_solver/complete_solution.html',
                 solution=solution_text,
@@ -199,29 +199,29 @@ def resoudre_exercice():
         except Exception as e:
             logger.error(f"Erreur lors de l'affichage de la solution existante: {str(e)}\n{traceback.format_exc()}")
             # En cas d'erreur, continuer avec le formulaire normal
-    
+
     if request.method == 'POST':
         try:
             enonce = request.form.get('enonce')
             exercise_id = request.form.get('exercise_id', current_exercise.id if current_exercise else None)
-            
+
             if not exercise_id:
                 flash("Aucun exercice trouvé. Veuillez d'abord créer un exercice.", "warning")
                 return redirect(url_for('exercise_new'))
-            
+
             if not enonce:
                 flash("Veuillez saisir un énoncé pour résoudre l'exercice.", "warning")
                 return redirect(url_for('resoudre_exercice'))
-            
+
             # Utiliser le module exercise_resolution pour générer la solution complète
             result = resolve_exercise_completely(int(exercise_id), enonce)
-            
+
             if result['success']:
                 # S'assurer que solution_text est une chaîne de caractères
                 solution_text = result['solution']
                 if isinstance(solution_text, dict):
                     solution_text = json.dumps(solution_text, ensure_ascii=False)
-                
+
                 # Créer une entrée de solution dans la base de données pour l'historique
                 solution_entry = ExerciseSolution(
                     title=f"Résolution de {current_exercise.name}",
@@ -233,7 +233,7 @@ def resoudre_exercice():
                 )
                 db.session.add(solution_entry)
                 db.session.commit()
-                
+
                 flash("Exercice résolu avec succès!", "success")
                 return render_template(
                     'exercise_solver/complete_solution.html',
@@ -253,7 +253,7 @@ def resoudre_exercice():
         except Exception as e:
             flash(f"Une erreur est survenue lors du traitement: {str(e)}", "danger")
             logger.error(f"Erreur dans resoudre_exercice: {str(e)}\n{traceback.format_exc()}")
-            
+
     return render_template(
         'formulaire.html', 
         exercise=current_exercise,
@@ -334,13 +334,13 @@ def register():
                 logger.warning("Inscription échouée: les mots de passe ne correspondent pas")
                 flash("Les mots de passe ne correspondent pas.", "danger")
                 return render_template('auth/register.html', title='Inscription', form=form)
-                
+
             # Vérifier la longueur minimale du mot de passe
             if len(form.password.data) < 6:
                 logger.warning("Inscription échouée: mot de passe trop court")
                 flash("Le mot de passe doit contenir au moins 6 caractères.", "danger")
                 return render_template('auth/register.html', title='Inscription', form=form)
-                
+
             user = User(
                 username=form.username.data,
                 email=form.email.data,
@@ -369,11 +369,11 @@ def register():
             db.session.add(user)
             db.session.commit()
             logger.info(f"Nouvel utilisateur créé avec succès: {user.username} (ID: {user.id})")
-            
+
             # Connecter automatiquement l'utilisateur
             login_user(user)
             logger.info(f"Utilisateur connecté automatiquement: {user.username}")
-            
+
             flash('Votre compte a été créé avec succès! Bienvenue sur SmartOHADA.', 'success')
             logger.info(f"Redirection vers le tableau de bord pour: {user.username}")
             return redirect(url_for('dashboard'))
@@ -386,7 +386,7 @@ def register():
     # Si on arrive ici, soit c'est une requête GET, soit le formulaire n'est pas valide
     if request.method == 'POST' and not form.validate():
         logger.warning(f"Formulaire d'inscription invalide. Erreurs: {form.errors}")
-        
+
     return render_template('auth/register.html', title='Inscription', form=form)
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -516,11 +516,11 @@ def exercises_list():
 @login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    
+
     # Vérifier que l'utilisateur a les droits
     if exercise.user_id != current_user.id:
         abort(403)
-    
+
     # Rediriger directement vers la résolution complète de l'exercice
     return redirect(url_for('resoudre_exercice'))
 
@@ -611,27 +611,27 @@ def delete_exercise(exercise_id):
 @login_required
 def exercise_rename(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    
+
     # Check if user has permission
     if exercise.user_id != current_user.id:
         abort(403)
-    
+
     # Check if exercise is closed
     if exercise.is_closed:
         flash('Impossible de renommer un exercice clôturé.', 'danger')
         return redirect(url_for('exercises_list'))
-    
+
     # Get new name from form
     new_name = request.form.get('name', '').strip()
-    
+
     if not new_name:
         flash('Le nom de l\'exercice ne peut pas être vide.', 'danger')
         return redirect(url_for('exercises_list'))
-    
+
     # Update exercise name
     exercise.name = new_name
     db.session.commit()
-    
+
     flash('Exercice renommé avec succès!', 'success')
     return redirect(url_for('exercises_list'))
 
@@ -797,21 +797,21 @@ def transactions_list(exercise_id):
 def transaction_new(exercise_id):
     """Création d'une nouvelle transaction"""
     exercise = Exercise.query.get_or_404(exercise_id)
-    
+
     # Check if user has permission
     if exercise.user_id != current_user.id:
         abort(403)
-        
+
     # Check if exercise is closed
     if exercise.is_closed:
         flash('Impossible de créer une transaction sur un exercice clôturé.', 'danger')
         return redirect(url_for('transactions_list', exercise_id=exercise_id))
-        
+
     form = TransactionForm()
-    
+
     # Setup transaction items
     form.setup_transaction_items()
-    
+
     if form.validate_on_submit():
         transaction = Transaction(
             reference=form.reference.data,
@@ -821,10 +821,10 @@ def transaction_new(exercise_id):
             exercise_id=exercise_id,
             user_id=current_user.id
         )
-        
+
         db.session.add(transaction)
         db.session.commit()
-        
+
         # Add items
         for item in form.items:
             if item.account_id.data and (item.debit_amount.data > 0 or item.credit_amount.data > 0):
@@ -836,15 +836,15 @@ def transaction_new(exercise_id):
                     credit_amount=item.credit_amount.data or 0
                 )
                 db.session.add(transaction_item)
-                
+
         db.session.commit()
-        
+
         flash('Transaction créée avec succès!', 'success')
         return redirect(url_for('transactions_list', exercise_id=exercise_id))
-        
+
     # Load accounts for dropdown
     accounts = Account.query.filter_by(exercise_id=exercise_id, is_active=True).order_by(Account.account_number).all()
-    
+
     return render_template('transactions/form.html', title='Nouvelle transaction', form=form, exercise=exercise, accounts=accounts)
 
 @app.route('/transactions/<int:transaction_id>/edit', methods=['GET', 'POST'])
@@ -1398,14 +1398,14 @@ def exercise_solution_view(solution_id):
 def delete_exercise_solution(solution_id):
     """Supprimer une solution d'exercice"""
     solution = ExerciseSolution.query.get_or_404(solution_id)
-    
+
     # Vérifier que l'utilisateur a le droit de supprimer cette solution
     if solution.user_id != current_user.id:
         abort(403)
-        
+
     db.session.delete(solution)
     db.session.commit()
-    
+
     flash('Solution supprimée avec succès!', 'success')
     return redirect(url_for('exercise_solutions_list'))
 
@@ -1414,11 +1414,11 @@ def delete_exercise_solution(solution_id):
 def publish_exercise_solution(solution_id):
     """Publier une solution d'exercice dans le fil social"""
     solution = ExerciseSolution.query.get_or_404(solution_id)
-    
+
     # Vérifier que l'utilisateur a le droit de publier cette solution
     if solution.user_id != current_user.id:
         abort(403)
-    
+
     # Créer un post social avec la solution
     try:
         post = Post(
@@ -1427,7 +1427,7 @@ def publish_exercise_solution(solution_id):
         )
         db.session.add(post)
         db.session.commit()
-        
+
         flash('Solution publiée avec succès sur votre fil social!', 'success')
         return redirect(url_for('feed'))
     except Exception as e:
@@ -2129,15 +2129,15 @@ def log_client_error():
         error_data = request.json
         if not error_data:
             return jsonify({'success': False, 'error': 'Aucune donnée fournie'}), 400
-            
+
         # Enrichir les données d'erreur
         error_data['timestamp'] = datetime.utcnow().isoformat()
         error_data['user_id'] = current_user.id if not current_user.is_anonymous else None
         error_data['ip_address'] = request.remote_addr
-        
+
         # Journaliser l'erreur
         logger.error(f"Erreur client: {json.dumps(error_data)}")
-        
+
         # Enregistrer dans un fichier dédié
         try:
             os.makedirs('logs', exist_ok=True)
@@ -2145,7 +2145,7 @@ def log_client_error():
                 f.write(json.dumps(error_data) + '\n')
         except Exception as e:
             logger.error(f"Impossible d'écrire l'erreur client dans le fichier: {str(e)}")
-        
+
         return jsonify({'success': True}), 200
     except Exception as e:
         logger.error(f"Erreur lors de la journalisation de l'erreur client: {str(e)}")
@@ -2163,12 +2163,12 @@ def get_first_exercise():
             result = db.session.execute(stmt)
             exercise = result.scalar_one_or_none()  # Récupère un seul résultat ou None
             return exercise
-            
+
         exercise = fetch_first_exercise()
         if exercise:
             return jsonify({'success': True, 'exercise_id': exercise.id}), 200
         return jsonify({'success': False, 'error': 'Aucun exercice trouvé'}), 404
-        
+
     except Exception as e:
         logger.error(f"Erreur lors de la récupération du premier exercice: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -2177,7 +2177,7 @@ def get_first_exercise():
 @login_required
 def advanced_search():
     """Recherche avancée avec filtres"""
-    
+
     # Récupérer les filtres depuis le formulaire ou les paramètres GET
     filters = {}
     if request.method == 'POST':
@@ -2200,7 +2200,7 @@ def advanced_search():
             'user_id': request.args.get('user_id'),
             'workgroup_id': request.args.get('workgroup_id')
         }
-    
+
     # Construction des requêtes selon les filtres
     results = {
         'users': [],
@@ -2209,11 +2209,11 @@ def advanced_search():
         'events': [],
         'exercises': []
     }
-    
+
     # Recherche active seulement si des mots-clés sont fournis
     if filters.get('keywords'):
         keywords = filters['keywords'].split()
-        
+
         # Construire les conditions de recherche
         date_filter = []
         if filters.get('date_from'):
@@ -2222,14 +2222,14 @@ def advanced_search():
                 date_filter.append(Post.created_at >= date_from)
             except:
                 pass
-                
+
         if filters.get('date_to'):
             try:
                 date_to = datetime.strptime(filters['date_to'], '%Y-%m-%d')
                 date_filter.append(Post.created_at <= date_to)
             except:
                 pass
-        
+
         # Recherche selon le type
         if filters['type'] == 'all' or filters['type'] == 'users':
             # Construction de la requête pour les utilisateurs
@@ -2244,33 +2244,33 @@ def advanced_search():
                     )
                 )
             results['users'] = user_query.all()
-        
+
         if filters['type'] == 'all' or filters['type'] == 'posts':
             # Construction de la requête pour les publications
             post_query = Post.query
             for keyword in keywords:
                 post_query = post_query.filter(Post.content.ilike(f'%{keyword}%'))
-                
+
             # Appliquer les filtres de date
             for date_condition in date_filter:
                 post_query = post_query.filter(date_condition)
-                
+
             # Filtrer par utilisateur si spécifié
             if filters.get('user_id'):
                 post_query = post_query.filter(Post.user_id == int(filters['user_id']))
-                
+
             # Filtrer par groupe si spécifié
             if filters.get('workgroup_id'):
                 post_query = post_query.filter(Post.workgroup_id == int(filters['workgroup_id']))
-                
+
             results['posts'] = post_query.order_by(Post.created_at.desc()).all()
-            
+
         # Autres types de recherche (workgroups, events, exercises) selon les mêmes principes
         # ...
-    
+
     # Préparation des données pour le formulaire
     workgroups = current_user.workgroups.all()
-    
+
     return render_template(
         'social/advanced_search.html',
         title='Recherche avancée',
