@@ -39,8 +39,9 @@ def start_application():
     try:
         logger.info("Démarrage de l'application...")
         
-        # Exécuter main.py directement
-        exec(open('main.py').read())
+        # Import direct au lieu d'exec
+        import main
+        main.main()
         
     except KeyboardInterrupt:
         logger.info("Arrêt demandé par l'utilisateur")
@@ -48,7 +49,8 @@ def start_application():
         logger.error(f"Erreur de démarrage: {e}")
         logger.info("Tentative avec start_simple.py...")
         try:
-            exec(open('start_simple.py').read())
+            import start_simple
+            start_simple.start_app_with_retry()
         except Exception as fallback_error:
             logger.error(f"Échec du fallback: {fallback_error}")
             sys.exit(1)
