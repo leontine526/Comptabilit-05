@@ -3,6 +3,13 @@ import uuid
 import logging
 import xlsxwriter
 import traceback
+
+# Configurez le logger
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 from flask import render_template, request, redirect, url_for, flash, abort, send_file, jsonify, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename

@@ -69,3 +69,5 @@ flask-sqlalchemy
 eventlet
 sqlalchemy
 pymysql
+PyMuPDF
+PyMuPDF
