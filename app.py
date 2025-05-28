@@ -159,12 +159,6 @@ def load_user(user_id):
 # def welcome():
 #     return render_template('welcome.html', title="Bienvenue")
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "ohada_comptabilite_secret_key")
-# app = Flask(__name__, static_folder='static', template_folder='templates')
-# app.config.from_object(Config)
-# app.jinja_env.filters['format_amount'] = lambda amount: "${:,.2f}".format(amount)
-
 # Ajouter un filtre pour convertir les retours à la ligne en balises <br>
 def nl2br(value):
     if value:

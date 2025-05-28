@@ -40,15 +40,12 @@ def start_application():
     try:
         logger.info("Démarrage de l'application...")
         
-        # Initialiser la base de données si nécessaire
-        try:
-            subprocess.run([sys.executable, "db_initialize.py"], check=False)
-        except Exception as e:
-            logger.warning(f"Problème d'initialisation DB: {e}")
-        
-        # Démarrer avec main.py
+        # Démarrer directement avec main.py (l'initialisation DB se fait dans app.py)
         logger.info("Démarrage via main.py...")
-        subprocess.run([sys.executable, "main.py"])
+        
+        # Utiliser exec au lieu de subprocess pour éviter les problèmes de sous-processus
+        import main
+        main.main()
         
     except KeyboardInterrupt:
         logger.info("Arrêt demandé par l'utilisateur")
@@ -56,7 +53,12 @@ def start_application():
         logger.error(f"Erreur de démarrage: {e}")
         # Essayer avec start_simple.py en fallback
         logger.info("Tentative avec start_simple.py...")
-        subprocess.run([sys.executable, "start_simple.py"])
+        try:
+            import start_simple
+            start_simple.start_app_with_retry()
+        except Exception as fallback_error:
+            logger.error(f"Échec du fallback: {fallback_error}")
+            sys.exit(1)
 
 if __name__ == "__main__":
     print("=== DÉMARRAGE PROPRE SMARTOHADA ===")
