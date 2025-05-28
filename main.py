@@ -1,61 +1,48 @@
 
+#!/usr/bin/env python
+"""
+Point d'entrée principal pour l'application SmartOHADA
+"""
 import os
-from flask import Flask, render_template, request, redirect, url_for
-from flask_login import LoginManager, current_user, login_required
-from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_sqlalchemy import SQLAlchemy
+import sys
+import logging
 
-# Créer l'application Flask
-app = Flask(__name__)
-app.secret_key = "ohada_comptabilite_secret_key"
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+# Configuration du logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-# Configuration de la base de données
-database_uri = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_Crwao4WUkt5f@ep-spring-pond-a5upovj4-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require")
-app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_size": 10,
-    "pool_recycle": 60,
-    "pool_pre_ping": True,
-    "max_overflow": 15,
-    "pool_timeout": 10
-}
-
-# Initialiser SQLAlchemy
-db = SQLAlchemy(app)
-
-# Assurez-vous que la configuration est définie avant d'initialiser l'application
-if not app.config.get("SQLALCHEMY_DATABASE_URI"):
-    raise RuntimeError("La configuration SQLALCHEMY_DATABASE_URI n'est pas définie!")
-
-# Configurer le gestionnaire de connexion
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
-login_manager.login_message_category = "warning"
-
-@login_manager.user_loader
-def load_user(user_id):
+def main():
+    """Fonction principale de démarrage"""
     try:
-        # Import local pour éviter l'import circulaire
-        from models import User
-        return User.query.get(int(user_id))
+        # Importer l'application depuis app.py
+        from app import app, socketio
+        
+        # Importer les routes après avoir créé l'application
+        import routes
+        
+        # Obtenir le port depuis l'environnement
+        port = int(os.environ.get('PORT', 5000))
+        
+        logger.info(f"Démarrage de SmartOHADA sur le port {port}")
+        
+        # Démarrer l'application avec SocketIO
+        socketio.run(
+            app,
+            host='0.0.0.0',
+            port=port,
+            debug=True,
+            allow_unsafe_werkzeug=True
+        )
+        
+    except ImportError as e:
+        logger.error(f"Erreur d'importation: {e}")
+        sys.exit(1)
     except Exception as e:
-        print(f"Erreur lors du chargement de l'utilisateur: {str(e)}")
-        return None
+        logger.error(f"Erreur de démarrage: {e}")
+        sys.exit(1)
 
-# Ajouter un filtre pour convertir les retours à la ligne en balises <br>
-@app.template_filter('nl2br')
-def nl2br(value):
-    if value:
-        return value.replace('\n', '<br>')
-    return value
-
-# Importer les routes
-from routes import *
-
-# Démarrer l'application
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    main()
