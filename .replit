@@ -21,6 +21,15 @@ mode = "sequential"
 task = "shell.exec"
 args = "python start_robust.py"
 
+[[workflows.workflow]]
+name = "Démarrage Robuste"
+author = 43114514
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_robust.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
