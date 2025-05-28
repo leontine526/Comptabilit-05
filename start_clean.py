@@ -6,7 +6,6 @@ Script de démarrage propre pour SmartOHADA
 import os
 import sys
 import logging
-import subprocess
 
 # Configuration du logging
 logging.basicConfig(
@@ -40,22 +39,16 @@ def start_application():
     try:
         logger.info("Démarrage de l'application...")
         
-        # Démarrer directement avec main.py (l'initialisation DB se fait dans app.py)
-        logger.info("Démarrage via main.py...")
-        
-        # Utiliser exec au lieu de subprocess pour éviter les problèmes de sous-processus
-        import main
-        main.main()
+        # Exécuter main.py directement
+        exec(open('main.py').read())
         
     except KeyboardInterrupt:
         logger.info("Arrêt demandé par l'utilisateur")
     except Exception as e:
         logger.error(f"Erreur de démarrage: {e}")
-        # Essayer avec start_simple.py en fallback
         logger.info("Tentative avec start_simple.py...")
         try:
-            import start_simple
-            start_simple.start_app_with_retry()
+            exec(open('start_simple.py').read())
         except Exception as fallback_error:
             logger.error(f"Échec du fallback: {fallback_error}")
             sys.exit(1)
