@@ -39,6 +39,11 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "ohada_comptabilite_secret_key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # Pour la génération d'URL avec https
 
+# Configuration pour résoudre les problèmes de cookies
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False  # False pour le développement
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+
 # Configurer la base de données
 database_uri = os.environ.get("DATABASE_URL")
 if not database_uri:
@@ -83,6 +88,15 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 
 # Initialiser les extensions
 db.init_app(app)
+
+# Appliquer le fix pour les sessions
+try:
+    from session_fix import CompatibleSessionInterface
+    app.session_interface = CompatibleSessionInterface()
+    logger.info("Fix de session appliqué avec succès")
+except Exception as e:
+    logger.warning(f"Impossible d'appliquer le fix de session: {str(e)}")
+    pass
 
 # Configurer les hooks pour gérer automatiquement les transactions avortées
 @app.teardown_request
