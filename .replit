@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrage Sécurisé"
+runButton = "Démarrage Minimal"
 
 [[workflows.workflow]]
 name = "Démarrage Robuste"
@@ -105,6 +105,15 @@ args = "python install_all_dependencies.py"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python verify_dependencies.py"
+
+[[workflows.workflow]]
+name = "Démarrage Minimal"
+author = 43348398
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_minimal.py"
 
 [[ports]]
 localPort = 5000
