@@ -49,7 +49,9 @@ def check_and_install_modules():
         "pdfkit",
         "pytesseract",
         "nltk",
-        "spacy"
+        "spacy",
+        "numpy",
+        "fitz"
     ]
 
     # Compter combien de modules sont manquants
@@ -64,9 +66,13 @@ def check_and_install_modules():
 
     # Installer les modules manquants
     if missing_modules:
-        logger.info(f"{len(missing_modules)} modules manquants trouvés")
+        logger.info(f"{len(missing_modules)} modules manquants trouvés: {', '.join(missing_modules)}")
         for module in missing_modules:
-            install_module(module)
+            # Mapping spécial pour certains modules
+            if module == "fitz":
+                install_module("PyMuPDF")
+            else:
+                install_module(module)
     else:
         logger.info("Tous les modules requis sont déjà installés")
 

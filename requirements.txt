@@ -39,3 +39,8 @@ psutil
 xlsxwriter
 
 pymongo
+fitz
+numpy
+opencv-python
+PyMuPDF
+python-dotenv
