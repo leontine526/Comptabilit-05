@@ -51,3 +51,4 @@ flask-sqlalchemy
 numpy
 python-dotenv
 scikit-learn
+eventlet
