@@ -42,10 +42,24 @@ except ImportError:
 try:
     # Essayer d'importer le module original
     from exercise_solver import solver, save_example_pdf
-except ImportError:
+except ImportError as e:
     # Utiliser la version simplifiée en cas d'erreur
-    from exercise_solver_dummy import solver, save_example_pdf
-    logger.warning("Utilisation de la version simplifiée du solveur d'exercices")
+    logger.warning(f"Erreur import exercise_solver: {str(e)}")
+    try:
+        from exercise_solver_dummy import solver, save_example_pdf
+        logger.warning("Utilisation de la version simplifiée du solveur d'exercices")
+    except ImportError:
+        # Créer des fonctions factices si même la version dummy n'est pas disponible
+        class DummySolver:
+            def solve_exercise(self, text):
+                return {'success': False, 'message': 'Solveur non disponible'}
+            def load_examples(self):
+                pass
+                
+        solver = DummySolver()
+        def save_example_pdf(*args, **kwargs):
+            return False
+        logger.warning("Utilisation d'un solveur d'exercices factice")
 from exercise_resolution import resolve_exercise_completely
 from models import ExerciseExample, ExerciseSolution
 import json

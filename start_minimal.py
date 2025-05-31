@@ -35,46 +35,60 @@ def check_critical_imports():
 
 def create_dummy_modules():
     """Crée des modules factices pour les dépendances optionnelles manquantes"""
+    import sys
+    import types
     
-    # Module factice pour fitz/PyMuPDF
-    fitz_dummy = """
-class fitz:
-    @staticmethod
-    def open(*args, **kwargs):
-        raise ImportError("PyMuPDF non disponible - fonctionnalité PDF désactivée")
-    
-    class Document:
-        def __init__(self):
-            pass
-"""
-    
-    # Module factice pour eventlet
-    eventlet_dummy = """
-import threading
-import time
-
-class eventlet:
-    @staticmethod
-    def sleep(seconds):
-        time.sleep(seconds)
-    
-    @staticmethod  
-    def spawn(func, *args, **kwargs):
-        thread = threading.Thread(target=func, args=args, kwargs=kwargs)
-        thread.start()
-        return thread
-"""
-    
+    # Créer un module fitz factice complet
     try:
         import fitz
-    except ImportError:
-        exec(fitz_dummy, globals())
+        logger.info("✅ PyMuPDF disponible")
+    except ImportError as e:
+        logger.info(f"Création du module fitz factice pour: {str(e)}")
+        
+        # Créer le module frontend manquant
+        frontend_module = types.ModuleType('frontend')
+        frontend_module.__dict__.update({
+            'Document': type('Document', (), {}),
+            'Page': type('Page', (), {}),
+            'Rect': type('Rect', (), {}),
+            'Point': type('Point', (), {}),
+        })
+        sys.modules['frontend'] = frontend_module
+        
+        # Créer le module fitz factice
+        fitz_module = types.ModuleType('fitz')
+        
+        class DummyDocument:
+            def __init__(self, *args, **kwargs):
+                self.page_count = 0
+            
+            def __len__(self):
+                return 0
+            
+            def __getitem__(self, index):
+                raise IndexError("Document factice sans pages")
+            
+            def close(self):
+                pass
+        
+        fitz_module.open = lambda *args, **kwargs: DummyDocument(*args, **kwargs)
+        fitz_module.Document = DummyDocument
+        sys.modules['fitz'] = fitz_module
         logger.info("✅ Module fitz factice créé")
     
+    # Gérer eventlet
     try:
         import eventlet
+        logger.info("✅ eventlet disponible")
     except ImportError:
-        exec(eventlet_dummy, globals())
+        logger.info("Création du module eventlet factice")
+        import threading
+        import time
+        
+        eventlet_module = types.ModuleType('eventlet')
+        eventlet_module.sleep = time.sleep
+        eventlet_module.spawn = lambda func, *args, **kwargs: threading.Thread(target=func, args=args, kwargs=kwargs)
+        sys.modules['eventlet'] = eventlet_module
         logger.info("✅ Module eventlet factice créé")
 
 def main():
@@ -84,6 +98,13 @@ def main():
     # Créer les dossiers nécessaires
     for folder in ['logs', 'uploads', 'static/uploads']:
         os.makedirs(folder, exist_ok=True)
+    
+    # Corriger PyMuPDF en premier
+    try:
+        from fix_pymupdf import fix_pymupdf
+        fix_pymupdf()
+    except Exception as e:
+        logger.warning(f"Impossible d'appliquer le correctif PyMuPDF: {e}")
     
     # Vérifier les imports critiques
     if not check_critical_imports():
