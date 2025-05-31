@@ -44,3 +44,10 @@ numpy
 opencv-python
 PyMuPDF
 python-dotenv
+flask
+flask-login
+flask-socketio
+flask-sqlalchemy
+numpy
+python-dotenv
+scikit-learn

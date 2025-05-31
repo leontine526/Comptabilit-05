@@ -93,6 +93,19 @@ mode = "sequential"
 task = "shell.exec"
 args = "python start_safe.py"
 
+[[workflows.workflow]]
+name = "Installer Dépendances"
+author = 43348398
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python install_all_dependencies.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python verify_dependencies.py"
+
 [[ports]]
 localPort = 5000
 externalPort = 80

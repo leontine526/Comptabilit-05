@@ -26,18 +26,39 @@ def install_missing_package(package_name):
 def check_and_fix_imports():
     """Vérifie et corrige les importations manquantes"""
     critical_packages = {
+        "flask": "flask",
+        "flask_login": "flask-login",
+        "flask_sqlalchemy": "flask-sqlalchemy",
+        "flask_socketio": "flask-socketio",
+        "sqlalchemy": "sqlalchemy",
         "dotenv": "python-dotenv",
         "numpy": "numpy", 
-        "fitz": "PyMuPDF"
+        "sklearn": "scikit-learn",
+        "fitz": "PyMuPDF",
+        "werkzeug": "werkzeug",
+        "eventlet": "eventlet"
     }
     
+    missing_count = 0
     for module, package in critical_packages.items():
         try:
             __import__(module)
             logger.info(f"✅ Module {module} disponible")
         except ImportError:
             logger.warning(f"⚠️ Module {module} manquant, installation...")
-            install_missing_package(package)
+            if install_missing_package(package):
+                logger.info(f"✅ {module} installé avec succès")
+            else:
+                missing_count += 1
+                logger.error(f"❌ Échec installation {module}")
+    
+    if missing_count > 0:
+        logger.warning(f"⚠️ {missing_count} modules n'ont pas pu être installés automatiquement")
+        logger.info("Exécution du script d'installation complet...")
+        try:
+            subprocess.check_call([sys.executable, "install_all_dependencies.py"])
+        except Exception as e:
+            logger.error(f"Échec du script d'installation: {e}")
 
 def main():
     """Démarre l'application de manière sécurisée"""
