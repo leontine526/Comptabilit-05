@@ -10,7 +10,6 @@ psycopg2-binary==2.9.10
 pymysql
 
 python-dotenv==1.1.0
-eventlet>=0.40.0
 werkzeug>=3.1.0
 gunicorn
 
@@ -40,3 +39,4 @@ xlsxwriter
 pymongo
 fitz
 opencv-python
+eventlet==0.38.0
