@@ -10,8 +10,8 @@ psycopg2-binary==2.9.10
 pymysql
 
 python-dotenv==1.1.0
-eventlet==0.39.1
-werkzeug==2.3.8
+eventlet>=0.40.0
+werkzeug>=3.1.0
 gunicorn
 
 PyMuPDF
@@ -37,18 +37,6 @@ jinja2
 
 psutil
 xlsxwriter
-
 pymongo
 fitz
-numpy
 opencv-python
-PyMuPDF
-python-dotenv
-flask
-flask-login
-flask-socketio
-flask-sqlalchemy
-numpy
-python-dotenv
-scikit-learn
-eventlet
