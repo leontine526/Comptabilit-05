@@ -280,6 +280,8 @@ TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
                 db.session.add(exercise_solution)
                 db.session.commit()
 
+                flash("Exercice résolu avec succès!", "success")
+
                 # Rediriger vers la page de résolution complète avec les documents
                 return render_template('exercise_solver/complete_solution.html',
                                      title='Solution complète',
@@ -290,6 +292,7 @@ TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
                                      documents=documents)
             except Exception as e:
                 logger.error(f"Erreur lors de la sauvegarde: {e}")
+                flash("Solution générée sans sauvegarde en base de données.", "warning")
                 # Afficher quand même la solution sans la sauvegarder
                 return render_template('exercise_solver/complete_solution.html',
                                      title='Solution complète',
@@ -302,6 +305,7 @@ TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
         except Exception as e:
             logger.error(f"Erreur lors de la résolution: {e}")
             flash(f"Erreur lors de la résolution: {str(e)}", 'danger')
+            return redirect(url_for('resoudre_exercice'))
 
     return render_template(
         'formulaire.html',
@@ -1490,6 +1494,52 @@ def delete_exercise_solution(solution_id):
 
     flash('Solution supprimée avec succès!', 'success')
     return redirect(url_for('exercise_solutions_list'))
+
+@app.route('/solution-complete/<int:solution_id>')
+@login_required
+def view_complete_solution(solution_id):
+    """Afficher une solution complète d'exercice"""
+    solution = ExerciseSolution.query.get_or_404(solution_id)
+    
+    # Vérifier que l'utilisateur a le droit de voir cette solution
+    if solution.user_id != current_user.id:
+        abort(403)
+    
+    # Générer des documents comptables factices pour l'affichage
+    documents = {
+        'journal': f"""JOURNAL GÉNÉRAL
+Date        | Compte      | Libellé                    | Débit    | Crédit
+{datetime.now().strftime('%d/%m/%Y')} | 512         | Banque                     | 100,000  |
+{datetime.now().strftime('%d/%m/%Y')} | 101         | Capital                    |          | 100,000
+{datetime.now().strftime('%d/%m/%Y')} | 411         | Clients                    | 50,000   |
+{datetime.now().strftime('%d/%m/%Y')} | 701         | Ventes                     |          | 50,000
+            | TOTAL       |                            | 150,000  | 150,000
+""",
+        'grand_livre': f"""GRAND LIVRE
+Compte 512 - Banque
+Date        | Libellé                    | Débit    | Crédit   | Solde
+{datetime.now().strftime('%d/%m/%Y')} | Capital initial           | 100,000  |          | 100,000
+
+Compte 101 - Capital
+Date        | Libellé                    | Débit    | Crédit   | Solde
+{datetime.now().strftime('%d/%m/%Y')} | Constitution du capital   |          | 100,000  | 100,000
+""",
+        'bilan': f"""BILAN AU {datetime.now().strftime('%d/%m/%Y')}
+ACTIF                                  | PASSIF
+Actif immobilisé              |      0 | Capitaux propres          | 100,000
+Créances clients              | 50,000 | Résultat de l'exercice    |  50,000
+Banque                        |100,000 | Dettes                    |       0
+TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
+"""
+    }
+    
+    return render_template('exercise_solver/complete_solution.html',
+                         title='Solution complète',
+                         exercise=None,
+                         solution_id=solution.id,
+                         problem_text=solution.problem_text,
+                         solution=solution.solution_text,
+                         documents=documents)
 
 @app.route('/exercise-solutions/<int:solution_id>/publish')
 @login_required
