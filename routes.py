@@ -238,7 +238,8 @@ TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
                                      problem_text=solution.problem_text,
                                      solution=solution.solution_text,
                                      documents=documents)
-        except:
+        except Exception as e:
+            logger.error(f"Erreur lors de l'affichage de la solution {solution_id}: {e}")
             flash("Solution non trouvée", "error")
 
     if request.method == 'POST':

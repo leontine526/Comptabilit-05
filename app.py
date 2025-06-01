@@ -21,6 +21,7 @@ try:
     from flask_login import LoginManager, current_user
     from werkzeug.middleware.proxy_fix import ProxyFix
     from flask_socketio import SocketIO, emit, join_room, leave_room
+    import re
 
 except ImportError as e:
     logger.error(f"Erreur d'importation: {str(e)}")
@@ -177,10 +178,10 @@ def load_user(user_id):
 # Custom Jinja2 filters
 @app.template_filter('nl2br')
 def nl2br_filter(text):
-    """Convert newlines to <br> tags"""
-    if text:
-        return text.replace('\n', '<br>')
-    return text
+    """Convertit les retours à la ligne en balises <br>"""
+    if text is None:
+        return ''
+    return re.sub(r'\r?\n', '<br>', str(text))
 
 @app.template_filter('tojson')
 def to_json_filter(obj):
