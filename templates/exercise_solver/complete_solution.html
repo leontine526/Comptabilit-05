@@ -108,23 +108,7 @@
     .card { border: none !important; box-shadow: none !important; }
 }
 </style>
-{% endblock %}card-body">
-                            <div class="p-3 border rounded" style="background-color: white; border-color: #dee2e6 !important;">
-                                {{ problem_text|nl2br if problem_text else 'Énoncé non disponible' }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mb-4 border-0 shadow-sm">
-                        <div class="card-header" style="background-color: #fff3e0; border-bottom: 3px solid #ff9800;">
-                            <h5 class="mb-0" style="color: #f57c00;"><i class="fas fa-lightbulb me-2"></i>Solution détaillée</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="solution-content p-3 border rounded" style="background-color: white; min-height: 150px; border-color: #dee2e6 !important;">
-                                {{ solution|safe if solution else 'Solution en cours de génération...' }}
-                            </div>
-                        </div>
-                    </div>
+{% endblock %}
 
                     {% if documents %}
                     <div class="card mt-4 border-0 shadow-sm">

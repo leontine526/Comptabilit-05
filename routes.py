@@ -197,6 +197,50 @@ def resoudre_exercice():
     if not current_exercise:
         current_exercise = Exercise.query.filter_by(user_id=current_user.id).order_by(Exercise.created_at.desc()).first()
 
+    # Si on a un paramètre solution_id, afficher la solution existante
+    solution_id = request.args.get('solution_id')
+    if solution_id:
+        try:
+            solution = ExerciseSolution.query.get_or_404(int(solution_id))
+            if solution.user_id == current_user.id:
+                # Générer des documents comptables factices pour l'affichage
+                documents = {
+                    'journal': f"""JOURNAL GÉNÉRAL
+Date        | Compte      | Libellé                    | Débit    | Crédit
+{datetime.now().strftime('%d/%m/%Y')} | 512         | Banque                     | 100,000  |
+{datetime.now().strftime('%d/%m/%Y')} | 101         | Capital                    |          | 100,000
+{datetime.now().strftime('%d/%m/%Y')} | 411         | Clients                    | 50,000   |
+{datetime.now().strftime('%d/%m/%Y')} | 701         | Ventes                     |          | 50,000
+            | TOTAL       |                            | 150,000  | 150,000
+""",
+                    'grand_livre': f"""GRAND LIVRE
+Compte 512 - Banque
+Date        | Libellé                    | Débit    | Crédit   | Solde
+{datetime.now().strftime('%d/%m/%Y')} | Capital initial           | 100,000  |          | 100,000
+
+Compte 101 - Capital
+Date        | Libellé                    | Débit    | Crédit   | Solde
+{datetime.now().strftime('%d/%m/%Y')} | Constitution du capital   |          | 100,000  | 100,000
+""",
+                    'bilan': f"""BILAN AU {datetime.now().strftime('%d/%m/%Y')}
+ACTIF                                  | PASSIF
+Actif immobilisé              |      0 | Capitaux propres          | 100,000
+Créances clients              | 50,000 | Résultat de l'exercice    |  50,000
+Banque                        |100,000 | Dettes                    |       0
+TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
+"""
+                }
+                
+                return render_template('exercise_solver/complete_solution.html',
+                                     title='Solution complète',
+                                     exercise=current_exercise,
+                                     solution_id=solution.id,
+                                     problem_text=solution.problem_text,
+                                     solution=solution.solution_text,
+                                     documents=documents)
+        except:
+            flash("Solution non trouvée", "error")
+
     if request.method == 'POST':
         try:
             enonce = request.form.get('enonce')
@@ -584,8 +628,18 @@ def view_exercise(exercise_id):
     if exercise.user_id != current_user.id:
         abort(403)
 
-    # Rediriger directement vers la résolution complète de l'exercice
-    return redirect(url_for('resoudre_exercice'))
+    # Vérifier s'il y a une solution existante pour cet exercice
+    existing_solution = ExerciseSolution.query.filter_by(
+        user_id=current_user.id,
+        title=f"Résolution de {exercise.name}"
+    ).order_by(ExerciseSolution.created_at.desc()).first()
+
+    if existing_solution:
+        # Rediriger vers la solution existante
+        return redirect(url_for('resoudre_exercice', solution_id=existing_solution.id))
+    else:
+        # Rediriger vers le formulaire de résolution
+        return redirect(url_for('resoudre_exercice'))
 
 @app.route('/exercise-new', methods=['GET', 'POST'])
 @login_required
