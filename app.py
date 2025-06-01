@@ -1,3 +1,4 @@
+# Adding the missing fromjson filter to the Jinja2 environment.
 import os
 import logging
 import sys
@@ -20,7 +21,7 @@ try:
     from flask_login import LoginManager, current_user
     from werkzeug.middleware.proxy_fix import ProxyFix
     from flask_socketio import SocketIO, emit, join_room, leave_room
-    
+
 except ImportError as e:
     logger.error(f"Erreur d'importation: {str(e)}")
     sys.exit(1)
@@ -173,10 +174,31 @@ def load_user(user_id):
 # def welcome():
 #     return render_template('welcome.html', title="Bienvenue")
 
-# Ajouter un filtre pour convertir les retours à la ligne en balises <br>
-def nl2br(value):
-    if value:
-        return value.replace('\n', '<br>')
-    return value
+# Custom Jinja2 filters
+@app.template_filter('nl2br')
+def nl2br_filter(text):
+    """Convert newlines to <br> tags"""
+    if text:
+        return text.replace('\n', '<br>')
+    return text
 
-app.jinja_env.filters['nl2br'] = nl2br
+@app.template_filter('tojson')
+def to_json_filter(obj):
+    """Convert object to JSON string"""
+    try:
+        import json
+        return json.dumps(obj, ensure_ascii=False)
+    except:
+        return '{}'
+
+@app.template_filter('fromjson')
+def from_json_filter(json_str):
+    """Convert JSON string to object"""
+    try:
+        import json
+        if isinstance(json_str, str):
+            return json.loads(json_str)
+        return json_str
+    except:
+        return []
+`
