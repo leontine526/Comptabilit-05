@@ -8,79 +8,98 @@
 // Initialiser les composants Bootstrap comme l'accordéon pour la FAQ
 // Fonction pour afficher/masquer le spinner de chargement
 function toggleLoadingSpinner(show) {
-    const spinner = document.getElementById('loading-spinner');
+    let spinner = document.getElementById('loading-spinner');
     if (!spinner) {
         const spinnerHtml = `
             <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none;">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Chargement...</span>
+                <div class="d-flex flex-column align-items-center bg-dark bg-opacity-75 p-4 rounded">
+                    <div class="spinner-border text-light mb-3" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <div class="text-light fw-bold">Chargement en cours...</div>
                 </div>
-                <div class="mt-2 text-primary">Chargement en cours...</div>
             </div>`;
         document.body.insertAdjacentHTML('beforeend', spinnerHtml);
+        spinner = document.getElementById('loading-spinner');
     }
-    document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
+    
+    if (show) {
+        spinner.style.display = 'flex';
+        spinner.style.opacity = '1';
+    } else {
+        spinner.style.opacity = '0';
+        setTimeout(() => {
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        }, 300);
+    }
 }
 
 // Intercepter tous les clics sur les liens et boutons
 document.addEventListener('click', function(e) {
-    const clickable = e.target.closest('a, button');
-    if (clickable && !clickable.hasAttribute('data-no-loading') && !clickable.classList.contains('btn-close') && !clickable.classList.contains('dropdown-toggle')) {
-        // Vérifier si c'est un lien externe ou un lien avec href="#"
+    const clickable = e.target.closest('a, button[type="submit"], input[type="submit"]');
+    
+    if (clickable && !clickable.hasAttribute('data-no-loading') && 
+        !clickable.classList.contains('btn-close') && 
+        !clickable.classList.contains('dropdown-toggle') &&
+        !clickable.classList.contains('navbar-toggler')) {
+        
+        // Vérifier si c'est un lien qui doit déclencher le chargement
         const href = clickable.getAttribute('href');
-        if (href && href !== '#' && !href.startsWith('javascript:') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
-            if (!document.getElementById('loading-spinner')) {
-                const spinnerHtml = `
-                    <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none;">
-                        <div class="d-flex flex-column align-items-center bg-dark bg-opacity-75 p-3 rounded">
-                            <div class="spinner-border text-light mb-2" role="status">
-                                <span class="visually-hidden">Chargement...</span>
-                            </div>
-                            <div class="text-light">Chargement en cours...</div>
-                        </div>
-                    </div>`;
-                document.body.insertAdjacentHTML('beforeend', spinnerHtml);
-            }
-            document.getElementById('loading-spinner').style.display = 'block';
+        const isForm = clickable.type === 'submit' || clickable.closest('form');
+        
+        if ((href && href !== '#' && !href.startsWith('javascript:') && 
+             !href.startsWith('mailto:') && !href.startsWith('tel:') && 
+             !href.startsWith('#')) || isForm) {
             
-            // Masquer automatiquement après 5 secondes pour éviter qu'il reste bloqué
+            // Afficher le spinner
+            toggleLoadingSpinner(true);
+            
+            // Masquer automatiquement après 8 secondes pour éviter qu'il reste bloqué
             setTimeout(() => {
-                const spinner = document.getElementById('loading-spinner');
-                if (spinner) {
-                    spinner.style.display = 'none';
-                }
-            }, 5000);
+                toggleLoadingSpinner(false);
+            }, 8000);
         }
     }
 });
 
 // Masquer le spinner une fois la page chargée
 window.addEventListener('load', function() {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.style.display = 'none';
-    }
+    toggleLoadingSpinner(false);
 });
 
 // Masquer le spinner lors du changement de page
 window.addEventListener('beforeunload', function() {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.style.display = 'none';
-    }
+    toggleLoadingSpinner(false);
 });
 
 // Masquer le spinner au chargement du DOM
 document.addEventListener('DOMContentLoaded', function() {
-    const spinner = document.getElementById('loading-spinner');
-    if (spinner) {
-        spinner.style.display = 'none';
-    }
+    toggleLoadingSpinner(false);
+    
+    // Ajouter un délai pour s'assurer que la page est complètement chargée
+    setTimeout(() => {
+        toggleLoadingSpinner(false);
+    }, 500);
 });
 
 document.addEventListener('DOMContentLoaded', function() {
     // Masquer le spinner au chargement initial
     toggleLoadingSpinner(false);
+    
+    // Gérer les soumissions de formulaires
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form && !form.hasAttribute('data-no-loading')) {
+            toggleLoadingSpinner(true);
+            
+            // Masquer automatiquement après 10 secondes pour les formulaires
+            setTimeout(() => {
+                toggleLoadingSpinner(false);
+            }, 10000);
+        }
+    });
 
     // Initialiser tous les tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

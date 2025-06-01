@@ -72,7 +72,32 @@ body.dark-mode {
   background-color: #505050;
 }
 
+/* Spinner de chargement */
+#loading-spinner {
+    transition: opacity 0.3s ease-in-out;
+    backdrop-filter: blur(2px);
+}
+
+#loading-spinner .spinner-border {
+    border-width: 3px;
+}
+
+/* Animation du spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading-spinner .spinner-border {
+    animation: spin 1s linear infinite;
+}
+
 /* Navigation */
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
 .navbar-brand {
   font-weight: 600;
   letter-spacing: 0.5px;
