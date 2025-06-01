@@ -51,7 +51,7 @@
 
                         <!-- Module Comptabilité -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link nav-main-item dropdown-toggle {% if request.endpoint in ['exercises_list', 'exercise_new', 'transactions_list', 'transaction_new', 'accounts_list', 'account_new'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link nav-main-item dropdown-toggle {% if request.endpoint in ['exercises_list', 'exercise_new', 'transactions_list', 'transaction_new', 'accounts_list', 'account_new'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-calculator me-1"></i>Comptabilité
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark dropdown-columns">
@@ -82,7 +82,7 @@
 
                         <!-- Module Document -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link nav-main-item dropdown-toggle {% if request.endpoint in ['documents_list', 'document_upload', 'document_view', 'document_process'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link nav-main-item dropdown-toggle {% if request.endpoint in ['documents_list', 'document_upload', 'document_view', 'document_process'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-file-alt me-1"></i>Documents
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark">
@@ -98,7 +98,7 @@
 
                         <!-- Module analyse IA -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link nav-main-item dropdown-toggle {% if request.endpoint in ['exercise_solver_form', 'exercise_examples_list', 'exercise_solutions_list', 'exercise_solver_complete'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link nav-main-item dropdown-toggle {% if request.endpoint in ['exercise_solver_form', 'exercise_examples_list', 'exercise_solutions_list', 'exercise_solver_complete'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-brain me-1"></i>Analyse IA
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark">
@@ -116,7 +116,7 @@
 
                         <!-- Module Social -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link nav-main-item dropdown-toggle social-nav-link {% if request.endpoint in ['feed', 'stories', 'workgroups_list', 'workgroup_new'] %}active{% endif %}" href="{{ url_for('feed') }}" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link nav-main-item dropdown-toggle social-nav-link {% if request.endpoint in ['feed', 'stories', 'workgroups_list', 'workgroup_new'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-share-alt me-1"></i>Social
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark">
