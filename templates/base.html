@@ -114,21 +114,39 @@
                             </ul>
                         </li>
 
-                        <!-- Module Social -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link nav-main-item dropdown-toggle social-nav-link {% if request.endpoint in ['feed', 'stories', 'workgroups_list', 'workgroup_new'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-share-alt me-1"></i>Social
+                        <!-- Outils -->
+                        <li class="nav-item dropdown" id="outils-dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="outilsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-tools"></i> Outils
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><h6 class="dropdown-header">Réseau social</h6></li>
-                                <li><a class="dropdown-item" href="{{ url_for('feed') }}"><i class="fas fa-stream me-2"></i>Fil d'actualité</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('stories') }}"><i class="fas fa-history me-2"></i>Stories</a></li>
+                            <ul class="dropdown-menu" aria-labelledby="outilsDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('resoudre_exercice') }}"><i class="fas fa-calculator"></i> Résoudre exercice</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('text_processing') }}"><i class="fas fa-file-alt"></i> Traitement de texte</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cogs"></i> Configuration</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><h6 class="dropdown-header">Collaboration</h6></li>
-                                <li><a class="dropdown-item" href="{{ url_for('workgroups_list') }}"><i class="fas fa-users me-2"></i>Groupes de travail</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('workgroup_new') }}"><i class="fas fa-user-plus me-2"></i>Nouveau groupe</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('messages_list') }}"><i class="fas fa-comments me-2"></i>Messagerie</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-download"></i> Sauvegarde</a></li>
                             </ul>
+                        </li>
+
+                        <!-- Apprentissage -->
+                        <li class="nav-item dropdown" id="apprentissage-dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="apprentissageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-graduation-cap"></i> Apprentissage
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="apprentissageDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('exercise_examples_list') }}"><i class="fas fa-book-open"></i> Exemples d'exercices</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-video"></i> Tutoriels</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle"></i> Guide OHADA</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-certificate"></i> Certifications</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Réseau Social -->
+                        <li class="nav-item" id="social-nav">
+                            <a class="nav-link" href="{{ url_for('feed') }}">
+                                <i class="fas fa-users"></i> Réseau Social
+                            </a>
                         </li>
                     {% else %}
                         <li class="nav-item">

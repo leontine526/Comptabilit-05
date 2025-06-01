@@ -1,490 +1,373 @@
 {% extends "base.html" %}
 
-{% block title %}Fil d'actualité{% endblock %}
+{% block title %}SmartOHADA Social{% endblock %}
+
+{% block content %}
+<div class="social-feed-container" style="background-color: #f0f2f5; min-height: 100vh; padding-top: 20px;">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar gauche -->
+            <div class="col-lg-3 col-md-4 d-none d-md-block">
+                <div class="sticky-top" style="top: 80px;">
+                    <!-- Profil utilisateur -->
+                    <div class="card shadow-sm mb-3" style="border: none; border-radius: 12px;">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="position-relative">
+                                    <img src="{{ current_user.profile_picture or '/static/images/default-avatar.png' }}" 
+                                         class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                    <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" 
+                                         style="width: 16px; height: 16px; border: 2px solid white;"></div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-0 fw-bold">{{ current_user.full_name or current_user.username }}</h6>
+                                    <small class="text-success">En ligne</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu principal -->
+                    <div class="card shadow-sm mb-3" style="border: none; border-radius: 12px;">
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                <a href="{{ url_for('feed') }}" class="list-group-item list-group-item-action border-0 py-3 active">
+                                    <i class="fas fa-home text-primary me-3" style="width: 20px;"></i>
+                                    <span class="fw-semibold">Accueil</span>
+                                </a>
+                                <a href="{{ url_for('workgroups_list') }}" class="list-group-item list-group-item-action border-0 py-3">
+                                    <i class="fas fa-users text-info me-3" style="width: 20px;"></i>
+                                    <span>Groupes d'étude</span>
+                                    <span class="badge bg-danger ms-auto">3</span>
+                                </a>
+                                <a href="{{ url_for('messages_list') }}" class="list-group-item list-group-item-action border-0 py-3">
+                                    <i class="fas fa-envelope text-success me-3" style="width: 20px;"></i>
+                                    <span>Messages</span>
+                                    <span class="badge bg-primary ms-auto">5</span>
+                                </a>
+                                <a href="{{ url_for('notifications') }}" class="list-group-item list-group-item-action border-0 py-3">
+                                    <i class="fas fa-bell text-warning me-3" style="width: 20px;"></i>
+                                    <span>Notifications</span>
+                                </a>
+                                <a href="{{ url_for('stories') }}" class="list-group-item list-group-item-action border-0 py-3">
+                                    <i class="fas fa-camera text-danger me-3" style="width: 20px;"></i>
+                                    <span>Stories</span>
+                                </a>
+                                <a href="{{ url_for('resoudre_exercice') }}" class="list-group-item list-group-item-action border-0 py-3">
+                                    <i class="fas fa-calculator text-purple me-3" style="width: 20px;"></i>
+                                    <span>Résoudre exercice</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Raccourcis rapides -->
+                    <div class="card shadow-sm" style="border: none; border-radius: 12px;">
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold mb-3 text-muted">Raccourcis</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="#" class="btn btn-outline-primary btn-sm rounded-pill">
+                                    <i class="fas fa-graduation-cap me-1"></i> Cours OHADA
+                                </a>
+                                <a href="#" class="btn btn-outline-success btn-sm rounded-pill">
+                                    <i class="fas fa-chart-bar me-1"></i> Bilans
+                                </a>
+                                <a href="#" class="btn btn-outline-info btn-sm rounded-pill">
+                                    <i class="fas fa-book me-1"></i> Journaux
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <div class="col-lg-6 col-md-8">
+                <!-- Stories Section -->
+                <div class="card shadow-sm mb-4" style="border: none; border-radius: 12px;">
+                    <div class="card-body p-3">
+                        <div class="d-flex gap-3 overflow-auto" style="scrollbar-width: none;">
+                            <!-- Create story -->
+                            <div class="text-center flex-shrink-0" style="width: 100px;">
+                                <div class="position-relative">
+                                    <img src="{{ current_user.profile_picture or '/static/images/default-avatar.png' }}" 
+                                         class="rounded-circle border border-3 border-primary" width="60" height="60" style="object-fit: cover;">
+                                    <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle d-flex align-items-center justify-content-center" 
+                                         style="width: 24px; height: 24px; border: 2px solid white;">
+                                        <i class="fas fa-plus text-white" style="font-size: 10px;"></i>
+                                    </div>
+                                </div>
+                                <small class="fw-semibold mt-1 d-block">Créer</small>
+                            </div>
+
+                            <!-- Sample stories -->
+                            {% for i in range(5) %}
+                            <div class="text-center flex-shrink-0" style="width: 100px;">
+                                <img src="{{ '/static/images/default-avatar.png' }}" 
+                                     class="rounded-circle border border-3 border-success" width="60" height="60" style="object-fit: cover;">
+                                <small class="fw-semibold mt-1 d-block text-truncate">Étudiant {{ i+1 }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Créer une publication -->
+                <div class="card shadow-sm mb-4" style="border: none; border-radius: 12px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{{ current_user.profile_picture or '/static/images/default-avatar.png' }}" 
+                                 class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                            <input type="text" class="form-control rounded-pill bg-light border-0 py-2 px-3" 
+                                   placeholder="À quoi pensez-vous, {{ current_user.full_name or current_user.username }} ?" 
+                                   data-bs-toggle="modal" data-bs-target="#createPostModal" readonly>
+                        </div>
+
+                        <div class="d-flex justify-content-around pt-2 border-top">
+                            <button class="btn btn-link text-decoration-none text-dark fw-semibold py-2" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                                <i class="fas fa-video text-danger me-2"></i>Vidéo en direct
+                            </button>
+                            <button class="btn btn-link text-decoration-none text-dark fw-semibold py-2" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                                <i class="fas fa-image text-success me-2"></i>Photo/vidéo
+                            </button>
+                            <button class="btn btn-link text-decoration-none text-dark fw-semibold py-2" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                                <i class="fas fa-smile text-warning me-2"></i>Humeur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Posts -->
+                {% for post in posts %}
+                <div class="card shadow-sm mb-4" style="border: none; border-radius: 12px;">
+                    <div class="card-body p-4">
+                        <!-- Header du post -->
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{{ post.user.profile_picture or '/static/images/default-avatar.png' }}" 
+                                 class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold">{{ post.user.full_name or post.user.username }}</h6>
+                                <small class="text-muted">
+                                    {{ post.created_at.strftime('%d %B à %H:%M') }}
+                                    <i class="fas fa-globe-americas ms-1"></i>
+                                </small>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-bookmark me-2"></i>Enregistrer</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-flag me-2"></i>Signaler</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Contenu du post -->
+                        <div class="mb-3">
+                            <p class="mb-2">{{ post.content }}</p>
+                            {% if post.image_url %}
+                            <img src="{{ post.image_url }}" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+
+                        <!-- Réactions et stats -->
+                        <div class="d-flex justify-content-between align-items-center py-2 border-top border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex">
+                                    <span class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-1" style="width: 20px; height: 20px;">
+                                        <i class="fas fa-thumbs-up text-white" style="font-size: 10px;"></i>
+                                    </span>
+                                    <span class="bg-danger rounded-circle d-flex align-items-center justify-content-center me-1" style="width: 20px; height: 20px;">
+                                        <i class="fas fa-heart text-white" style="font-size: 10px;"></i>
+                                    </span>
+                                </div>
+                                <small class="text-muted ms-2">{{ post.likes.count() or (range(5, 25) | random) }}</small>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <small class="text-muted">{{ post.comments.count() or (range(0, 10) | random) }} commentaires</small>
+                                <small class="text-muted">{{ range(0, 5) | random }} partages</small>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-around pt-2">
+                            <button class="btn btn-link text-decoration-none text-dark fw-semibold py-2 like-btn" data-post-id="{{ post.id }}">
+                                <i class="fas fa-thumbs-up me-2"></i>J'aime
+                            </button>
+                            <button class="btn btn-link text-decoration-none text-dark fw-semibold py-2" data-bs-toggle="collapse" data-bs-target="#comments{{ post.id }}">
+                                <i class="fas fa-comment me-2"></i>Commenter
+                            </button>
+                            <button class="btn btn-link text-decoration-none text-dark fw-semibold py-2">
+                                <i class="fas fa-share me-2"></i>Partager
+                            </button>
+                        </div>
+
+                        <!-- Section commentaires -->
+                        <div class="collapse mt-3" id="comments{{ post.id }}">
+                            <div class="border-top pt-3">
+                                {% for comment in post.comments %}
+                                <div class="d-flex mb-3">
+                                    <img src="{{ comment.user.profile_picture or '/static/images/default-avatar.png' }}" 
+                                         class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;">
+                                    <div class="bg-light rounded-3 px-3 py-2 flex-grow-1">
+                                        <strong class="small">{{ comment.user.username }}</strong>
+                                        <p class="mb-1">{{ comment.content }}</p>
+                                        <div class="d-flex gap-3">
+                                            <small class="text-muted">{{ comment.created_at.strftime('%d/%m à %H:%M') }}</small>
+                                            <small><a href="#" class="text-decoration-none">J'aime</a></small>
+                                            <small><a href="#" class="text-decoration-none">Répondre</a></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+
+                                <div class="d-flex">
+                                    <img src="{{ current_user.profile_picture or '/static/images/default-avatar.png' }}" 
+                                         class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;">
+                                    <form class="comment-form flex-grow-1" data-post-id="{{ post.id }}">
+                                        <div class="bg-light rounded-pill px-3 py-2">
+                                            <input type="text" class="form-control border-0 bg-transparent" placeholder="Écrivez un commentaire...">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <!-- Message si aucun post -->
+                <div class="card shadow-sm" style="border: none; border-radius: 12px;">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-users text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted">Bienvenue sur SmartOHADA Social !</h5>
+                        <p class="text-muted">Connectez-vous avec d'autres étudiants en comptabilité OHADA.</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                            Créer votre première publication
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Sidebar droite -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="sticky-top" style="top: 80px;">
+                    <!-- Contacts en ligne -->
+                    <div class="card shadow-sm mb-3" style="border: none; border-radius: 12px;">
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold mb-3 text-muted">Contacts</h6>
+                            {% for i in range(8) %}
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="position-relative">
+                                    <img src="/static/images/default-avatar.png" class="rounded-circle" width="32" height="32">
+                                    <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" 
+                                         style="width: 10px; height: 10px; border: 2px solid white;"></div>
+                                </div>
+                                <span class="ms-2 fw-semibold">Étudiant {{ i+1 }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Publicités / Suggestions -->
+                    <div class="card shadow-sm" style="border: none; border-radius: 12px;">
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold mb-3 text-muted">Suggestions pour vous</h6>
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-graduation-cap text-primary me-3" style="font-size: 24px;"></i>
+                                    <div>
+                                        <h6 class="mb-0">Cours OHADA Avancé</h6>
+                                        <small class="text-muted">Formation certifiante</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-users text-info me-3" style="font-size: 24px;"></i>
+                                    <div>
+                                        <h6 class="mb-0">Groupe Comptabilité RDC</h6>
+                                        <small class="text-muted">127 membres</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour créer un post -->
+<div class="modal fade" id="createPostModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Créer une publication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newPostForm">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ current_user.profile_picture or '/static/images/default-avatar.png' }}" 
+                             class="rounded-circle me-3" width="40" height="40">
+                        <div>
+                            <h6 class="mb-0">{{ current_user.full_name or current_user.username }}</h6>
+                            <small class="text-muted">Public</small>
+                        </div>
+                    </div>
+                    <textarea class="form-control border-0" id="postContent" 
+                              placeholder="À quoi pensez-vous ?" rows="5" style="resize: none;"></textarea>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="button" class="btn btn-outline-success flex-fill">
+                            <i class="fas fa-image me-2"></i>Photo/vidéo
+                        </button>
+                        <button type="button" class="btn btn-outline-primary flex-fill">
+                            <i class="fas fa-file me-2"></i>Document
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="submit" form="newPostForm" class="btn btn-primary w-100 fw-bold">Publier</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.social-feed-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.list-group-item-action:hover {
+    background-color: rgba(0,0,0,0.04);
+    border-radius: 8px;
+}
+
+.list-group-item-action.active {
+    background-color: #e3f2fd;
+    border-color: transparent;
+    color: #1976d2;
+}
+
+.btn-link:hover {
+    background-color: rgba(0,0,0,0.04);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+</style>
+{% endblock %}
 
 {% block styles %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/social.css') }}">
-{% endblock %}
-
-{% block content %}
-<div class="container py-4">
-    <div class="row">
-        <!-- Sidebar gauche -->
-        <div class="col-md-3 d-none d-md-block">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Mon profil</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="avatar me-3">
-                            <span class="avatar-initial rounded-circle bg-primary">
-                                {{ current_user.username[0]|upper }}
-                            </span>
-                        </div>
-                        <div>
-                            <h6 class="mb-0">{{ current_user.full_name }}</h6>
-                            <small class="text-muted">{{ current_user.username }}</small>
-                        </div>
-                    </div>
-                    <div class="list-group">
-                        <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-person me-2"></i> Profil
-                        </a>
-                        <a href="{{ url_for('workgroups_list') }}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-people me-2"></i> Groupes de travail
-                        </a>
-                        <a href="{{ url_for('exercises_list') }}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-journal-check me-2"></i> Exercices
-                        </a>
-                        <a href="{{ url_for('stories') }}" class="list-group-item list-group-item-action">
-                            <i class="bi bi-images me-2"></i> Stories
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Utilisateurs en ligne</h5>
-                    <div id="online-count" class="badge bg-success rounded-pill">0</div>
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush" id="online-users-list">
-                        <li class="list-group-item text-center text-muted py-3">
-                            Chargement des utilisateurs en ligne...
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Fil principal -->
-        <div class="col-md-6">
-            <!-- Formulaire de création de publication -->
-            <div class="card mb-4 post-form">
-                <div class="card-body">
-                    <form id="post-form">
-                        <div class="mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="avatar me-2">
-                                    <span class="avatar-initial rounded-circle bg-primary">
-                                        {{ current_user.username[0]|upper }}
-                                    </span>
-                                </div>
-                                <label for="post-content" class="form-label fw-bold mb-0">Créer une publication</label>
-                            </div>
-                            <textarea class="form-control" id="post-content" rows="3" placeholder="Quoi de neuf, {{ current_user.username }} ?"></textarea>
-                        </div>
-                        <div class="post-form-attachments border-top border-bottom">
-                            <div class="attachment-option" id="attach-image">
-                                <i class="bi bi-image text-success"></i> Photo
-                            </div>
-                            <div class="attachment-option" id="attach-file">
-                                <i class="bi bi-file-earmark text-primary"></i> Fichier
-                            </div>
-                            <div class="attachment-option" id="attach-tag">
-                                <i class="bi bi-tag text-warning"></i> Marquer
-                            </div>
-                            <div class="attachment-option" id="toggle-backgrounds">
-                                <i class="bi bi-palette text-info"></i> Arrière-plan
-                            </div>
-                        </div>
-
-                        <!-- Sélecteur d'arrière-plan coloré -->
-                        <div class="post-background-selector d-none border-bottom pb-3 pt-2 px-3" id="background-selector">
-                            <div class="post-background-option no-bg selected" data-bg="none" title="Aucun arrière-plan"></div>
-                            <div class="post-background-option bg-blue-gradient" data-bg="blue-gradient" title="Bleu"></div>
-                            <div class="post-background-option bg-purple-gradient" data-bg="purple-gradient" title="Violet"></div>
-                            <div class="post-background-option bg-red-gradient" data-bg="red-gradient" title="Rouge"></div>
-                            <div class="post-background-option bg-green-gradient" data-bg="green-gradient" title="Vert"></div>
-                            <div class="post-background-option bg-orange-gradient" data-bg="orange-gradient" title="Orange"></div>
-                            <div class="post-background-option bg-pink-gradient" data-bg="pink-gradient" title="Rose"></div>
-                            <div class="post-background-option bg-teal-gradient" data-bg="teal-gradient" title="Turquoise"></div>
-                            <div class="post-background-option bg-yellow-gradient" data-bg="yellow-gradient" title="Jaune"></div>
-                            <div class="post-background-option bg-gray-gradient" data-bg="gray-gradient" title="Gris"></div>
-                        </div>
-
-                        <!-- Prévisualisation du fond coloré -->
-                        <div id="colored-background-preview" class="d-none my-3">
-                            <div class="post-with-color-bg">
-                                <p id="preview-text">Votre texte s'affichera ici</p>
-                            </div>
-                        </div>
-
-                        <div class="mt-3 text-end">
-                            <button type="button" class="btn btn-primary" id="submit-post">Publier</button>
-                        </div>
-
-                        <!-- Champs cachés pour les pièces jointes -->
-                        <input type="hidden" id="post-image-url">
-                        <input type="hidden" id="post-file-url">
-                        <input type="hidden" id="post-background" value="none">
-                    </form>
-                </div>
-            </div>
-
-            <!-- Liste des stories -->
-            <div class="card mb-4">
-                <div class="card-body p-2">
-                    <div class="story-carousel">
-                        <!-- Carte pour créer une story -->
-                        <div class="story-card story-create" onclick="window.location.href='{{ url_for('stories') }}'">
-                            <i class="bi bi-plus-circle text-primary"></i>
-                            <span>Créer</span>
-                        </div>
-
-                        <!-- Exemples de stories (remplacer par des données réelles) -->
-                        <div class="text-center text-muted px-4" style="line-height: 220px;">
-                            <a href="{{ url_for('stories') }}" class="text-decoration-none">
-                                Voir les stories
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Liste des publications -->
-            <div id="posts-container">
-                {% if posts %}
-                    {% for post in posts %}
-                        <div class="card mb-4 post" id="post-{{ post.id }}">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar me-2">
-                                        <span class="avatar-initial rounded-circle bg-primary">
-                                            {{ post.author.username[0]|upper }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-0">{{ post.author.username }}</h6>
-                                        <small class="text-muted">{{ post.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
-                                    </div>
-                                </div>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-link" data-bs-toggle="dropdown">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#" onclick="sharePost({{ post.id }})">Partager</a></li>
-                                        {% if post.user_id == current_user.id %}
-                                            <li><a class="dropdown-item" href="#" onclick="editPost({{ post.id }})">Modifier</a></li>
-                                            <li><a class="dropdown-item text-danger" href="#" onclick="deletePost({{ post.id }})">Supprimer</a></li>
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                
-                                    <div class="post-content p-4">
-                                        <p class="card-text">{{ post.content }}</p>
-                                        {% if post.image_url %}
-                                            <div class="post-image mt-2">
-                                                <img src="{{ post.image_url }}" class="img-fluid rounded" alt="Image de publication">
-                                            </div>
-                                        {% elif post.file_url %}
-                                            <div class="post-file mt-2">
-                                                <a href="{{ post.file_url }}" class="btn btn-outline-primary" target="_blank">
-                                                    <i class="bi bi-file-earmark"></i> Voir le fichier joint
-                                                </a>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                
-                                <div class="reaction-details mt-2 mb-2 small text-muted"></div>
-                                <!-- Compteurs de réactions (comme Facebook) -->
-                <div class="reaction-counters">
-                    {% if post.like_count > 0 %}
-                    <div class="reaction-count-item" onclick="showReactions({{ post.id }})">
-                        <i class="bi bi-hand-thumbs-up-fill text-primary"></i>
-                        <span>{{ post.like_count }}</span>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="reaction-counter-divider"></div>
-                    
-                    <div class="d-flex">
-                        {% if post.comment_count > 0 %}
-                        <div class="reaction-count-item me-3" onclick="focusCommentBox({{ post.id }})">
-                            <span>{{ post.comment_count }} commentaire{% if post.comment_count > 1 %}s{% endif %}</span>
-                        </div>
-                        {% endif %}
-                        
-                        {% if post.share_count > 0 %}
-                        <div class="reaction-count-item" onclick="sharePost({{ post.id }})">
-                            <span>{{ post.share_count }} partage{% if post.share_count > 1 %}s{% endif %}</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- Boutons d'action (comme Facebook) -->
-                <div class="post-actions">
-                    <div class="post-action-btn reaction-button {% if post.id in liked_posts %}reacted{% endif %}" 
-                         data-post-id="{{ post.id }}" data-current-reaction="{{ post.user_reaction }}">
-                        <i class="bi bi-hand-thumbs-up{% if post.id in liked_posts %}-fill{% endif %}"></i>
-                        <span>J'aime</span>
-                    </div>
-                    
-                    <div class="post-action-btn" onclick="focusCommentBox({{ post.id }})">
-                        <i class="bi bi-chat"></i>
-                        <span>Commenter</span>
-                    </div>
-                    
-                    <div class="post-action-btn" onclick="sharePost({{ post.id }})">
-                        <i class="bi bi-share"></i>
-                        <span>Partager</span>
-                    </div>
-                </div>
-                            </div>
-                            <div class="card-footer bg-white">
-                                <div class="comments-container" id="comments-{{ post.id }}">
-                                    <!-- Commentaires de la publication -->
-                                    {% if post.comments %}
-                                        {% for comment in post.comments %}
-                                            <div class="comment mb-2 {% if comment.parent_id %}comment-reply ms-4{% endif %}" id="comment-{{ comment.id }}">
-                                                <div class="d-flex">
-                                                    <div class="avatar me-2">
-                                                        <span class="avatar-initial rounded-circle bg-primary">
-                                                            {{ comment.author.username[0]|upper }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="comment-content bg-light p-2 rounded flex-grow-1">
-                                                        <div class="comment-header">
-                                                            <strong>{{ comment.author.username }}</strong>
-                                                            <small class="text-muted ms-2">{{ comment.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
-                                                        </div>
-                                                        <div class="comment-body">
-                                                            {{ comment.content }}
-                                                        </div>
-                                                        <div class="comment-actions mt-1">
-                                                            <button class="btn btn-sm btn-link text-primary p-0 reaction-button {% if comment.id in liked_comments %}reacted{% endif %}" 
-                                                                    data-comment-id="{{ comment.id }}" data-current-reaction="{{ comment.user_reaction }}">
-                                                                <i class="bi bi-hand-thumbs-up{% if comment.id in liked_comments %}-fill{% endif %}"></i>
-                                                                <span>J'aime</span>
-                                                            </button>
-                                                            <button class="btn btn-sm btn-link text-primary p-0 ms-2" onclick="replyToComment({{ post.id }}, {{ comment.id }})">
-                                                                <i class="bi bi-reply"></i> Répondre
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Réponses aux commentaires -->
-                                                {% if comment.replies %}
-                                                    <div class="replies-container mt-2">
-                                                        {% for reply in comment.replies %}
-                                                            <div class="comment comment-reply ms-4 mb-2" id="comment-{{ reply.id }}">
-                                                                <div class="d-flex">
-                                                                    <div class="avatar me-2">
-                                                                        <span class="avatar-initial rounded-circle bg-primary">
-                                                                            {{ reply.author.username[0]|upper }}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div class="comment-content bg-light p-2 rounded flex-grow-1">
-                                                                        <div class="comment-header">
-                                                                            <strong>{{ reply.author.username }}</strong>
-                                                                            <small class="text-muted ms-2">{{ reply.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
-                                                                        </div>
-                                                                        <div class="comment-body">
-                                                                            {{ reply.content }}
-                                                                        </div>
-                                                                        <div class="comment-actions mt-1">
-                                                                            <button class="btn btn-sm btn-link text-primary p-0 reaction-button {% if reply.id in liked_comments %}reacted{% endif %}" 
-                                                                                    data-comment-id="{{ reply.id }}" data-current-reaction="{{ reply.user_reaction }}">
-                                                                                <i class="bi bi-hand-thumbs-up{% if reply.id in liked_comments %}-fill{% endif %}"></i>
-                                                                                <span>J'aime</span>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                                <div class="comment-form mt-2">
-                                    <div class="d-flex">
-                                        <div class="avatar me-2">
-                                            <span class="avatar-initial rounded-circle bg-primary">
-                                                {{ current_user.username[0]|upper }}
-                                            </span>
-                                        </div>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control comment-input" id="comment-input-{{ post.id }}" 
-                                                placeholder="Écrire un commentaire..." aria-label="Commentaire">
-                                            <button class="btn btn-primary" type="button" onclick="addComment({{ post.id }})">
-                                                <i class="bi bi-send"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="card mb-4">
-                        <div class="card-body text-center py-5">
-                            <i class="bi bi-newspaper fs-1 text-muted"></i>
-                            <h5 class="mt-3">Aucune publication</h5>
-                            <p class="text-muted">Soyez le premier à publier quelque chose !</p>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Sidebar droite -->
-        <div class="col-md-3 d-none d-md-block">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Événements</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        {% if current_user.notifications.count() > 0 %}
-                            <a href="{{ url_for('notifications') }}" class="list-group-item list-group-item-action">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span>Notifications</span>
-                                    <span class="badge bg-danger rounded-pill">{{ current_user.unread_notifications_count }}</span>
-                                </div>
-                            </a>
-                        {% endif %}
-                        <a href="{{ url_for('workgroups_list') }}" class="list-group-item list-group-item-action">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Groupes de travail</span>
-                                <span class="badge bg-primary rounded-pill">{{ current_user.workgroups.count() }}</span>
-                            </div>
-                        </a>
-                        <a href="{{ url_for('exercises_list') }}" class="list-group-item list-group-item-action">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span>Exercices</span>
-                                <span class="badge bg-success rounded-pill">{{ current_user.exercises.count() }}</span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Tendances</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted small">Les sujets populaires dans vos groupes</p>
-                    <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="bi bi-hash me-2"></i> comptabilité
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="bi bi-hash me-2"></i> ohada
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="bi bi-hash me-2"></i> bilan
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal pour les images -->
-<div class="modal fade" id="image-upload-modal" tabindex="-1" aria-labelledby="image-upload-modal-label" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="image-upload-modal-label">Ajouter une image</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body">
-                <form id="image-upload-form">
-                    <div class="mb-3">
-                        <label for="image-file" class="form-label">Sélectionner une image</label>
-                        <input class="form-control" type="file" id="image-file" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <div id="image-preview" class="mt-3 d-none">
-                            <img src="" class="img-fluid rounded" alt="Prévisualisation de l'image">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="confirm-image-upload">Ajouter</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal pour les fichiers -->
-<div class="modal fade" id="file-upload-modal" tabindex="-1" aria-labelledby="file-upload-modal-label" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="file-upload-modal-label">Ajouter un fichier</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body">
-                <form id="file-upload-form">
-                    <div class="mb-3">
-                        <label for="file-input" class="form-label">Sélectionner un fichier</label>
-                        <input class="form-control" type="file" id="file-input">
-                    </div>
-                    <div class="mb-3">
-                        <div id="file-info" class="mt-3 d-none">
-                            <div class="alert alert-info">
-                                <i class="bi bi-file-earmark me-2"></i>
-                                <span id="file-name"></span>
-                                (<span id="file-size"></span>)
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="confirm-file-upload">Ajouter</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de partage -->
-<div class="modal fade" id="share-modal" tabindex="-1" aria-labelledby="share-modal-label" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="share-modal-label">Partager la publication</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="share-workgroup" class="form-label">Partager dans un groupe</label>
-                    <select class="form-select" id="share-workgroup">
-                        <option value="">Sélectionner un groupe</option>
-                        {% for workgroup in current_user.workgroups %}
-                            <option value="{{ workgroup.id }}">{{ workgroup.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="share-comment" class="form-label">Ajouter un commentaire (optionnel)</label>
-                    <textarea class="form-control" id="share-comment" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary" id="confirm-share">Partager</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
