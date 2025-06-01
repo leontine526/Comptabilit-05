@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 from app import app, db, socketio
 
 # Import des routes sociales
-from models import User, Workgroup, Message, Post, Comment, Like, Notification, Story, StoryView, ExerciseSolution
+from models import User, Workgroup, Message, Post, Comment, Like, Notification, Story, StoryView, ExerciseSolution, PrivateMessage
 
 @app.route('/social/share-exercise-solution/<int:solution_id>', methods=['POST'])
 @login_required

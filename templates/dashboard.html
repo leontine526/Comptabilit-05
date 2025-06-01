@@ -149,6 +149,7 @@
                                 <a href="{{ url_for('document_upload', exercise_id=exercises[0].id) }}" class="btn btn-primary">Télécharger un document</a>
                             {% else %}
                                 <p class="text-muted">Créez d'abord un exercice pour ajouter des documents.</p>
+                                <a href="{{ url_for('exercise_new') }}" class="btn btn-primary">Créer un exercice</a>
                             {% endif %}
                         </div>
                     {% endif %}

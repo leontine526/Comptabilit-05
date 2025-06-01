@@ -25,25 +25,53 @@ function toggleLoadingSpinner(show) {
 // Intercepter tous les clics sur les liens et boutons
 document.addEventListener('click', function(e) {
     const clickable = e.target.closest('a, button');
-    if (clickable && !clickable.hasAttribute('data-no-loading') && !clickable.classList.contains('btn-close')) {
-        if (!document.getElementById('loading-spinner')) {
-            const spinnerHtml = `
-                <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none;">
-                    <div class="d-flex flex-column align-items-center bg-dark bg-opacity-75 p-3 rounded">
-                        <div class="spinner-border text-light mb-2" role="status">
-                            <span class="visually-hidden">Chargement...</span>
+    if (clickable && !clickable.hasAttribute('data-no-loading') && !clickable.classList.contains('btn-close') && !clickable.classList.contains('dropdown-toggle')) {
+        // Vérifier si c'est un lien externe ou un lien avec href="#"
+        const href = clickable.getAttribute('href');
+        if (href && href !== '#' && !href.startsWith('javascript:') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+            if (!document.getElementById('loading-spinner')) {
+                const spinnerHtml = `
+                    <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none;">
+                        <div class="d-flex flex-column align-items-center bg-dark bg-opacity-75 p-3 rounded">
+                            <div class="spinner-border text-light mb-2" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            <div class="text-light">Chargement en cours...</div>
                         </div>
-                        <div class="text-light">Chargement en cours...</div>
-                    </div>
-                </div>`;
-            document.body.insertAdjacentHTML('beforeend', spinnerHtml);
+                    </div>`;
+                document.body.insertAdjacentHTML('beforeend', spinnerHtml);
+            }
+            document.getElementById('loading-spinner').style.display = 'block';
+            
+            // Masquer automatiquement après 5 secondes pour éviter qu'il reste bloqué
+            setTimeout(() => {
+                const spinner = document.getElementById('loading-spinner');
+                if (spinner) {
+                    spinner.style.display = 'none';
+                }
+            }, 5000);
         }
-        document.getElementById('loading-spinner').style.display = 'block';
     }
 });
 
 // Masquer le spinner une fois la page chargée
 window.addEventListener('load', function() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none';
+    }
+});
+
+// Masquer le spinner lors du changement de page
+window.addEventListener('beforeunload', function() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none';
+    }
+});
+
+// Masquer le spinner au chargement du DOM
+document.addEventListener('DOMContentLoaded', function() {
     const spinner = document.getElementById('loading-spinner');
     if (spinner) {
         spinner.style.display = 'none';

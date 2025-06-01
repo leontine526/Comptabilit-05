@@ -63,13 +63,13 @@
                                         <li><hr class="dropdown-divider"></li>
 
                                         <li><h6 class="dropdown-header">Plan comptable</h6></li>
-                                        <li><a class="dropdown-item" href="{{ url_for('accounts_list', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-sitemap me-2"></i>Consulter le plan</a></li>
-                                        <li><a class="dropdown-item" href="{{ url_for('account_new', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-plus-square me-2"></i>Ajouter un compte</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('accounts_list', exercise_id=current_user.exercises.first().id) if current_user.exercises.first() else url_for('exercise_new') }}"><i class="fas fa-sitemap me-2"></i>Consulter le plan</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('account_new', exercise_id=current_user.exercises.first().id) if current_user.exercises.first() else url_for('exercise_new') }}"><i class="fas fa-plus-square me-2"></i>Ajouter un compte</a></li>
                                     </div>
                                     <div class="col-md-6">
                                         <li><h6 class="dropdown-header">Journal comptable</h6></li>
-                                        <li><a class="dropdown-item" href="{{ url_for('transactions_list', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-file-invoice me-2"></i>Journal général</a></li>
-                                        <li><a class="dropdown-item" href="{{ url_for('transactions_list', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-edit me-2"></i>Saisie d'écritures</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('transactions_list', exercise_id=current_user.exercises.first().id) if current_user.exercises.first() else url_for('exercise_new') }}"><i class="fas fa-file-invoice me-2"></i>Journal général</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('transaction_new', exercise_id=current_user.exercises.first().id) if current_user.exercises.first() else url_for('exercise_new') }}"><i class="fas fa-edit me-2"></i>Saisie d'écritures</a></li>
 
                                         <li><hr class="dropdown-divider"></li>
                                         <li><h6 class="dropdown-header">États financiers</h6></li>
@@ -87,8 +87,8 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark">
                                 <li><h6 class="dropdown-header">Gestion documentaire</h6></li>
-                                <li><a class="dropdown-item" href="{{ url_for('documents_list', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-folder-open me-2"></i>Mes documents</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('document_upload', exercise_id=1) if current_user.exercises.first() else '#' }}"><i class="fas fa-upload me-2"></i>Importer un document</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('documents_list', exercise_id=current_user.exercises.first().id) if current_user.exercises.first() else url_for('exercise_new') }}"><i class="fas fa-folder-open me-2"></i>Mes documents</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('document_upload', exercise_id=current_user.exercises.first().id) if current_user.exercises.first() else url_for('exercise_new') }}"><i class="fas fa-upload me-2"></i>Importer un document</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><h6 class="dropdown-header">Outils</h6></li>
                                 <li><a class="dropdown-item" href="{{ url_for('text_processing') }}"><i class="fas fa-language me-2"></i>Traitement de texte</a></li>
@@ -116,7 +116,7 @@
 
                         <!-- Module Social -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link nav-main-item dropdown-toggle social-nav-link {% if request.endpoint in ['feed', 'stories', 'workgroups_list', 'workgroup_new'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link nav-main-item dropdown-toggle social-nav-link {% if request.endpoint in ['feed', 'stories', 'workgroups_list', 'workgroup_new'] %}active{% endif %}" href="{{ url_for('feed') }}" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-share-alt me-1"></i>Social
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark">
@@ -127,7 +127,7 @@
                                 <li><h6 class="dropdown-header">Collaboration</h6></li>
                                 <li><a class="dropdown-item" href="{{ url_for('workgroups_list') }}"><i class="fas fa-users me-2"></i>Groupes de travail</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('workgroup_new') }}"><i class="fas fa-user-plus me-2"></i>Nouveau groupe</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-comments me-2"></i>Messagerie</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('messages_list') }}"><i class="fas fa-comments me-2"></i>Messagerie</a></li>
                             </ul>
                         </li>
                     {% else %}
@@ -198,6 +198,13 @@
                                     </li>
                                 {% endif %}
                             </ul>
+                        </li>
+
+                        <!-- Bouton de déconnexion rapide -->
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-danger btn-sm ms-2" href="{{ url_for('logout') }}" title="Déconnexion">
+                                <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
+                            </a>
                         </li>
 
                         <!-- User Profile Dropdown -->

@@ -432,7 +432,17 @@ def profile():
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     """Sert les fichiers uploadés comme les images de profil"""
-    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    try:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(file_path):
+            return send_file(file_path)
+        else:
+            # Fichier non trouvé, retourner une image par défaut ou une erreur 404
+            logger.warning(f"Fichier non trouvé: {file_path}")
+            abort(404)
+    except Exception as e:
+        logger.error(f"Erreur lors du service du fichier {filename}: {str(e)}")
+        abort(404)
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
