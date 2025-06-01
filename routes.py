@@ -749,12 +749,58 @@ def accounts_list(exercise_id):
 @app.route('/exercises/<int:exercise_id>/accounts/new', methods=['GET', 'POST'])
 @login_required
 def account_new(exercise_id):
+    exercise = Exercise.query.get_or_404(exercise_id)
+
+    # Check if user has permission
+    if exercise.user_id != current_user.id:
+        abort(403)
+
+    # Check if exercise is closed
+    if exercise.is_closed:
+        flash('Impossible de créer un compte sur un exercice clôturé.', 'danger')
+        return redirect(url_for('accounts_list', exercise_id=exercise_id))
+
+    form = AccountForm()
+
+    # Load parent accounts for dropdown
+    form.parent_id.choices = [(0, 'Aucun')] + [
+        (a.id, a.full_name) for a in Account.query.filter_by(exercise_id=exercise_id).order_by(Account.account_number).all()
+    ]
+
+    if form.validate_on_submit():
+        parent_id = form.parent_id.data if form.parent_id.data != 0 else None
+
+        account = Account(
+            account_number=form.account_number.data,
+            name=form.name.data,
+            account_type=form.account_type.data,
+            description=form.description.data,
+            parent_id=parent_id,
+            exercise_id=exercise_id
+        )
+
+        db.session.add(account)
+        db.session.commit()
+
+        flash('Compte créé avec succès!', 'success')
+        return redirect(url_for('accounts_list', exercise_id=exercise_id))
+
+    return render_template('accounts/form.html', title='Nouveau compte', form=form, exercise=exercise)
 
 # Ajouter aussi cette route pour create_account
 @app.route('/accounts/new', methods=['GET', 'POST'])
 @login_required
 def create_account():
-    exercise = Exercise.query.get_or_404(exercise_id)
+    # Récupérer le premier exercice de l'utilisateur
+    exercise = Exercise.query.filter_by(user_id=current_user.id, is_closed=False).first()
+    if not exercise:
+        exercise = Exercise.query.filter_by(user_id=current_user.id).order_by(Exercise.created_at.desc()).first()
+    
+    if not exercise:
+        flash('Vous devez d\'abord créer un exercice.', 'warning')
+        return redirect(url_for('exercise_new'))
+    
+    return redirect(url_for('account_new', exercise_id=exercise.id))
 
     # Check if user has permission
     if exercise.user_id != current_user.id:
