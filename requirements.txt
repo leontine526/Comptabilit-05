@@ -78,3 +78,6 @@ xlsxwriter
 reportlab
 requests
 pymongo
+flask
+flask-login
+flask-sqlalchemy
