@@ -203,6 +203,7 @@ def resoudre_exercice():
         try:
             solution = ExerciseSolution.query.get_or_404(int(solution_id))
             if solution.user_id == current_user.id:
+                flash('Exercice résolu avec succès !', 'success')
                 # Générer des documents comptables factices pour l'affichage
                 documents = {
                     'journal': f"""JOURNAL GÉNÉRAL
@@ -328,17 +329,11 @@ TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
                 flash("Exercice résolu avec succès!", "success")
 
                 # Rediriger vers la page de résolution complète avec les documents
-                return render_template('exercise_solver/complete_solution.html',
-                                     title='Solution complète',
-                                     exercise=current_exercise,
-                                     solution_id=exercise_solution.id,
-                                     problem_text=enonce,
-                                     solution=solution_text,
-                                     documents=documents)
+                return redirect(url_for('resoudre_exercice', solution_id=exercise_solution.id))
             except Exception as e:
                 logger.error(f"Erreur lors de la sauvegarde: {e}")
-                flash("Solution générée sans sauvegarde en base de données.", "warning")
-                # Afficher quand même la solution sans la sauvegarder
+                flash("Solution générée mais erreur lors de la sauvegarde.", "warning")
+                # Créer une solution temporaire avec un ID factice
                 return render_template('exercise_solver/complete_solution.html',
                                      title='Solution complète',
                                      exercise=current_exercise,

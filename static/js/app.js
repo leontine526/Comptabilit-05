@@ -22,7 +22,7 @@ function toggleLoadingSpinner(show) {
         document.body.insertAdjacentHTML('beforeend', spinnerHtml);
         spinner = document.getElementById('loading-spinner');
     }
-    
+
     if (show) {
         spinner.style.display = 'flex';
         spinner.style.opacity = '1';
@@ -39,23 +39,23 @@ function toggleLoadingSpinner(show) {
 // Intercepter tous les clics sur les liens et boutons
 document.addEventListener('click', function(e) {
     const clickable = e.target.closest('a, button[type="submit"], input[type="submit"]');
-    
+
     if (clickable && !clickable.hasAttribute('data-no-loading') && 
         !clickable.classList.contains('btn-close') && 
         !clickable.classList.contains('dropdown-toggle') &&
         !clickable.classList.contains('navbar-toggler')) {
-        
+
         // Vérifier si c'est un lien qui doit déclencher le chargement
         const href = clickable.getAttribute('href');
         const isForm = clickable.type === 'submit' || clickable.closest('form');
-        
+
         if ((href && href !== '#' && !href.startsWith('javascript:') && 
              !href.startsWith('mailto:') && !href.startsWith('tel:') && 
              !href.startsWith('#')) || isForm) {
-            
+
             // Afficher le spinner
             toggleLoadingSpinner(true);
-            
+
             // Masquer automatiquement après 8 secondes pour éviter qu'il reste bloqué
             setTimeout(() => {
                 toggleLoadingSpinner(false);
@@ -77,7 +77,7 @@ window.addEventListener('beforeunload', function() {
 // Masquer le spinner au chargement du DOM
 document.addEventListener('DOMContentLoaded', function() {
     toggleLoadingSpinner(false);
-    
+
     // Ajouter un délai pour s'assurer que la page est complètement chargée
     setTimeout(() => {
         toggleLoadingSpinner(false);
@@ -87,13 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     // Masquer le spinner au chargement initial
     toggleLoadingSpinner(false);
-    
+
     // Gérer les soumissions de formulaires
     document.addEventListener('submit', function(e) {
         const form = e.target;
         if (form && !form.hasAttribute('data-no-loading')) {
             toggleLoadingSpinner(true);
-            
+
             // Masquer automatiquement après 10 secondes pour les formulaires
             setTimeout(() => {
                 toggleLoadingSpinner(false);
@@ -785,3 +785,59 @@ function loadDocumentPreview(documentId, containerSelector) {
             </div>`;
         });
 }
+
+function showLoadingMessage() {
+    console.log('Affichage du message de chargement...');
+
+    // Supprimer tout message de chargement existant
+    const existingMsg = document.getElementById('loading-message');
+    if (existingMsg) {
+        existingMsg.remove();
+    }
+
+    const exerciseForm = document.getElementById('exercise-form');
+    if (exerciseForm) {
+        const loadingMsg = document.createElement('div');
+        loadingMsg.className = 'alert alert-info mt-3 d-flex align-items-center';
+        loadingMsg.id = 'loading-message';
+        loadingMsg.innerHTML = `
+            <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+            <span>🔄 Résolution en cours... Veuillez patienter.</span>
+        `;
+
+        // Insérer après le formulaire
+        exerciseForm.parentNode.insertBefore(loadingMsg, exerciseForm.nextSibling);
+        console.log('Message de chargement affiché');
+    } else {
+        console.warn('Formulaire d\'exercice non trouvé');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('exercise-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Soumission du formulaire détectée');
+
+                // Vérifier que l'énoncé n'est pas vide
+                const enonceField = form.querySelector('textarea[name="enonce"]');
+                if (enonceField && enonceField.value.trim() === '') {
+                    e.preventDefault();
+                    alert('Veuillez saisir un énoncé pour résoudre l\'exercice.');
+                    return false;
+                }
+
+                // Afficher le message de chargement
+                showLoadingMessage();
+
+                // Désactiver le bouton de soumission pour éviter les doubles soumissions
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Résolution...';
+                }
+
+                console.log('Formulaire soumis avec succès');
+            });
+        }
+});

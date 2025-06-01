@@ -14,8 +14,8 @@
                     <h4><i class="fas fa-calculator mr-2"></i>Résolution d'Exercice Comptable</h4>
                 </div>
                 <div class="card-body">
-                  
-                    <form id="exerciseForm" method="POST" action="{{ url_for('resoudre_exercice') }}">
+
+                    <form id="exercise-form" method="POST" class="needs-validation" novalidate>
                         {{ csrf_token() if csrf_token }}
 
                         <div class="form-group">
@@ -27,17 +27,21 @@
                             </select>
                         </div>
 
-                        <div class="form-group mt-4">
-                            <label for="enonce">Énoncé complet de l'exercice:</label>
-                            <textarea class="form-control" id="enonce" name="enonce" rows="8" placeholder="Saisissez l'énoncé complet de l'exercice comptable..." required></textarea>
-                            <small class="form-text text-muted">
-                                Saisissez l'intégralité de l'énoncé de votre exercice. Notre système analysera automatiquement les opérations et générera les écritures comptables.
-                            </small>
+                        <div class="mb-3">
+                            <label for="enonce" class="form-label fw-bold">
+                                <i class="fas fa-edit text-primary me-2"></i>Énoncé de l'exercice
+                            </label>
+                            <textarea name="enonce" id="enonce" class="form-control" rows="8" 
+                                     placeholder="Saisissez ici l'énoncé complet de votre exercice de comptabilité..." 
+                                     required></textarea>
+                            <div class="invalid-feedback">
+                                Veuillez saisir l'énoncé de l'exercice.
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-calculator mr-1"></i> Comptabiliser
+                            <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                                <i class="fas fa-calculator me-2"></i>Résoudre l'exercice
                             </button>
                         </div>
                     </form>
@@ -70,7 +74,7 @@
         document.getElementById('enonce').focus();
 
         // Vérification du formulaire
-        const form = document.getElementById('exerciseForm');
+        const form = document.getElementById('exercise-form');
         form.addEventListener('submit', function(e) {
             const enonce = document.getElementById('enonce');
             if (!enonce.value.trim()) {
