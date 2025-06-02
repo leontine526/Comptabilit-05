@@ -893,8 +893,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-```
-
-```text
-The code has been updated to improve the detection of clicks and display the loading spinner with a slight delay to avoid flickering, and it excludes clicks on modal triggers from triggering the spinner.
-</text>
