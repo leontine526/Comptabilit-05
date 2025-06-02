@@ -841,3 +841,50 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 });
+
+// Gestion des classes de comptes dans le plan comptable
+document.addEventListener('DOMContentLoaded', function() {
+    // Vérifier que nous sommes sur la page des comptes
+    const accountClasses = document.querySelectorAll('.account-class');
+
+    if (accountClasses && accountClasses.length > 0) {
+        accountClasses.forEach(function(classElement) {
+            classElement.addEventListener('click', function() {
+                const classId = this.dataset.classId;
+                const subAccountsContainer = document.getElementById('sub-accounts-' + classId);
+
+                if (subAccountsContainer) {
+                    if (subAccountsContainer.style.display === 'none' || !subAccountsContainer.style.display) {
+                        // Charger les sous-comptes via AJAX
+                        fetch('/accounts/class/' + classId + '/subaccounts')
+                            .then(response => response.json())
+                            .then(data => {
+                                let html = '<div class="sub-accounts-list">';
+                                data.subaccounts.forEach(function(account) {
+                                    html += `
+                                        <div class="sub-account-item">
+                                            <h4>${account.code} - ${account.name}</h4>
+                                            <p class="account-description">${account.description || 'Aucune description disponible'}</p>
+                                            <div class="account-usage">
+                                                <strong>Utilisation:</strong> ${account.usage_example || 'Non spécifié'}
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                                html += '</div>';
+                                subAccountsContainer.innerHTML = html;
+                                subAccountsContainer.style.display = 'block';
+                            })
+                            .catch(error => {
+                                console.error('Erreur lors du chargement des sous-comptes:', error);
+                                subAccountsContainer.innerHTML = '<p>Erreur lors du chargement des sous-comptes.</p>';
+                                subAccountsContainer.style.display = 'block';
+                            });
+                    } else {
+                        subAccountsContainer.style.display = 'none';
+                    }
+                }
+            });
+        });
+    }
+});

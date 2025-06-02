@@ -82,7 +82,7 @@ def create_base_chart_of_accounts(exercise_id):
             {'number': '60', 'name': 'Achats et variations de stocks', 'type': 'charge'},
             {'number': '70', 'name': 'Ventes', 'type': 'produit'},
         ]
-        
+
         for acc_data in base_accounts:
             account = Account(
                 account_number=acc_data['number'],
@@ -92,7 +92,7 @@ def create_base_chart_of_accounts(exercise_id):
                 is_active=True
             )
             db.session.add(account)
-        
+
         logger.info(f"Plan comptable de base créé pour l'exercice {exercise_id}")
     except Exception as e:
         logger.error(f"Erreur lors de la création du plan comptable de base: {e}")
@@ -231,7 +231,7 @@ Banque                        |100,000 | Dettes                    |       0
 TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
 """
                 }
-                
+
                 return render_template('exercise_solver/complete_solution.html',
                                      title='Solution complète',
                                      exercise=current_exercise,
@@ -795,24 +795,24 @@ def share_exercise_to_social(exercise_id):
     try:
         # Récupérer les transactions de l'exercice
         transactions = Transaction.query.filter_by(exercise_id=exercise_id).all()
-        
+
         # Créer le contenu du post
         content = f"📊 Partage de mon exercice comptable : {exercise.name}\n\n"
         content += f"📅 Période : {exercise.start_date.strftime('%d/%m/%Y')} - {exercise.end_date.strftime('%d/%m/%Y')}\n"
-        
+
         if exercise.description:
             content += f"📝 Description : {exercise.description}\n"
-        
+
         content += f"💼 Nombre de transactions : {len(transactions)}\n"
-        
+
         if transactions:
             content += "\n🔍 Aperçu des transactions :\n"
             for i, transaction in enumerate(transactions[:3]):  # Limite à 3 transactions
                 content += f"• {transaction.description} - {transaction.transaction_date.strftime('%d/%m/%Y')}\n"
-            
+
             if len(transactions) > 3:
                 content += f"• ... et {len(transactions) - 3} autres transactions\n"
-        
+
         content += f"\n#ComptabilitéOHADA #Exercice #Partage"
 
         # Créer le post social
@@ -821,13 +821,13 @@ def share_exercise_to_social(exercise_id):
             content=content,
             user_id=current_user.id
         )
-        
+
         db.session.add(post)
         db.session.commit()
 
         flash('Exercice partagé avec succès dans le réseau social !', 'success')
         return redirect(url_for('feed'))
-        
+
     except Exception as e:
         db.session.rollback()
         logger.error(f"Erreur lors du partage de l'exercice {exercise_id}: {str(e)}")
@@ -897,11 +897,11 @@ def create_account():
     exercise = Exercise.query.filter_by(user_id=current_user.id, is_closed=False).first()
     if not exercise:
         exercise = Exercise.query.filter_by(user_id=current_user.id).order_by(Exercise.created_at.desc()).first()
-    
+
     if not exercise:
         flash('Vous devez d\'abord créer un exercice.', 'warning')
         return redirect(url_for('exercise_new'))
-    
+
     return redirect(url_for('account_new', exercise_id=exercise.id))
 
     # Check if user has permission
@@ -1292,7 +1292,7 @@ def documents_list(exercise_id):
         documents = Document.query.filter_by(exercise_id=exercise_id).order_by(Document.upload_date.desc()).all()
 
         return render_template('documents/list.html', title='Documents', exercise=exercise, documents=documents)
-    
+
     except Exception as e:
         logger.error(f"Erreur lors de l'affichage des documents pour l'exercice {exercise_id}: {str(e)}")
         flash(f"Erreur lors du chargement des documents: {str(e)}", 'danger')
@@ -1305,9 +1305,9 @@ def documents_general():
     try:
         # Récupérer tous les documents de l'utilisateur
         documents = Document.query.filter_by(user_id=current_user.id).order_by(Document.upload_date.desc()).all()
-        
+
         return render_template('documents/general_list.html', title='Mes Documents', documents=documents)
-    
+
     except Exception as e:
         logger.error(f"Erreur lors de l'affichage des documents généraux: {str(e)}")
         flash(f"Erreur lors du chargement des documents: {str(e)}", 'danger')
@@ -1424,7 +1424,7 @@ def document_process(document_id):
 
         if extracted_data:
             # Create transaction from extracted data
-            transaction_id = create_transaction_from_document(document_id, extracted_data)
+            transaction_id = create_transaction_from_document(document.id, extracted_data)
 
             if transaction_id:
                 flash('Une transaction a été automatiquement créée à partir du document.', 'success')
@@ -1669,11 +1669,11 @@ def delete_exercise_solution(solution_id):
 def view_complete_solution(solution_id):
     """Afficher une solution complète d'exercice"""
     solution = ExerciseSolution.query.get_or_404(solution_id)
-    
+
     # Vérifier que l'utilisateur a le droit de voir cette solution
     if solution.user_id != current_user.id:
         abort(403)
-    
+
     # Générer des documents comptables factices pour l'affichage
     documents = {
         'journal': f"""JOURNAL GÉNÉRAL
@@ -1701,7 +1701,7 @@ Banque                        |100,000 | Dettes                    |       0
 TOTAL ACTIF                   |150,000 | TOTAL PASSIF              | 150,000
 """
     }
-    
+
     return render_template('exercise_solver/complete_solution.html',
                          title='Solution complète',
                          exercise=None,
@@ -2371,7 +2371,8 @@ def search():
         search_type = form.search_type.data if form.validate_on_submit() else request.args.get('search_type', 'all')
 
         if search_type == 'all' or search_type == 'users':
-            users = User.query.filter(User.username.contains(query) | User.full_name.contains(query) | User.email.contains(query)).all()
+            users = User.query.filter(User.username.contains(query)```python
+ | User.full_name.contains(query) | User.email.contains(query)).all()
         else:
             users = []
 
@@ -2579,3 +2580,47 @@ def advanced_search():
         results=results,
         workgroups=workgroups
     )
+
+@app.route('/exercises/<int:exercise_id>')
+@login_required
+def exercise_detail(exercise_id):
+    exercise = Exercise.query.get_or_404(exercise_id)
+    if exercise.user_id != current_user.id:
+        flash('Vous ne pouvez voir que vos propres exercices.', 'error')
+        return redirect(url_for('exercises_list'))
+
+    return render_template('exercises/detail.html', exercise=exercise)
+
+@app.route('/exercises/<int:exercise_id>/delete', methods=['DELETE'])
+@login_required
+def delete_exercise(exercise_id):
+    try:
+        exercise = Exercise.query.get_or_404(exercise_id)
+        if exercise.user_id != current_user.id:
+            return jsonify({'success': False, 'message': 'Non autorisé'}), 403
+
+        db.session.delete(exercise)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/exercises/<int:exercise_id>/rename', methods=['POST'])
+@login_required
+def rename_exercise(exercise_id):
+    try:
+        exercise = Exercise.query.get_or_404(exercise_id)
+        if exercise.user_id != current_user.id:
+            return jsonify({'success': False, 'message': 'Non autorisé'}), 403
+
+        data = request.get_json()
+        new_title = data.get('title', '').strip()
+
+        if not new_title:
+            return jsonify({'success': False, 'message': 'Le titre ne peut pas être vide'}), 400
+
+        exercise.name = new_title
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500

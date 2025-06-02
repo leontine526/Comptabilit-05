@@ -16,7 +16,7 @@
             <i class="fas fa-plus"></i> Nouvel exercice
         </a>
     </div>
-    
+
     <!-- Bouton flottant "+" pour créer un nouvel exercice -->
     <a href="{{ url_for('exercise_new') }}" class="btn btn-primary rounded-circle position-fixed" style="bottom: 30px; right: 30px; width: 60px; height: 60px; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;">
         <i class="fas fa-plus"></i>
@@ -102,7 +102,7 @@
                                     </button>
                                 </form>
                             </div>
-                            
+
                             <!-- Modal pour renommer l'exercice -->
                             <div class="modal fade" id="renameExerciseModal{{ exercise.id }}" tabindex="-1" aria-labelledby="renameExerciseModalLabel{{ exercise.id }}" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -178,4 +178,68 @@
 </div>
 {% endif %}
 </div>
+<script>
+    // Fonctions pour les filtres et la recherche d'exercices
+    function filterExercises() {
+        // Logique de filtrage ici
+    }
+
+    // Fonction pour supprimer un exercice
+    function deleteExercise(exerciseId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet exercice ?')) {
+            fetch(`/exercises/${exerciseId}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erreur lors de la suppression: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la suppression');
+            });
+        }
+    }
+
+    // Fonction pour renommer un exercice
+    function renameExercise(exerciseId, currentTitle) {
+        const newTitle = prompt('Nouveau titre:', currentTitle);
+        if (newTitle && newTitle !== currentTitle) {
+            fetch(`/exercises/${exerciseId}/rename`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                },
+                body: JSON.stringify({ title: newTitle })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erreur lors du renommage: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors du renommage');
+            });
+        }
+    }
+
+    // Fonction pour partager un exercice
+    function shareExercise(exerciseId) {
+        // Ouvrir une modal ou rediriger vers la page de partage
+        window.open(`/workgroups/share-exercise/${exerciseId}`, '_blank', 'width=600,height=400');
+    }
+</script>
 {% endblock %}
