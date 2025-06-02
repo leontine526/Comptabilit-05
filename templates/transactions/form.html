@@ -267,6 +267,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const balance = Math.abs(totalDebit - totalCredit);
         document.getElementById('balance').value = balance.toFixed(2);
         
+        // Mettre à jour l'apparence selon l'équilibre
+        const balanceField = document.getElementById('balance');
+        if (Math.abs(balance) < 0.01) {
+            balanceField.classList.remove('is-invalid');
+            balanceField.classList.add('is-valid');
+        } else {
+            balanceField.classList.remove('is-valid');
+            balanceField.classList.add('is-invalid');
+        }
+    }e.toFixed(2);
+        
         const balanceStatus = document.getElementById('balanceStatus');
         if (balance < 0.01) {
             balanceStatus.innerHTML = '<span class="badge bg-success">Équilibrée</span>';

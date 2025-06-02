@@ -190,7 +190,7 @@ function selectReaction(button, reactionType) {
         }
     })
     .catch(error => {
-        console.error('Erreur:', error);
+        console.error('Erreur lors de l\'envoi de la réaction:', error);
     });
 }
 
@@ -384,7 +384,7 @@ function toggleReaction(postId, commentId, reactionType) {
         }
     })
     .catch(error => {
-        console.error('Erreur:', error);
+        console.error('Erreur lors de l\'envoi de la réaction:', error);
     });
 }
 
@@ -899,10 +899,10 @@ function setupReactionButtons() {
                 }
 
                 // Recharger les commentaires ou ajouter le nouveau commentaire au DOM
+                ```text
                 reloadComments(postId);
 
                 // Notification
-```text
                 showToast('Commentaire ajouté avec succès', 'success');
             })
             .catch(error => {

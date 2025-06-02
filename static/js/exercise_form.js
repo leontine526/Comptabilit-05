@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Validation des dates
             if (startDateInput && startDateInput.value && endDateInput && endDateInput.value) {
                 const startDate = new Date(startDateInput.value);
-                const endDate = new Date(endDateInput.value);
+                const endDate = new Date(endDateInput.value);value);
 
                 if (endDate < startDate) {
                     endDateInput.classList.add('is-invalid');
@@ -112,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 enonceField.classList.remove('is-invalid');
                 return true;
+            }
+        });ue;
             }
         });
     }
