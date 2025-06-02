@@ -268,6 +268,17 @@
         {% endwith %}
     </div>
 
+    <!-- Indicateur de chargement initial -->
+    <div id="initial-loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 10000; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="text-center text-white">
+            <div class="spinner-border mb-3" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <h4 class="fw-bold">SmartOHADA</h4>
+            <p class="mb-0">Chargement de l'application...</p>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="flex-grow-1">
 
@@ -460,6 +471,28 @@
     {% block scripts %}{% endblock %}
 
     <script>
+    // Masquer l'indicateur de chargement initial
+    window.addEventListener('load', function() {
+        const initialLoading = document.getElementById('initial-loading');
+        if (initialLoading) {
+            initialLoading.style.opacity = '0';
+            setTimeout(() => {
+                initialLoading.style.display = 'none';
+            }, 500);
+        }
+    });
+
+    // Masquer l'indicateur après un délai maximum même si la page n'est pas complètement chargée
+    setTimeout(() => {
+        const initialLoading = document.getElementById('initial-loading');
+        if (initialLoading) {
+            initialLoading.style.opacity = '0';
+            setTimeout(() => {
+                initialLoading.style.display = 'none';
+            }, 500);
+        }
+    }, 3000);
+
     // Ajouter une classe au body selon la taille de l'écran
     document.addEventListener('DOMContentLoaded', function() {
         function updateBodyClass() {

@@ -43,23 +43,28 @@ document.addEventListener('click', function(e) {
     if (clickable && !clickable.hasAttribute('data-no-loading') && 
         !clickable.classList.contains('btn-close') && 
         !clickable.classList.contains('dropdown-toggle') &&
-        !clickable.classList.contains('navbar-toggler')) {
+        !clickable.classList.contains('navbar-toggler') &&
+        !clickable.classList.contains('toast-close') &&
+        !clickable.classList.contains('close')) {
 
         // Vérifier si c'est un lien qui doit déclencher le chargement
         const href = clickable.getAttribute('href');
         const isForm = clickable.type === 'submit' || clickable.closest('form');
+        const isModal = clickable.hasAttribute('data-bs-toggle') && clickable.getAttribute('data-bs-toggle') === 'modal';
 
         if ((href && href !== '#' && !href.startsWith('javascript:') && 
              !href.startsWith('mailto:') && !href.startsWith('tel:') && 
-             !href.startsWith('#')) || isForm) {
+             !href.startsWith('#') && !isModal) || isForm) {
 
-            // Afficher le spinner
-            toggleLoadingSpinner(true);
+            // Afficher le spinner avec un petit délai pour éviter les flashs
+            setTimeout(() => {
+                toggleLoadingSpinner(true);
+            }, 100);
 
-            // Masquer automatiquement après 8 secondes pour éviter qu'il reste bloqué
+            // Masquer automatiquement après 10 secondes pour éviter qu'il reste bloqué
             setTimeout(() => {
                 toggleLoadingSpinner(false);
-            }, 8000);
+            }, 10000);
         }
     }
 });
@@ -888,3 +893,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+```
+
+```text
+The code has been updated to improve the detection of clicks and display the loading spinner with a slight delay to avoid flickering, and it excludes clicks on modal triggers from triggering the spinner.
+</text>

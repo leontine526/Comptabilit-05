@@ -1,10 +1,55 @@
 
-/* Styles pour le spinner de chargement */
+/* Styles pour le spinner de chargement amélioré */
 #loading-spinner {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 2rem;
-    border-radius: 1rem;
-    text-align: center;
+    transition: all 0.3s ease-in-out;
+    user-select: none;
+    pointer-events: all;
+}
+
+#loading-spinner .spinner-border {
+    border-width: 0.25em;
+}
+
+#loading-spinner .progress {
+    background-color: rgba(0, 123, 255, 0.15);
+    border-radius: 0.5rem;
+}
+
+#loading-spinner .progress-bar {
+    border-radius: 0.5rem;
+}
+
+/* Animation pour le spinner de chargement */
+@keyframes pulse-loading {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+#loading-spinner .bg-white {
+    animation: pulse-loading 2s ease-in-out infinite;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Empêcher l'interaction avec la page pendant le chargement */
+body.loading {
+    overflow: hidden;
+}
+
+/* Style pour les petits écrans */
+@media (max-width: 576px) {
+    #loading-spinner .bg-white {
+        margin: 0 1rem;
+        min-width: 260px;
+    }
+    
+    #loading-spinner h5 {
+        font-size: 1.1rem;
+    }
+    
+    #loading-spinner p {
+        font-size: 0.9rem;
+    }
 }
 
 /* Custom theme with professional color palette 
