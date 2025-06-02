@@ -1,0 +1,90 @@
+
+{% extends "base.html" %}
+
+{% block title %}Mes Documents - Comptabilité OHADA{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Mes Documents</h1>
+        <div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if documents %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nom du fichier</th>
+                            <th>Type de document</th>
+                            <th>Exercice</th>
+                            <th>Date d'ajout</th>
+                            <th>Description</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for document in documents %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                {{ document.original_filename }}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ document.document_type or 'Document' }}</span>
+                            </td>
+                            <td>
+                                {% if document.exercise %}
+                                    <a href="{{ url_for('view_exercise', exercise_id=document.exercise.id) }}" class="text-decoration-none">
+                                        {{ document.exercise.name }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Aucun exercice</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ document.upload_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>{{ document.description or '-' }}</td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('document_view', document_id=document.id) }}" class="btn btn-sm btn-outline-primary" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('document_download', document_id=document.id) }}" class="btn btn-sm btn-outline-success" title="Télécharger">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    {% if document.exercise and not document.exercise.is_closed %}
+                                    <form action="{{ url_for('document_delete', document_id=document.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-file-upload text-muted" style="font-size: 4rem;"></i>
+                </div>
+                <h4>Aucun document</h4>
+                <p class="text-muted mb-4">Vous n'avez pas encore téléchargé de documents.</p>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,253 +1,681 @@
-{% extends "base.html" %}
 
-{% block title %}Plan comptable OHADA - Comptabilité OHADA{% endblock %}
+<old_str>{% extends "base.html" %}
+
+{% block title %}Plan comptable - Comptabilité OHADA{% endblock %}
 
 {% block page_actions %}
-<a href="{{ url_for('create_account') }}" class="btn btn-primary">
+<a href="{{ url_for('account_new', exercise_id=exercise.id) }}" class="btn btn-primary">
     <i data-feather="plus"></i> Nouveau compte
 </a>
 {% endblock %}
 
 {% block content %}
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <!-- Search and filters -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="accountSearch" placeholder="Rechercher un compte...">
-                    <button class="btn btn-outline-secondary" type="button">
-                        <i data-feather="search"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <select class="form-select" id="accountTypeFilter">
-                    <option value="">Tous les types</option>
-                    <option value="asset">Actif</option>
-                    <option value="liability">Passif</option>
-                    <option value="equity">Capitaux propres</option>
-                    <option value="revenue">Produit</option>
-                    <option value="expense">Charge</option>
-                </select>
-            </div>
-        </div>
-        
-        {% if accounts %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle datatable">
-                <thead>
-                    <tr>
-                        <th>N° Compte</th>
-                        <th>Nom</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                        <th>Statut</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for account in accounts %}
-                    <tr>
-                        <td class="font-monospace">{{ account.account_number }}</td>
-                        <td>{{ account.name }}</td>
-                        <td>
-                            {% if account.account_type == 'asset' %}
-                            <span class="badge bg-primary">Actif</span>
-                            {% elif account.account_type == 'liability' %}
-                            <span class="badge bg-warning">Passif</span>
-                            {% elif account.account_type == 'equity' %}
-                            <span class="badge bg-info">Capitaux propres</span>
-                            {% elif account.account_type == 'revenue' %}
-                            <span class="badge bg-success">Produit</span>
-                            {% elif account.account_type == 'expense' %}
-                            <span class="badge bg-danger">Charge</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if account.description %}
-                            {{ account.description[:50] + '...' if account.description|length > 50 else account.description }}
-                            {% else %}
-                            <span class="text-muted">-</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if account.is_system %}
-                            <span class="badge bg-secondary">Système OHADA</span>
-                            {% else %}
-                            <span class="badge bg-success">Personnalisé</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group">
-                                {% if not account.is_system %}
-                                <a href="{{ url_for('edit_account', account_id=account.id) }}" class="btn btn-sm btn-outline-primary">
-                                    <i data-feather="edit"></i>
-                                </a>
-                                <form action="{{ url_for('deactivate_account', account_id=account.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir désactiver ce compte ?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i data-feather="slash"></i>
-                                    </button>
-                                </form>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Plan comptable - {{ exercise.name }}</h1>
+        <a href="{{ url_for('account_new', exercise_id=exercise.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouveau compte
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if accounts %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Nom du compte</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in accounts %}
+                        <tr>
+                            <td><strong>{{ account.account_number }}</strong></td>
+                            <td>{{ account.name }}</td>
+                            <td>
+                                {% if account.account_type == 'actif' %}
+                                    <span class="badge bg-primary">Actif</span>
+                                {% elif account.account_type == 'passif' %}
+                                    <span class="badge bg-info">Passif</span>
+                                {% elif account.account_type == 'charge' %}
+                                    <span class="badge bg-danger">Charge</span>
+                                {% elif account.account_type == 'produit' %}
+                                    <span class="badge bg-success">Produit</span>
+                                {% elif account.account_type == 'capital' %}
+                                    <span class="badge bg-warning">Capital</span>
                                 {% else %}
-                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
-                                    <i data-feather="lock"></i>
-                                </button>
+                                    <span class="badge bg-secondary">Autre</span>
                                 {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="text-center p-5">
-            <div class="mb-4">
-                <i data-feather="list" class="text-muted" style="width: 64px; height: 64px;"></i>
+                            </td>
+                            <td>{{ account.description or '-' }}</td>
+                            <td>
+                                {% if account.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    {% if not exercise.is_closed %}
+                                    <a href="{{ url_for('account_edit', account_id=account.id) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                        <i data-feather="edit"></i>
+                                    </a>
+                                    <form action="{{ url_for('account_toggle', account_id=account.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Activer/Désactiver">
+                                            <i data-feather="toggle-left"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Afficher les sous-comptes -->
+                        {% for sub_account in account.children %}
+                        <tr class="table-light">
+                            <td class="ps-4"><strong>{{ sub_account.account_number }}</strong></td>
+                            <td class="ps-3">{{ sub_account.name }}</td>
+                            <td>
+                                {% if sub_account.account_type == 'actif' %}
+                                    <span class="badge bg-primary">Actif</span>
+                                {% elif sub_account.account_type == 'passif' %}
+                                    <span class="badge bg-info">Passif</span>
+                                {% elif sub_account.account_type == 'charge' %}
+                                    <span class="badge bg-danger">Charge</span>
+                                {% elif sub_account.account_type == 'produit' %}
+                                    <span class="badge bg-success">Produit</span>
+                                {% elif sub_account.account_type == 'capital' %}
+                                    <span class="badge bg-warning">Capital</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Autre</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ sub_account.description or '-' }}</td>
+                            <td>
+                                {% if sub_account.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    {% if not exercise.is_closed %}
+                                    <a href="{{ url_for('account_edit', account_id=sub_account.id) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                        <i data-feather="edit"></i>
+                                    </a>
+                                    <form action="{{ url_for('account_toggle', account_id=sub_account.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Activer/Désactiver">
+                                            <i data-feather="toggle-left"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <h4>Aucun compte défini</h4>
-            <p class="text-muted mb-4">Le plan comptable OHADA n'a pas encore été initialisé.</p>
-            <a href="{{ url_for('create_account') }}" class="btn btn-primary">
-                <i data-feather="plus"></i> Créer un compte
-            </a>
+            {% else %}
+            <div class="text-center p-5">
+                <div class="mb-4">
+                    <i data-feather="file-text" class="text-muted" style="width: 64px; height: 64px;"></i>
+                </div>
+                <h4>Aucun compte comptable</h4>
+                <p class="text-muted mb-4">Vous n'avez pas encore créé de compte comptable pour cet exercice.</p>
+                <a href="{{ url_for('account_new', exercise_id=exercise.id) }}" class="btn btn-primary">
+                    <i data-feather="plus"></i> Créer mon premier compte
+                </a>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 </div>
+{% endblock %}</old_str>
+<new_str>{% extends "base.html" %}
 
-<!-- OHADA account information -->
-<div class="card border-0 shadow-sm">
-    <div class="card-header bg-light">
-        <h5 class="mb-0"><i data-feather="info" class="me-2"></i> Le plan comptable OHADA</h5>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h6 class="mb-3">Structure du plan comptable OHADA</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Classe</th>
-                                <th>Désignation</th>
-                                <th>Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="font-monospace">Classe 1</td>
-                                <td>Comptes de ressources durables</td>
-                                <td><span class="badge bg-info">Capitaux propres</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-monospace">Classe 2</td>
-                                <td>Comptes d'actif immobilisé</td>
-                                <td><span class="badge bg-primary">Actif</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-monospace">Classe 3</td>
-                                <td>Comptes de stocks</td>
-                                <td><span class="badge bg-primary">Actif</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-monospace">Classe 4</td>
-                                <td>Comptes de tiers</td>
-                                <td><span class="badge bg-primary">Actif</span> / <span class="badge bg-warning">Passif</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-monospace">Classe 5</td>
-                                <td>Comptes de trésorerie</td>
-                                <td><span class="badge bg-primary">Actif</span> / <span class="badge bg-warning">Passif</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-monospace">Classe 6</td>
-                                <td>Comptes de charges</td>
-                                <td><span class="badge bg-danger">Charge</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-monospace">Classe 7</td>
-                                <td>Comptes de produits</td>
-                                <td><span class="badge bg-success">Produit</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="col-md-6">
-                <h6 class="mb-3">À propos du plan comptable OHADA</h6>
-                <p>Le Système Comptable OHADA (SYSCOHADA) est le référentiel comptable en vigueur dans les 17 pays membres de l'Organisation pour l'Harmonisation en Afrique du Droit des Affaires.</p>
-                
-                <h6 class="mb-2 mt-4">Personnalisation</h6>
-                <p class="mb-0">Vous pouvez créer des comptes personnalisés pour vos besoins spécifiques tout en respectant la structure du SYSCOHADA.</p>
-                
-                <div class="alert alert-info mt-4 mb-0">
-                    <i data-feather="info" class="me-2"></i>
-                    Les comptes système ne peuvent pas être modifiés ou supprimés.
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{% block title %}Plan comptable - Comptabilité OHADA{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('account_new', exercise_id=exercise.id) }}" class="btn btn-primary">
+    <i data-feather="plus"></i> Nouveau compte
+</a>
 {% endblock %}
 
-{% block scripts %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Plan comptable - {{ exercise.name }}</h1>
+        <a href="{{ url_for('account_new', exercise_id=exercise.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouveau compte
+        </a>
+    </div>
+
+    <!-- Classes comptables OHADA -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3>Classes comptables OHADA</h3>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 1 - Comptes de capitaux</h5>
+                            <p class="card-text">Capital, réserves, emprunts et dettes assimilées</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe1')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 2 - Comptes d'immobilisations</h5>
+                            <p class="card-text">Immobilisations incorporelles, corporelles et financières</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe2')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-warning text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 3 - Comptes de stocks</h5>
+                            <p class="card-text">Stocks de marchandises, matières premières, produits</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe3')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 4 - Comptes de tiers</h5>
+                            <p class="card-text">Fournisseurs, clients, organismes sociaux, État</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe4')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-danger text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 5 - Comptes de trésorerie</h5>
+                            <p class="card-text">Valeurs mobilières, banques, caisses</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe5')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-dark text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 6 - Comptes de charges</h5>
+                            <p class="card-text">Achats, services extérieurs, charges de personnel</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe6')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-secondary text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 7 - Comptes de produits</h5>
+                            <p class="card-text">Ventes, production, produits financiers</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe7')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-purple text-white h-100" style="background-color: #6f42c1;">
+                        <div class="card-body">
+                            <h5 class="card-title">Classe 8 - Comptes spéciaux</h5>
+                            <p class="card-text">Comptes de régularisation et comptes spéciaux</p>
+                            <button class="btn btn-light btn-sm" onclick="toggleClassDetails('classe8')">Voir détails</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Détails des classes (masqués par défaut) -->
+    <div id="classe1" class="class-details card mb-4" style="display: none;">
+        <div class="card-header bg-primary text-white">
+            <h5>Classe 1 - Comptes de capitaux - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>10 - Capital</strong> : Capital social, apports</li>
+                        <li><strong>11 - Réserves</strong> : Réserves légales, statutaires</li>
+                        <li><strong>12 - Report à nouveau</strong> : Bénéfices ou pertes reportés</li>
+                        <li><strong>13 - Résultat net de l'exercice</strong></li>
+                        <li><strong>14 - Subventions d'investissement</strong></li>
+                        <li><strong>15 - Provisions réglementées</strong></li>
+                        <li><strong>16 - Emprunts et dettes assimilées</strong></li>
+                        <li><strong>17 - Dettes rattachées à des participations</strong></li>
+                        <li><strong>18 - Comptes de liaison</strong></li>
+                        <li><strong>19 - Provisions pour risques et charges</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 1 enregistrent les ressources durables de l'entreprise :</p>
+                    <ul>
+                        <li>Capitaux propres (capital, réserves, résultats)</li>
+                        <li>Capitaux empruntés (emprunts à long terme)</li>
+                        <li>Provisions pour risques et charges</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes figurent au passif du bilan et représentent les ressources stables de l'entreprise.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classe2" class="class-details card mb-4" style="display: none;">
+        <div class="card-header bg-info text-white">
+            <h5>Classe 2 - Comptes d'immobilisations - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>20 - Immobilisations incorporelles</strong> : Logiciels, brevets, fonds de commerce</li>
+                        <li><strong>21 - Immobilisations corporelles</strong> : Terrains, constructions, matériel</li>
+                        <li><strong>22 - Immobilisations mises en concession</strong></li>
+                        <li><strong>23 - Immobilisations en cours</strong></li>
+                        <li><strong>24 - Immobilisations financières</strong> : Participations, prêts</li>
+                        <li><strong>25-27 - Autres immobilisations</strong></li>
+                        <li><strong>28 - Amortissements</strong> : Amortissements des immobilisations</li>
+                        <li><strong>29 - Provisions pour dépréciation</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 2 enregistrent les biens durables de l'entreprise :</p>
+                    <ul>
+                        <li>Biens utilisés pour l'exploitation (plus d'un an)</li>
+                        <li>Investissements financiers</li>
+                        <li>Amortissements et dépréciations</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes figurent à l'actif du bilan et sont amortis sur leur durée d'utilisation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classe3" class="class-details card mb-4" style="display: none;">
+        <div class="card-header bg-warning text-white">
+            <h5>Classe 3 - Comptes de stocks - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>30 - Stocks de marchandises</strong></li>
+                        <li><strong>31 - Matières premières</strong></li>
+                        <li><strong>32 - Autres approvisionnements</strong></li>
+                        <li><strong>33 - En-cours de production de biens</strong></li>
+                        <li><strong>34 - En-cours de production de services</strong></li>
+                        <li><strong>35 - Stocks de produits</strong></li>
+                        <li><strong>36 - Stocks provenant d'immobilisations</strong></li>
+                        <li><strong>37 - Stocks de marchandises</strong></li>
+                        <li><strong>38 - Achats stockés</strong></li>
+                        <li><strong>39 - Provisions pour dépréciation des stocks</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 3 enregistrent les stocks de l'entreprise :</p>
+                    <ul>
+                        <li>Biens destinés à la vente</li>
+                        <li>Matières premières et fournitures</li>
+                        <li>Produits finis et en-cours</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes figurent à l'actif du bilan et sont évalués au plus bas du coût et de la valeur nette de réalisation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classe4" class="class-details card mb-4" style="display: none;">
+        <div class="card-header bg-success text-white">
+            <h5>Classe 4 - Comptes de tiers - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>40 - Fournisseurs et comptes rattachés</strong></li>
+                        <li><strong>41 - Clients et comptes rattachés</strong></li>
+                        <li><strong>42 - Personnel</strong></li>
+                        <li><strong>43 - Organismes sociaux</strong></li>
+                        <li><strong>44 - État et collectivités</strong></li>
+                        <li><strong>45 - Organismes internationaux</strong></li>
+                        <li><strong>46 - Associés et groupe</strong></li>
+                        <li><strong>47 - Débiteurs et créditeurs divers</strong></li>
+                        <li><strong>48 - Comptes de régularisation</strong></li>
+                        <li><strong>49 - Provisions pour dépréciation</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 4 enregistrent les créances et dettes de l'entreprise :</p>
+                    <ul>
+                        <li>Relations avec les fournisseurs et clients</li>
+                        <li>Dettes sociales et fiscales</li>
+                        <li>Autres créances et dettes</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes figurent à l'actif (créances) ou au passif (dettes) du bilan selon leur nature.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classe5" class="class-details card mb-4" style="display: none;">
+        <div class="card-header bg-danger text-white">
+            <h5>Classe 5 - Comptes de trésorerie - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>50 - Valeurs mobilières de placement</strong></li>
+                        <li><strong>51 - Banques et établissements financiers</strong></li>
+                        <li><strong>52 - Instruments de trésorerie</strong></li>
+                        <li><strong>53 - Caisse</strong></li>
+                        <li><strong>54 - Régies d'avances</strong></li>
+                        <li><strong>55 - Virements internes</strong></li>
+                        <li><strong>56-57 - Autres comptes de trésorerie</strong></li>
+                        <li><strong>58 - Provisions pour dépréciation</strong></li>
+                        <li><strong>59 - Autres comptes financiers</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 5 enregistrent les disponibilités de l'entreprise :</p>
+                    <ul>
+                        <li>Comptes bancaires et postaux</li>
+                        <li>Caisse et espèces</li>
+                        <li>Placements à court terme</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes figurent à l'actif du bilan et représentent la liquidité immédiate de l'entreprise.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classe6" class="class-details card mb-4" style="display: none;">
+        <div class="card-header bg-dark text-white">
+            <h5>Classe 6 - Comptes de charges - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>60 - Achats et variations de stocks</strong></li>
+                        <li><strong>61 - Services extérieurs</strong></li>
+                        <li><strong>62 - Autres services extérieurs</strong></li>
+                        <li><strong>63 - Impôts et taxes</strong></li>
+                        <li><strong>64 - Charges de personnel</strong></li>
+                        <li><strong>65 - Autres charges</strong></li>
+                        <li><strong>66 - Charges financières</strong></li>
+                        <li><strong>67 - Charges exceptionnelles</strong></li>
+                        <li><strong>68 - Dotations aux amortissements</strong></li>
+                        <li><strong>69 - Impôts sur les bénéfices</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 6 enregistrent toutes les charges de l'entreprise :</p>
+                    <ul>
+                        <li>Achats de biens et services</li>
+                        <li>Charges de personnel</li>
+                        <li>Charges financières et exceptionnelles</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes figurent au compte de résultat et diminuent le résultat de l'exercice.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classe7" class="class-details card mb-4" style="display: none;">
+        <div class="card-header bg-secondary text-white">
+            <h5>Classe 7 - Comptes de produits - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>70 - Ventes</strong></li>
+                        <li><strong>71 - Production stockée</strong></li>
+                        <li><strong>72 - Production immobilisée</strong></li>
+                        <li><strong>73 - Produits de cession</strong></li>
+                        <li><strong>74 - Subventions d'exploitation</strong></li>
+                        <li><strong>75 - Autres produits</strong></li>
+                        <li><strong>76 - Produits financiers</strong></li>
+                        <li><strong>77 - Produits exceptionnels</strong></li>
+                        <li><strong>78 - Reprises d'amortissements</strong></li>
+                        <li><strong>79 - Transferts de charges</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 7 enregistrent tous les produits de l'entreprise :</p>
+                    <ul>
+                        <li>Chiffre d'affaires et ventes</li>
+                        <li>Production de l'entreprise</li>
+                        <li>Produits financiers et exceptionnels</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes figurent au compte de résultat et augmentent le résultat de l'exercice.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classe8" class="class-details card mb-4" style="display: none;">
+        <div class="card-header text-white" style="background-color: #6f42c1;">
+            <h5>Classe 8 - Comptes spéciaux - Détails d'utilisation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Sous-comptes principaux :</h6>
+                    <ul>
+                        <li><strong>80 - Comptes de résultats</strong></li>
+                        <li><strong>81 - Valeurs comptables des cessions</strong></li>
+                        <li><strong>82 - Comptes de résultats intermédiaires</strong></li>
+                        <li><strong>83 - Engagements hors bilan</strong></li>
+                        <li><strong>84 - Comptes de régularisation</strong></li>
+                        <li><strong>85 - Consolidation</strong></li>
+                        <li><strong>86 - Comptes spéciaux</strong></li>
+                        <li><strong>87 - Comptes de liaison</strong></li>
+                        <li><strong>88 - Comptes d'attente</strong></li>
+                        <li><strong>89 - Bilan d'ouverture et de clôture</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Utilisation :</h6>
+                    <p>Les comptes de la classe 8 sont des comptes techniques :</p>
+                    <ul>
+                        <li>Détermination du résultat</li>
+                        <li>Comptes de régularisation</li>
+                        <li>Engagements hors bilan</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <strong>Note :</strong> Ces comptes servent principalement aux écritures de clôture et aux régularisations.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if accounts %}
+            <h4>Plan comptable de l'exercice</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Nom du compte</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in accounts %}
+                        <tr>
+                            <td><strong>{{ account.account_number }}</strong></td>
+                            <td>{{ account.name }}</td>
+                            <td>
+                                {% if account.account_type == 'actif' %}
+                                    <span class="badge bg-primary">Actif</span>
+                                {% elif account.account_type == 'passif' %}
+                                    <span class="badge bg-info">Passif</span>
+                                {% elif account.account_type == 'charge' %}
+                                    <span class="badge bg-danger">Charge</span>
+                                {% elif account.account_type == 'produit' %}
+                                    <span class="badge bg-success">Produit</span>
+                                {% elif account.account_type == 'capital' %}
+                                    <span class="badge bg-warning">Capital</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Autre</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ account.description or '-' }}</td>
+                            <td>
+                                {% if account.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    {% if not exercise.is_closed %}
+                                    <a href="{{ url_for('account_edit', account_id=account.id) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                        <i data-feather="edit"></i>
+                                    </a>
+                                    <form action="{{ url_for('account_toggle', account_id=account.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Activer/Désactiver">
+                                            <i data-feather="toggle-left"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Afficher les sous-comptes -->
+                        {% for sub_account in account.children %}
+                        <tr class="table-light">
+                            <td class="ps-4"><strong>{{ sub_account.account_number }}</strong></td>
+                            <td class="ps-3">{{ sub_account.name }}</td>
+                            <td>
+                                {% if sub_account.account_type == 'actif' %}
+                                    <span class="badge bg-primary">Actif</span>
+                                {% elif sub_account.account_type == 'passif' %}
+                                    <span class="badge bg-info">Passif</span>
+                                {% elif sub_account.account_type == 'charge' %}
+                                    <span class="badge bg-danger">Charge</span>
+                                {% elif sub_account.account_type == 'produit' %}
+                                    <span class="badge bg-success">Produit</span>
+                                {% elif sub_account.account_type == 'capital' %}
+                                    <span class="badge bg-warning">Capital</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Autre</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ sub_account.description or '-' }}</td>
+                            <td>
+                                {% if sub_account.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    {% if not exercise.is_closed %}
+                                    <a href="{{ url_for('account_edit', account_id=sub_account.id) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                        <i data-feather="edit"></i>
+                                    </a>
+                                    <form action="{{ url_for('account_toggle', account_id=sub_account.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Activer/Désactiver">
+                                            <i data-feather="toggle-left"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center p-5">
+                <div class="mb-4">
+                    <i data-feather="file-text" class="text-muted" style="width: 64px; height: 64px;"></i>
+                </div>
+                <h4>Aucun compte comptable</h4>
+                <p class="text-muted mb-4">Vous n'avez pas encore créé de compte comptable pour cet exercice.</p>
+                <a href="{{ url_for('account_new', exercise_id=exercise.id) }}" class="btn btn-primary">
+                    <i data-feather="plus"></i> Créer mon premier compte
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Search functionality
-        const searchInput = document.getElementById('accountSearch');
-        const table = document.querySelector('.datatable');
-        const rows = table.querySelectorAll('tbody tr');
-        
-        searchInput.addEventListener('keyup', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            rows.forEach(row => {
-                const accountNumber = row.querySelector('td:first-child').textContent.toLowerCase();
-                const accountName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const description = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-                
-                if (accountNumber.includes(searchTerm) || accountName.includes(searchTerm) || description.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+function toggleClassDetails(classeId) {
+    const element = document.getElementById(classeId);
+    if (element.style.display === 'none') {
+        // Masquer tous les autres détails
+        document.querySelectorAll('.class-details').forEach(el => {
+            el.style.display = 'none';
         });
-        
-        // Filter by account type
-        const typeFilter = document.getElementById('accountTypeFilter');
-        
-        typeFilter.addEventListener('change', function() {
-            const filterValue = this.value.toLowerCase();
-            
-            if (filterValue === '') {
-                rows.forEach(row => {
-                    row.style.display = '';
-                });
-                return;
-            }
-            
-            rows.forEach(row => {
-                const badge = row.querySelector('td:nth-child(3) .badge');
-                const accountType = badge.textContent.toLowerCase();
-                
-                // Map French to English types
-                let type = '';
-                if (accountType === 'actif') type = 'asset';
-                else if (accountType === 'passif') type = 'liability';
-                else if (accountType === 'capitaux propres') type = 'equity';
-                else if (accountType === 'produit') type = 'revenue';
-                else if (accountType === 'charge') type = 'expense';
-                
-                if (type === filterValue) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    });
+        // Afficher le détail sélectionné
+        element.style.display = 'block';
+        // Scroll vers l'élément
+        element.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        element.style.display = 'none';
+    }
+}
 </script>
-{% endblock %}
+{% endblock %}</new_str>

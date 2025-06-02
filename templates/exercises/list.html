@@ -90,17 +90,17 @@
                                         <i data-feather="lock"></i>
                                     </button>
                                 </form>
+                                {% endif %}
                                 <form action="{{ url_for('delete_exercise', exercise_id=exercise.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet exercice ? Cette action est irréversible.');">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer l'exercice">
                                         <i data-feather="trash"></i>
                                     </button>
                                 </form>
-                                <form action="{{ url_for('publish_exercise', exercise_id=exercise.id) }}" method="POST" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Partager l'exercice">
+                                <form action="{{ url_for('share_exercise_to_social', exercise_id=exercise.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Partager dans le réseau social">
                                         <i data-feather="share-2"></i>
                                     </button>
                                 </form>
-                                {% endif %}
                             </div>
                             
                             <!-- Modal pour renommer l'exercice -->

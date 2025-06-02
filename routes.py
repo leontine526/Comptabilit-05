@@ -782,6 +782,58 @@ def publish_exercise(exercise_id):
     flash('Exercice publié avec succès!', 'success')
     return redirect(url_for('view_exercise', exercise_id=exercise_id))
 
+@app.route('/exercises/<int:exercise_id>/share-social', methods=['POST'])
+@login_required
+def share_exercise_to_social(exercise_id):
+    """Partage un exercice complet dans le réseau social"""
+    exercise = Exercise.query.get_or_404(exercise_id)
+
+    # Vérifier que l'utilisateur est le propriétaire
+    if exercise.user_id != current_user.id:
+        abort(403)
+
+    try:
+        # Récupérer les transactions de l'exercice
+        transactions = Transaction.query.filter_by(exercise_id=exercise_id).all()
+        
+        # Créer le contenu du post
+        content = f"📊 Partage de mon exercice comptable : {exercise.name}\n\n"
+        content += f"📅 Période : {exercise.start_date.strftime('%d/%m/%Y')} - {exercise.end_date.strftime('%d/%m/%Y')}\n"
+        
+        if exercise.description:
+            content += f"📝 Description : {exercise.description}\n"
+        
+        content += f"💼 Nombre de transactions : {len(transactions)}\n"
+        
+        if transactions:
+            content += "\n🔍 Aperçu des transactions :\n"
+            for i, transaction in enumerate(transactions[:3]):  # Limite à 3 transactions
+                content += f"• {transaction.description} - {transaction.transaction_date.strftime('%d/%m/%Y')}\n"
+            
+            if len(transactions) > 3:
+                content += f"• ... et {len(transactions) - 3} autres transactions\n"
+        
+        content += f"\n#ComptabilitéOHADA #Exercice #Partage"
+
+        # Créer le post social
+        from models import Post
+        post = Post(
+            content=content,
+            user_id=current_user.id
+        )
+        
+        db.session.add(post)
+        db.session.commit()
+
+        flash('Exercice partagé avec succès dans le réseau social !', 'success')
+        return redirect(url_for('feed'))
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Erreur lors du partage de l'exercice {exercise_id}: {str(e)}")
+        flash(f"Erreur lors du partage: {str(e)}", 'danger')
+        return redirect(url_for('exercises_list'))
+
 # Account routes
 @app.route('/exercises/<int:exercise_id>/accounts')
 @login_required
@@ -1230,15 +1282,36 @@ def journal_export(exercise_id):
 @app.route('/exercises/<int:exercise_id>/documents')
 @login_required
 def documents_list(exercise_id):
-    exercise = Exercise.query.get_or_404(exercise_id)
+    try:
+        exercise = Exercise.query.get_or_404(exercise_id)
 
-    # Check if user has permission
-    if exercise.user_id != current_user.id:
-        abort(403)
+        # Check if user has permission
+        if exercise.user_id != current_user.id:
+            abort(403)
 
-    documents = Document.query.filter_by(exercise_id=exercise_id).order_by(Document.upload_date.desc()).all()
+        documents = Document.query.filter_by(exercise_id=exercise_id).order_by(Document.upload_date.desc()).all()
 
-    return render_template('documents/list.html', title='Documents', exercise=exercise, documents=documents)
+        return render_template('documents/list.html', title='Documents', exercise=exercise, documents=documents)
+    
+    except Exception as e:
+        logger.error(f"Erreur lors de l'affichage des documents pour l'exercice {exercise_id}: {str(e)}")
+        flash(f"Erreur lors du chargement des documents: {str(e)}", 'danger')
+        return redirect(url_for('exercises_list'))
+
+@app.route('/documents')
+@login_required
+def documents_general():
+    """Route générale pour afficher tous les documents de l'utilisateur"""
+    try:
+        # Récupérer tous les documents de l'utilisateur
+        documents = Document.query.filter_by(user_id=current_user.id).order_by(Document.upload_date.desc()).all()
+        
+        return render_template('documents/general_list.html', title='Mes Documents', documents=documents)
+    
+    except Exception as e:
+        logger.error(f"Erreur lors de l'affichage des documents généraux: {str(e)}")
+        flash(f"Erreur lors du chargement des documents: {str(e)}", 'danger')
+        return redirect(url_for('dashboard'))
 
 @app.route('/exercises/<int:exercise_id>/documents/upload', methods=['GET', 'POST'])
 @login_required
