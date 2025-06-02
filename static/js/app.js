@@ -13,7 +13,7 @@ function toggleLoadingSpinner(show) {
     if (spinnerVisible === show) return; // Éviter les appels redondants
 
     let spinner = document.getElementById('loading-spinner');
-    if (!spinner) {
+    if (!spinner && show) {
         const spinnerHtml = `
             <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none; pointer-events: none;">
                 <div class="d-flex flex-column align-items-center bg-dark bg-opacity-75 p-4 rounded">
@@ -27,45 +27,49 @@ function toggleLoadingSpinner(show) {
         spinner = document.getElementById('loading-spinner');
     }
 
+    if (!spinner) return;
+
     spinnerVisible = show;
 
     if (show) {
         spinner.style.display = 'flex';
         spinner.style.opacity = '1';
-        spinner.style.pointerEvents = 'none'; // Important: ne pas bloquer les interactions
+        spinner.style.pointerEvents = 'none'; // Crucial: ne jamais bloquer les interactions
     } else {
         spinner.style.opacity = '0';
         setTimeout(() => {
             if (spinner && !spinnerVisible) {
                 spinner.style.display = 'none';
             }
-        }, 300);
+        }, 200);
     }
 }
 
 // Masquer le spinner au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
-    toggleLoadingSpinner(false);
-
-    // Délai supplémentaire pour s'assurer que tout est chargé
-    setTimeout(() => {
-        toggleLoadingSpinner(false);
-    }, 500);
+    // S'assurer que le spinner est masqué au chargement
+    spinnerVisible = false;
+    const existingSpinner = document.getElementById('loading-spinner');
+    if (existingSpinner) {
+        existingSpinner.style.display = 'none';
+    }
 });
 
 // Masquer le spinner une fois la page complètement chargée
 window.addEventListener('load', function() {
-    toggleLoadingSpinner(false);
+    spinnerVisible = false;
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'none';
+    }
 });
 
-// Masquer le spinner lors du changement de page
-window.addEventListener('beforeunload', function() {
-    toggleLoadingSpinner(false);
-});
-
-// Gestionnaire d'événements pour les clics (version simplifiée)
+// Gestionnaire d'événements simplifié pour éviter les conflits
 document.addEventListener('click', function(e) {
-    const clickable = e.target.closest('a, button[type="submit"], input[type="submit"]');
+    // Ne pas traiter les clics si le spinner est déjà visible
+    if (spinnerVisible) return;
+    
+    const clickable = e.target.closest('a[href], button[type="submit"], input[type="submit"]');
 
     if (clickable && 
         !clickable.hasAttribute('data-no-loading') && 
@@ -74,44 +78,40 @@ document.addEventListener('click', function(e) {
         !clickable.classList.contains('navbar-toggler') &&
         !clickable.classList.contains('toast-close') &&
         !clickable.classList.contains('close') &&
-        !clickable.classList.contains('btn-secondary')) {
+        !clickable.classList.contains('btn-secondary') &&
+        !clickable.hasAttribute('data-bs-toggle')) {
 
         const href = clickable.getAttribute('href');
-        const isForm = clickable.type === 'submit' || clickable.closest('form');
-        const isModal = clickable.hasAttribute('data-bs-toggle');
+        const isSubmitButton = clickable.type === 'submit';
 
-        // Vérifier si c'est un lien qui doit déclencher le chargement
-        if ((href && href !== '#' && !href.startsWith('javascript:') && 
-             !href.startsWith('mailto:') && !href.startsWith('tel:') && 
-             !href.startsWith('#') && !isModal) || isForm) {
+        // Vérifier si c'est un lien de navigation valide
+        if (href && href !== '#' && !href.startsWith('javascript:') && 
+            !href.startsWith('mailto:') && !href.startsWith('tel:') && 
+            !href.startsWith('#')) {
 
-            // Afficher le spinner avec un délai court
+            // Délai très court pour éviter le scintillement
             setTimeout(() => {
-                if (!spinnerVisible) {
-                    toggleLoadingSpinner(true);
-                }
-            }, 100);
+                toggleLoadingSpinner(true);
+            }, 50);
 
-            // Masquer automatiquement après 8 secondes
+            // Masquer automatiquement après 6 secondes
             setTimeout(() => {
                 toggleLoadingSpinner(false);
-            }, 8000);
+            }, 6000);
         }
     }
 });
 
-// Gestion des soumissions de formulaires
+// Gestion des soumissions de formulaires (événement séparé pour éviter les doublons)
 document.addEventListener('submit', function(e) {
     const form = e.target;
-    if (form && !form.hasAttribute('data-no-loading')) {
-        setTimeout(() => {
-            toggleLoadingSpinner(true);
-        }, 100);
+    if (form && !form.hasAttribute('data-no-loading') && !spinnerVisible) {
+        toggleLoadingSpinner(true);
 
-        // Masquer automatiquement après 10 secondes pour les formulaires
+        // Masquer automatiquement après 8 secondes pour les formulaires
         setTimeout(() => {
             toggleLoadingSpinner(false);
-        }, 10000);
+        }, 8000);
     }
 });
 
