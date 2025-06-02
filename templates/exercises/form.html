@@ -1,107 +1,135 @@
+
 {% extends "base.html" %}
+
+{% block title %}
+{% if exercise %}
+    Modifier l'exercice
+{% else %}
+    Nouvel exercice
+{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="col-md-8 mx-auto">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5>{{ title }}</h5>
-            </div>
-            <div class="card-body">
-                <form method="post" id="exerciseForm">
-                    {{ form.hidden_tag() }}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        {% if exercise %}
+                            <i class="fas fa-edit"></i> Modifier l'exercice
+                        {% else %}
+                            <i class="fas fa-plus"></i> Nouvel exercice
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('create_exercise') if not exercise else url_for('edit_exercise', id=exercise.id) }}" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
 
-                    <div class="mb-3">
-                        {{ form.name.label(class="form-label") }}
-                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), required=true) }}
-                        {% for error in form.name.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="3") }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
 
-                    <div class="mb-3">
-                        {{ form.start_date.label(class="form-label") }}
-                        {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else ""), type="date", required=true) }}
-                        {% for error in form.start_date.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                        <div class="mb-3">
+                            {{ form.enonce.label(class="form-label") }}
+                            {{ form.enonce(class="form-control" + (" is-invalid" if form.enonce.errors else ""), rows="6") }}
+                            {% if form.enonce.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.enonce.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Décrivez l'exercice en détail avec toutes les données nécessaires.</div>
+                        </div>
 
-                    <div class="mb-3">
-                        {{ form.end_date.label(class="form-label") }}
-                        {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else ""), type="date", required=true) }}
-                        {% for error in form.end_date.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                        <div class="form-text">La date de fin doit être postérieure à la date de début.</div>
-                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.difficulty.label(class="form-label") }}
+                                    {{ form.difficulty(class="form-select" + (" is-invalid" if form.difficulty.errors else "")) }}
+                                    {% if form.difficulty.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.difficulty.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.category.label(class="form-label") }}
+                                    {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else "")) }}
+                                    {% if form.category.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.category.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        {{ form.description.label(class="form-label") }}
-                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=3) }}
-                        {% for error in form.description.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                        <div class="mb-3">
+                            {{ form.file.label(class="form-label") }}
+                            {{ form.file(class="form-control") }}
+                            <div class="form-text">Fichier optionnel (PDF, DOC, etc.)</div>
+                        </div>
 
-                    <div class="alert alert-info mt-3">
-                        <i class="fas fa-info-circle mr-2"></i> Après la création de cet exercice, vous serez redirigé vers la page de résolution par énoncé complet.
-                    </div>
-
-                    <div class="d-flex justify-content-between mt-3">
-                        <a href="{{ url_for('exercises_list') }}" class="btn btn-outline-secondary">Annuler</a>
-                        <button type="submit" id="submitBtn" class="btn btn-primary">
-                            {{ 'Enregistrer' if exercise else 'Créer l\'exercice' }}
-                        </button>
-                    </div>
-                </form>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('list_exercises') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                {% if exercise %}Modifier{% else %}Créer{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/exercise_form.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('exerciseForm');
-    const startDateInput = document.querySelector('input[name="start_date"]');
-    const endDateInput = document.querySelector('input[name="end_date"]');
-    const submitBtn = document.getElementById('submitBtn');
-
-    form.addEventListener('submit', function(e) {
-        let isValid = true;
-
-        // Validation date de fin > date de début
-        if (startDateInput.value && endDateInput.value) {
-            const startDate = new Date(startDateInput.value);
-            const endDate = new Date(endDateInput.value);
-
-            if (endDate < startDate) {
-                endDateInput.classList.add('is-invalid');
-                if (!endDateInput.nextElementSibling || !endDateInput.nextElementSibling.classList.contains('invalid-feedback')) {
-                    const errorMsg = document.createElement('div');
-                    errorMsg.classList.add('invalid-feedback');
-                    errorMsg.innerText = 'La date de fin doit être postérieure à la date de début';
-                    endDateInput.parentNode.insertBefore(errorMsg, endDateInput.nextElementSibling);
-                }
-                isValid = false;
-            } else {
-                endDateInput.classList.remove('is-invalid');
-                const errorMsg = endDateInput.nextElementSibling;
-                if (errorMsg && errorMsg.classList.contains('invalid-feedback')) {
-                    errorMsg.remove();
-                }rorMsg.remove();
-                }
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
             }
-        }
-
-        if (!isValid) {
-            e.preventDefault();
-        } else {
-            // Désactiver le bouton pour éviter les soumissions multiples
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
-        }
-    });
+        });
+    }
 });
 </script>
 {% endblock %}

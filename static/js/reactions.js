@@ -898,8 +898,7 @@ function setupReactionButtons() {
                     submitButton.innerHTML = 'Commenter';
                 }
 
-                // Recharger les commentaires ou ajouter le nouveau commentaire au DOM
-                ```text
+                // Recharger les commentaires ou ajouter le nouveaucommentaire au DOM
                 reloadComments(postId);
 
                 // Notification
