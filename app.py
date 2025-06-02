@@ -13,19 +13,20 @@ logging.basicConfig(level=logging.INFO,
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Imports de Flask et ses extensions
-try:
-    from flask import Flask, request, session, render_template, jsonify
-    from flask_sqlalchemy import SQLAlchemy
-    from sqlalchemy.orm import DeclarativeBase
-    from flask_login import LoginManager, current_user
-    from werkzeug.middleware.proxy_fix import ProxyFix
-    from flask_socketio import SocketIO, emit, join_room, leave_room
-    import re
+# Imports optimisés pour la vitesse
+from flask import Flask, request, session, render_template, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
+from flask_login import LoginManager, current_user
+from werkzeug.middleware.proxy_fix import ProxyFix
+import re
 
-except ImportError as e:
-    logger.error(f"Erreur d'importation: {str(e)}")
-    sys.exit(1)
+# Import SocketIO conditionnel pour éviter les ralentissements
+try:
+    from flask_socketio import SocketIO, emit, join_room, leave_room
+    SOCKETIO_AVAILABLE = True
+except ImportError:
+    SOCKETIO_AVAILABLE = False
 
 class Base(DeclarativeBase):
     pass
@@ -129,24 +130,20 @@ from flask import Flask, request, session, render_template, jsonify
 
 # Le gestionnaire d'erreur global est maintenant géré par error_handlers.py
 
-# Initialiser Socket.IO avec gestion d'erreur
-try:
-    import eventlet
-    socketio = SocketIO(app, async_mode='eventlet', 
-                       logger=True, engineio_logger=False,
-                       ping_timeout=60, ping_interval=25,
-                       cors_allowed_origins="*")
-    logger.info("Socket.IO initialisé avec succès (mode eventlet)")
-except ImportError:
+# Initialisation SocketIO optimisée
+if SOCKETIO_AVAILABLE:
     try:
+        # Configuration rapide sans logs verbeux
         socketio = SocketIO(app, async_mode=None, 
-                           logger=True, 
+                           logger=False, engineio_logger=False,
+                           ping_timeout=30, ping_interval=10,
                            cors_allowed_origins="*")
-        logger.info("Socket.IO initialisé avec succès (mode threading)")
+        logger.info("Socket.IO initialisé (mode rapide)")
     except Exception as e:
-        logger.error(f"Erreur lors de l'initialisation de Socket.IO: {str(e)}")
-        socketio = SocketIO(app)
-        logger.warning("Socket.IO initialisé en mode de secours")
+        logger.warning(f"SocketIO désactivé: {str(e)}")
+        socketio = None
+else:
+    socketio = None
 
 # Configurer le gestionnaire de connexion
 login_manager = LoginManager()

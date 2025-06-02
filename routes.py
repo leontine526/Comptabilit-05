@@ -724,7 +724,7 @@ def exercise_close(exercise_id):
 
 @app.route('/exercises/<int:exercise_id>/delete', methods=['POST'])
 @login_required
-def delete_exercise(exercise_id):
+def exercise_delete(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
 
     # Check if user has permission
@@ -2594,9 +2594,9 @@ def exercise_detail(exercise_id):
 
     return render_template('exercises/detail.html', exercise=exercise)
 
-@app.route('/exercises/<int:exercise_id>/delete', methods=['DELETE'])
+@app.route('/exercises/<int:exercise_id>/delete-ajax', methods=['DELETE'])
 @login_required
-def delete_exercise(exercise_id):
+def delete_exercise_ajax(exercise_id):
     try:
         exercise = Exercise.query.get_or_404(exercise_id)
         if exercise.user_id != current_user.id:

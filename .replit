@@ -10,7 +10,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python main.py"]
 
 [workflows]
-runButton = "Démarrage App"
+runButton = "Démarrage Ultra-Rapide"
 
 [[workflows.workflow]]
 name = "Démarrage Robuste"
@@ -123,6 +123,19 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python start_minimal.py"
+
+[[workflows.workflow]]
+name = "Démarrage Ultra-Rapide"
+author = 43388192
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python fix_nltk_resources.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_fast.py"
 
 [[ports]]
 localPort = 5000
