@@ -452,8 +452,27 @@
             // Gestion des erreurs JavaScript
             window.addEventListener('error', function(e) {
                 console.error('Erreur JavaScript interceptée:', e.message, 'à', e.filename, 'ligne', e.lineno);
-                // Éviter d'afficher des alertes intrusives, mais enregistrer l'erreur
+
+                // Réactiver les boutons en cas d'erreur JavaScript
+                setTimeout(function() {
+                    if (typeof activateAllButtons === 'function') {
+                        activateAllButtons();
+                    }
+                }, 1000);
+
                 return false;
+            });
+
+            // Gestionnaire pour les erreurs de promesses non gérées
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('Promesse rejetée non gérée:', e.reason);
+
+                // Réactiver les boutons en cas d'erreur
+                setTimeout(function() {
+                    if (typeof activateAllButtons === 'function') {
+                        activateAllButtons();
+                    }
+                }, 1000);
             });
 
             // Récupération des images en cas d'échec

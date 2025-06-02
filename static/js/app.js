@@ -64,40 +64,48 @@ window.addEventListener('load', function() {
     }
 });
 
-// Gestionnaire d'événements simplifié pour éviter les conflits
+// Gestionnaire d'événements amélioré pour tous les boutons
 document.addEventListener('click', function(e) {
     // Ne pas traiter les clics si le spinner est déjà visible
     if (spinnerVisible) return;
     
-    const clickable = e.target.closest('a[href], button[type="submit"], input[type="submit"]');
+    const clickable = e.target.closest('a[href], button, input[type="submit"], .btn, [role="button"]');
 
-    if (clickable && 
-        !clickable.hasAttribute('data-no-loading') && 
-        !clickable.classList.contains('btn-close') && 
-        !clickable.classList.contains('dropdown-toggle') &&
-        !clickable.classList.contains('navbar-toggler') &&
-        !clickable.classList.contains('toast-close') &&
-        !clickable.classList.contains('close') &&
-        !clickable.classList.contains('btn-secondary') &&
-        !clickable.hasAttribute('data-bs-toggle')) {
-
-        const href = clickable.getAttribute('href');
-        const isSubmitButton = clickable.type === 'submit';
-
-        // Vérifier si c'est un lien de navigation valide
-        if (href && href !== '#' && !href.startsWith('javascript:') && 
-            !href.startsWith('mailto:') && !href.startsWith('tel:') && 
-            !href.startsWith('#')) {
-
-            // Délai très court pour éviter le scintillement
-            setTimeout(() => {
-                toggleLoadingSpinner(true);
-            }, 50);
-
-            // Masquer automatiquement après 6 secondes
-            setTimeout(() => {
-                toggleLoadingSpinner(false);
-            }, 6000);
+    if (clickable) {
+        // Exceptions - éléments qui ne doivent pas déclencher le spinner
+        const exceptions = [
+            'btn-close',
+            'dropdown-toggle', 
+            'navbar-toggler',
+            'toast-close',
+            'close',
+            'modal-close',
+            'accordion-button'
+        ];
+        
+        // Vérifier si l'élément a un attribut ou classe d'exception
+        const hasException = exceptions.some(cls => clickable.classList.contains(cls)) ||
+                            clickable.hasAttribute('data-no-loading') ||
+                            clickable.hasAttribute('data-bs-toggle') ||
+                            clickable.hasAttribute('data-bs-dismiss');
+        
+        if (!hasException) {
+            const href = clickable.getAttribute('href');
+            const isButton = clickable.tagName === 'BUTTON' || clickable.type === 'submit';
+            
+            // Pour les liens de navigation
+            if (href && href !== '#' && !href.startsWith('javascript:') && 
+                !href.startsWith('mailto:') && !href.startsWith('tel:') && 
+                !href.startsWith('#')) {
+                
+                setTimeout(() => toggleLoadingSpinner(true), 50);
+                setTimeout(() => toggleLoadingSpinner(false), 6000);
+            }
+            // Pour les boutons (sauf ceux dans des modals)
+            else if (isButton && !clickable.closest('.modal')) {
+                setTimeout(() => toggleLoadingSpinner(true), 50);
+                setTimeout(() => toggleLoadingSpinner(false), 8000);
+            }
         }
     }
 });
@@ -120,17 +128,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Masquer le spinner au chargement initial
     toggleLoadingSpinner(false);
 
-    // Initialiser tous les tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    // Initialiser tous les tooltips avec gestion d'erreur
+    try {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    } catch (e) {
+        console.warn('Erreur lors de l\'initialisation des tooltips:', e);
+    }
 
-    // Initialiser tous les popovers
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    });
+    // Initialiser tous les popovers avec gestion d'erreur
+    try {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+    } catch (e) {
+        console.warn('Erreur lors de l\'initialisation des popovers:', e);
+    }
 
     // S'assurer que l'accordéon de la FAQ fonctionne correctement
     var accordionElement = document.getElementById('faqAccordion');
@@ -180,6 +196,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize exercise analysis
     initializeAnalysisCharts();
+
+    // Forcer l'activation de tous les boutons
+    activateAllButtons();
 });
 
 function initTestimonialSlider() {
@@ -644,3 +663,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Fonction pour s'assurer que tous les boutons sont opérationnels
+function activateAllButtons() {
+    // Réactiver tous les boutons désactivés (sauf ceux explicitement marqués)
+    document.querySelectorAll('button:disabled, input[type="submit"]:disabled').forEach(button => {
+        if (!button.hasAttribute('data-permanently-disabled')) {
+            button.disabled = false;
+        }
+    });
+
+    // S'assurer que tous les liens sont cliquables
+    document.querySelectorAll('a').forEach(link => {
+        if (link.href && link.href !== '#') {
+            link.style.pointerEvents = 'auto';
+            link.classList.remove('disabled');
+        }
+    });
+
+    // Réactiver les éléments de formulaire
+    document.querySelectorAll('input, select, textarea').forEach(element => {
+        if (!element.hasAttribute('data-permanently-readonly')) {
+            element.readOnly = false;
+        }
+        if (!element.hasAttribute('data-permanently-disabled')) {
+            element.disabled = false;
+        }
+    });
+
+    // S'assurer que les dropdowns fonctionnent
+    document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
+        if (!dropdown.hasAttribute('data-bs-toggle')) {
+            dropdown.setAttribute('data-bs-toggle', 'dropdown');
+        }
+    });
+
+    console.log('Tous les boutons ont été réactivés');
+}
+
+// Fonction de débogage pour vérifier l'état des boutons
+function debugButtons() {
+    const buttons = document.querySelectorAll('button, a, input[type="submit"]');
+    console.log(`Total d'éléments interactifs trouvés: ${buttons.length}`);
+    
+    const disabled = document.querySelectorAll('button:disabled, input[type="submit"]:disabled');
+    console.log(`Éléments désactivés: ${disabled.length}`);
+    
+    disabled.forEach((el, index) => {
+        console.log(`Élément désactivé ${index + 1}:`, el);
+    });
+    
+    return {
+        total: buttons.length,
+        disabled: disabled.length,
+        active: buttons.length - disabled.length
+    };
+}
+
+// Exposer la fonction de débogage globalement
+window.debugButtons = debugButtons;
+window.activateAllButtons = activateAllButtons;
