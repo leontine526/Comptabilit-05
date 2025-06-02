@@ -2371,8 +2371,11 @@ def search():
         search_type = form.search_type.data if form.validate_on_submit() else request.args.get('search_type', 'all')
 
         if search_type == 'all' or search_type == 'users':
-            users = User.query.filter(User.username.contains(query)```python
- | User.full_name.contains(query) | User.email.contains(query)).all()
+            users = User.query.filter(
+                User.username.contains(query) | 
+                User.full_name.contains(query) | 
+                User.email.contains(query)
+            ).all()
         else:
             users = []
 
