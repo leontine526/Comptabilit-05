@@ -53,7 +53,12 @@
     }
 
     // Exécuter périodiquement pour corriger les problèmes
-    setInterval(ensureButtonsWork, 5000);
+    setInterval(ensureButtonsWork, 2000);
+    
+    // Exécuter immédiatement après le chargement
+    setTimeout(ensureButtonsWork, 500);
+    setTimeout(ensureButtonsWork, 1000);
+    setTimeout(ensureButtonsWork, 2000);
 
     // Exécuter après les erreurs Ajax
     document.addEventListener('ajaxComplete', ensureButtonsWork);

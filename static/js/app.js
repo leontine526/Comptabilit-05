@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (existingSpinner) {
         existingSpinner.style.display = 'none';
     }
+    
+    // Activer tous les boutons immédiatement
+    setTimeout(activateAllButtons, 100);
 });
 
 // Masquer le spinner une fois la page complètement chargée
@@ -62,6 +65,9 @@ window.addEventListener('load', function() {
     if (spinner) {
         spinner.style.display = 'none';
     }
+    
+    // Réactiver tous les boutons après le chargement complet
+    setTimeout(activateAllButtons, 200);
 });
 
 // Gestionnaire d'événements amélioré pour tous les boutons
@@ -666,39 +672,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fonction pour s'assurer que tous les boutons sont opérationnels
 function activateAllButtons() {
-    // Réactiver tous les boutons désactivés (sauf ceux explicitement marqués)
-    document.querySelectorAll('button:disabled, input[type="submit"]:disabled').forEach(button => {
-        if (!button.hasAttribute('data-permanently-disabled')) {
-            button.disabled = false;
-        }
-    });
+    try {
+        // Réactiver tous les boutons désactivés (sauf ceux explicitement marqués)
+        document.querySelectorAll('button:disabled, input[type="submit"]:disabled').forEach(button => {
+            if (!button.hasAttribute('data-permanently-disabled') && !button.hasAttribute('data-keep-disabled')) {
+                button.disabled = false;
+                button.style.pointerEvents = 'auto';
+                button.style.cursor = 'pointer';
+            }
+        });
 
-    // S'assurer que tous les liens sont cliquables
-    document.querySelectorAll('a').forEach(link => {
-        if (link.href && link.href !== '#') {
-            link.style.pointerEvents = 'auto';
-            link.classList.remove('disabled');
-        }
-    });
+        // S'assurer que tous les liens sont cliquables
+        document.querySelectorAll('a').forEach(link => {
+            if (link.href && link.href !== '#' && !link.classList.contains('disabled')) {
+                link.style.pointerEvents = 'auto';
+                link.style.cursor = 'pointer';
+                link.classList.remove('disabled');
+            }
+        });
 
-    // Réactiver les éléments de formulaire
-    document.querySelectorAll('input, select, textarea').forEach(element => {
-        if (!element.hasAttribute('data-permanently-readonly')) {
-            element.readOnly = false;
-        }
-        if (!element.hasAttribute('data-permanently-disabled')) {
-            element.disabled = false;
-        }
-    });
+        // Réactiver tous les éléments avec la classe btn
+        document.querySelectorAll('.btn').forEach(btn => {
+            if (!btn.hasAttribute('data-permanently-disabled') && !btn.hasAttribute('data-keep-disabled')) {
+                btn.disabled = false;
+                btn.style.pointerEvents = 'auto';
+                btn.style.cursor = 'pointer';
+                btn.classList.remove('disabled');
+            }
+        });
 
-    // S'assurer que les dropdowns fonctionnent
-    document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
-        if (!dropdown.hasAttribute('data-bs-toggle')) {
-            dropdown.setAttribute('data-bs-toggle', 'dropdown');
-        }
-    });
+        // Réactiver les éléments de formulaire
+        document.querySelectorAll('input, select, textarea').forEach(element => {
+            if (!element.hasAttribute('data-permanently-readonly')) {
+                element.readOnly = false;
+            }
+            if (!element.hasAttribute('data-permanently-disabled') && !element.hasAttribute('data-keep-disabled')) {
+                element.disabled = false;
+                element.style.pointerEvents = 'auto';
+            }
+        });
 
-    console.log('Tous les boutons ont été réactivés');
+        // S'assurer que les dropdowns fonctionnent
+        document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
+            if (!dropdown.hasAttribute('data-bs-toggle')) {
+                dropdown.setAttribute('data-bs-toggle', 'dropdown');
+            }
+            dropdown.style.pointerEvents = 'auto';
+            dropdown.style.cursor = 'pointer';
+        });
+
+        // Réactiver les éléments de navigation
+        document.querySelectorAll('.nav-link, .navbar-nav a').forEach(navLink => {
+            navLink.style.pointerEvents = 'auto';
+            navLink.style.cursor = 'pointer';
+        });
+
+        // Forcer la réactivation des événements de clic
+        document.querySelectorAll('button, a, .btn, [onclick]').forEach(element => {
+            if (!element.hasAttribute('data-keep-disabled')) {
+                element.style.pointerEvents = 'auto';
+                element.style.cursor = 'pointer';
+            }
+        });
+
+        console.log('Tous les boutons ont été réactivés avec succès');
+    } catch (error) {
+        console.error('Erreur lors de l\'activation des boutons:', error);
+    }
 }
 
 // Fonction de débogage pour vérifier l'état des boutons
