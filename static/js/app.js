@@ -670,74 +670,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Fonction pour s'assurer que tous les boutons sont opérationnels
+// Fonction légère pour l'activation des boutons (déléguée à button-fix.js)
 function activateAllButtons() {
-    try {
-        // Réactiver tous les boutons désactivés (sauf ceux explicitement marqués)
+    // Déléguer à la fonction principale du button-fix.js
+    if (typeof window.ensureAllButtonsActive === 'function') {
+        window.ensureAllButtonsActive();
+    } else {
+        console.warn('Fonction d\'activation principale non disponible, utilisation de la version de base');
+        // Version de base en cas de problème
         document.querySelectorAll('button:disabled, input[type="submit"]:disabled').forEach(button => {
-            if (!button.hasAttribute('data-permanently-disabled') && !button.hasAttribute('data-keep-disabled')) {
+            if (!button.hasAttribute('data-keep-disabled')) {
                 button.disabled = false;
                 button.style.pointerEvents = 'auto';
-                button.style.cursor = 'pointer';
             }
         });
-
-        // S'assurer que tous les liens sont cliquables
-        document.querySelectorAll('a').forEach(link => {
-            if (link.href && link.href !== '#' && !link.classList.contains('disabled')) {
-                link.style.pointerEvents = 'auto';
-                link.style.cursor = 'pointer';
-                link.classList.remove('disabled');
-            }
-        });
-
-        // Réactiver tous les éléments avec la classe btn
-        document.querySelectorAll('.btn').forEach(btn => {
-            if (!btn.hasAttribute('data-permanently-disabled') && !btn.hasAttribute('data-keep-disabled')) {
-                btn.disabled = false;
-                btn.style.pointerEvents = 'auto';
-                btn.style.cursor = 'pointer';
-                btn.classList.remove('disabled');
-            }
-        });
-
-        // Réactiver les éléments de formulaire
-        document.querySelectorAll('input, select, textarea').forEach(element => {
-            if (!element.hasAttribute('data-permanently-readonly')) {
-                element.readOnly = false;
-            }
-            if (!element.hasAttribute('data-permanently-disabled') && !element.hasAttribute('data-keep-disabled')) {
-                element.disabled = false;
-                element.style.pointerEvents = 'auto';
-            }
-        });
-
-        // S'assurer que les dropdowns fonctionnent
-        document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
-            if (!dropdown.hasAttribute('data-bs-toggle')) {
-                dropdown.setAttribute('data-bs-toggle', 'dropdown');
-            }
-            dropdown.style.pointerEvents = 'auto';
-            dropdown.style.cursor = 'pointer';
-        });
-
-        // Réactiver les éléments de navigation
-        document.querySelectorAll('.nav-link, .navbar-nav a').forEach(navLink => {
-            navLink.style.pointerEvents = 'auto';
-            navLink.style.cursor = 'pointer';
-        });
-
-        // Forcer la réactivation des événements de clic
-        document.querySelectorAll('button, a, .btn, [onclick]').forEach(element => {
-            if (!element.hasAttribute('data-keep-disabled')) {
-                element.style.pointerEvents = 'auto';
-                element.style.cursor = 'pointer';
-            }
-        });
-
-        console.log('Tous les boutons ont été réactivés avec succès');
-    } catch (error) {
-        console.error('Erreur lors de l\'activation des boutons:', error);
     }
 }
 
