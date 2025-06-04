@@ -269,13 +269,13 @@
     </div>
 
     <!-- Indicateur de chargement initial -->
-    <div id="initial-loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 10000; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div id="initial-loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 10000; background: #0B4471; transition: opacity 0.3s ease;">
         <div class="text-center text-white">
-            <div class="spinner-border mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <div class="spinner-border mb-3" role="status" style="width: 3rem; height: 3rem; border-color: #ffffff transparent #ffffff transparent;">
                 <span class="visually-hidden">Chargement...</span>
             </div>
-            <h4 class="fw-bold">SmartOHADA</h4>
-            <p class="mb-0">Chargement de l'application...</p>
+            <h4 class="fw-bold mb-2">SmartOHADA</h4>
+            <p class="mb-0 small">Chargement en cours...</p>
         </div>
     </div>
 
@@ -492,27 +492,30 @@
     {% block scripts %}{% endblock %}
 
     <script>
-    // Masquer l'indicateur de chargement initial
-    window.addEventListener('load', function() {
+    // Fonction pour masquer l'écran de chargement
+    function hideLoadingScreen() {
         const initialLoading = document.getElementById('initial-loading');
-        if (initialLoading) {
+        if (initialLoading && initialLoading.style.display !== 'none') {
+            console.log('🎯 Masquage de l\'écran de chargement');
             initialLoading.style.opacity = '0';
             setTimeout(() => {
                 initialLoading.style.display = 'none';
-            }, 500);
+            }, 300);
         }
-    });
+    }
 
-    // Masquer l'indicateur après un délai maximum même si la page n'est pas complètement chargée
-    setTimeout(() => {
-        const initialLoading = document.getElementById('initial-loading');
-        if (initialLoading) {
-            initialLoading.style.opacity = '0';
-            setTimeout(() => {
-                initialLoading.style.display = 'none';
-            }, 500);
-        }
-    }, 3000);
+    // Masquer dès que le DOM est prêt (plus rapide)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hideLoadingScreen);
+    } else {
+        hideLoadingScreen();
+    }
+
+    // Sécurité : masquer après 1.5 secondes maximum
+    setTimeout(hideLoadingScreen, 1500);
+
+    // Masquer aussi au chargement complet
+    window.addEventListener('load', hideLoadingScreen);
 
     // Ajouter une classe au body selon la taille de l'écran
     document.addEventListener('DOMContentLoaded', function() {
