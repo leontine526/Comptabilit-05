@@ -2,174 +2,209 @@
 (function() {
     'use strict';
 
-    // Variable pour éviter les exécutions multiples
-    let isActivating = false;
-    let lastActivation = 0;
-    const ACTIVATION_COOLDOWN = 100; // ms
+    // Solution définitive pour les boutons non cliquables
+    function forceButtonActivation() {
+        // Sélecteurs très larges pour capturer tous les éléments interactifs
+        const allInteractiveSelectors = [
+            'button',
+            'a',
+            'input[type="submit"]',
+            'input[type="button"]',
+            '.btn',
+            '.nav-link',
+            '.dropdown-toggle',
+            '.dropdown-item',
+            '[onclick]',
+            '[data-bs-toggle]',
+            '[role="button"]',
+            '.btn-primary',
+            '.btn-secondary',
+            '.btn-success',
+            '.btn-danger',
+            '.btn-warning',
+            '.btn-info',
+            '.btn-light',
+            '.btn-dark',
+            '.btn-outline-primary',
+            '.btn-outline-secondary',
+            '.btn-outline-success',
+            '.btn-outline-danger',
+            '.btn-outline-warning',
+            '.btn-outline-info',
+            '.btn-outline-light',
+            '.btn-outline-dark'
+        ];
 
-    // Fonction principale d'activation des boutons
-    function ensureAllButtonsActive() {
-        // Éviter les exécutions trop rapprochées
-        const now = Date.now();
-        if (isActivating || (now - lastActivation < ACTIVATION_COOLDOWN)) {
-            return;
-        }
-
-        isActivating = true;
-        lastActivation = now;
-
-        try {
-            // Sélecteurs pour tous les éléments interactifs
-            const selectors = [
-                'button',
-                'a',
-                '.btn',
-                'input[type="submit"]',
-                'input[type="button"]',
-                '[onclick]',
-                '[data-bs-toggle]',
-                '[role="button"]',
-                '.nav-link',
-                '.dropdown-toggle',
-                '.dropdown-item'
-            ];
-            
-            selectors.forEach(selector => {
+        allInteractiveSelectors.forEach(selector => {
+            try {
                 document.querySelectorAll(selector).forEach(element => {
-                    // Ne pas toucher aux éléments explicitement marqués comme devant rester désactivés
+                    // Ne pas toucher aux éléments marqués comme devant rester désactivés
                     if (element.hasAttribute('data-keep-disabled') || 
                         element.hasAttribute('data-permanently-disabled')) {
                         return;
                     }
 
-                    // Réactiver l'élément
+                    // Force l'activation complète
+                    element.disabled = false;
                     element.removeAttribute('disabled');
-                    element.style.pointerEvents = 'auto';
-                    element.style.cursor = 'pointer';
-                    element.style.opacity = '1';
-                    element.classList.remove('disabled', 'pe-none');
-
-                    // Cas spéciaux pour les liens
+                    
+                    // Styles CSS forcés
+                    element.style.pointerEvents = 'auto !important';
+                    element.style.cursor = 'pointer !important';
+                    element.style.opacity = '1 !important';
+                    element.style.visibility = 'visible !important';
+                    element.style.display = element.style.display || 'inline-block';
+                    
+                    // Supprimer toutes les classes qui peuvent désactiver
+                    const disablingClasses = ['disabled', 'pe-none', 'pointer-events-none', 'btn-disabled'];
+                    disablingClasses.forEach(cls => element.classList.remove(cls));
+                    
+                    // Pour les liens
                     if (element.tagName === 'A') {
-                        // S'assurer que les liens ont un href ou un gestionnaire de clic
                         if (!element.href && !element.onclick && !element.getAttribute('onclick')) {
                             element.href = 'javascript:void(0)';
                         }
-                        // Supprimer tabindex négatif
-                        if (element.tabIndex < 0) {
-                            element.removeAttribute('tabindex');
-                        }
+                        element.removeAttribute('tabindex');
                     }
 
-                    // Réinitialiser les dropdowns Bootstrap si nécessaire
-                    if (element.hasAttribute('data-bs-toggle') && element.getAttribute('data-bs-toggle') === 'dropdown') {
-                        if (typeof bootstrap !== 'undefined') {
-                            try {
-                                // Éviter les erreurs de réinitialisation
-                                if (!element._dropdown) {
-                                    new bootstrap.Dropdown(element);
-                                }
-                            } catch (e) {
-                                // Ignorer les erreurs de Bootstrap
-                            }
+                    // Forcer l'ajout d'event listeners
+                    if (!element.hasAttribute('data-clickable-forced')) {
+                        element.setAttribute('data-clickable-forced', 'true');
+                        
+                        // Ajouter un gestionnaire de clic générique si aucun n'existe
+                        if (!element.onclick && !element.getAttribute('onclick') && 
+                            !element.href && element.type !== 'submit') {
+                            element.addEventListener('click', function(e) {
+                                // Ne rien faire, juste s'assurer que le clic est capturé
+                                console.log('Clic capturé sur:', this);
+                            });
                         }
                     }
                 });
-            });
+            } catch (error) {
+                console.warn('Erreur lors de l\'activation du sélecteur', selector, ':', error);
+            }
+        });
 
-            console.log('✅ Activation des boutons terminée avec succès');
-        } catch (error) {
-            console.error('❌ Erreur lors de l\'activation des boutons:', error);
-        } finally {
-            isActivating = false;
-        }
-    }
-
-    // Fonction de débogage
-    function debugButtonStates() {
-        const allInteractive = document.querySelectorAll('button, a, input[type="submit"], .btn');
-        const disabled = document.querySelectorAll('button:disabled, input:disabled, .disabled');
-        
-        console.log(`Debug: ${allInteractive.length} éléments interactifs, ${disabled.length} désactivés`);
-        
-        disabled.forEach((el, i) => {
-            console.log(`Élément désactivé ${i + 1}:`, el, {
-                disabled: el.disabled,
-                classes: el.className,
-                style: el.style.pointerEvents
+        // Force l'activation de tous les formulaires
+        document.querySelectorAll('form').forEach(form => {
+            form.style.pointerEvents = 'auto !important';
+            form.querySelectorAll('input, button, select, textarea').forEach(input => {
+                if (!input.hasAttribute('data-keep-disabled')) {
+                    input.disabled = false;
+                    input.removeAttribute('disabled');
+                    input.style.pointerEvents = 'auto !important';
+                }
             });
         });
     }
 
-    // Initialisation immédiate si le DOM est déjà prêt
+    // Fonction pour injecter des styles CSS forcés
+    function injectForceStyles() {
+        const existingStyle = document.getElementById('force-button-styles');
+        if (existingStyle) {
+            existingStyle.remove();
+        }
+
+        const style = document.createElement('style');
+        style.id = 'force-button-styles';
+        style.textContent = `
+            /* Force l'activation de tous les boutons */
+            button:not([data-keep-disabled]),
+            .btn:not([data-keep-disabled]),
+            a:not([data-keep-disabled]),
+            input[type="submit"]:not([data-keep-disabled]),
+            input[type="button"]:not([data-keep-disabled]) {
+                pointer-events: auto !important;
+                cursor: pointer !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+            
+            /* Supprimer les états désactivés */
+            .disabled:not([data-keep-disabled]),
+            .pe-none:not([data-keep-disabled]) {
+                pointer-events: auto !important;
+                opacity: 1 !important;
+            }
+            
+            /* Force les interactions sur les dropdowns */
+            .dropdown-toggle:not([data-keep-disabled]),
+            .dropdown-item:not([data-keep-disabled]) {
+                pointer-events: auto !important;
+                cursor: pointer !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Exécution immédiate et répétée
+    function executeForceActivation() {
+        injectForceStyles();
+        forceButtonActivation();
+    }
+
+    // Exécution au chargement du DOM
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', ensureAllButtonsActive);
+        document.addEventListener('DOMContentLoaded', executeForceActivation);
     } else {
-        ensureAllButtonsActive();
+        executeForceActivation();
     }
 
     // Exécution après le chargement complet
-    window.addEventListener('load', ensureAllButtonsActive);
+    window.addEventListener('load', executeForceActivation);
 
-    // Réactivation périodique (moins fréquente)
-    setInterval(ensureAllButtonsActive, 5000);
+    // Exécution périodique agressive
+    setInterval(executeForceActivation, 2000);
 
-    // Observer les mutations DOM avec throttling
+    // Observer très agressif pour les mutations DOM
     if (typeof MutationObserver !== 'undefined') {
-        let mutationTimeout;
-        const observer = new MutationObserver(function(mutations) {
-            // Vérifier si des changements significatifs ont eu lieu
-            let hasSignificantChanges = false;
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    // Vérifier si des boutons ont été ajoutés
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === 1) { // Element node
-                            if (node.matches && (
-                                node.matches('button, a, .btn, input[type="submit"]') ||
-                                node.querySelector('button, a, .btn, input[type="submit"]')
-                            )) {
-                                hasSignificantChanges = true;
-                            }
-                        }
-                    });
-                }
-                if (mutation.type === 'attributes' && 
-                    ['disabled', 'class', 'style'].includes(mutation.attributeName)) {
-                    hasSignificantChanges = true;
-                }
-            });
-
-            if (hasSignificantChanges) {
-                clearTimeout(mutationTimeout);
-                mutationTimeout = setTimeout(ensureAllButtonsActive, 200);
-            }
+        const observer = new MutationObserver(function() {
+            setTimeout(executeForceActivation, 100);
         });
 
         observer.observe(document.body, {
             childList: true,
             subtree: true,
             attributes: true,
-            attributeFilter: ['disabled', 'class', 'style', 'tabindex']
+            attributeFilter: ['disabled', 'class', 'style']
         });
     }
 
-    // Gestion des erreurs JavaScript
-    window.addEventListener('error', function(e) {
-        console.warn('Erreur JavaScript détectée, réactivation des boutons dans 1s');
-        setTimeout(ensureAllButtonsActive, 1000);
+    // Réactivation après les erreurs
+    window.addEventListener('error', function() {
+        setTimeout(executeForceActivation, 500);
     });
 
     // Réactivation après les requêtes AJAX
     if (typeof $ !== 'undefined') {
         $(document).ajaxComplete(function() {
-            setTimeout(ensureAllButtonsActive, 100);
+            setTimeout(executeForceActivation, 200);
         });
     }
 
-    // Exposer les fonctions globalement pour le débogage
-    window.ensureAllButtonsActive = ensureAllButtonsActive;
-    window.debugButtonStates = debugButtonStates;
+    // Fonction de débogage améliorée
+    window.debugButtonStates = function() {
+        const all = document.querySelectorAll('button, a, .btn, input[type="submit"]');
+        const disabled = document.querySelectorAll('[disabled], .disabled');
+        
+        console.log(`🔍 Total éléments interactifs: ${all.length}`);
+        console.log(`❌ Éléments désactivés: ${disabled.length}`);
+        
+        disabled.forEach((el, i) => {
+            console.log(`Désactivé ${i+1}:`, el, {
+                disabled: el.disabled,
+                classes: el.className,
+                style: el.style.cssText,
+                computed: window.getComputedStyle(el).pointerEvents
+            });
+        });
+        
+        return { total: all.length, disabled: disabled.length };
+    };
+
+    // Exposer la fonction globalement
+    window.forceButtonActivation = executeForceActivation;
     
-    console.log('🔧 Script d\'activation des boutons initialisé');
+    console.log('🚀 Solution définitive d\'activation des boutons chargée');
 })();
