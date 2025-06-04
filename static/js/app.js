@@ -1,4 +1,4 @@
-// Script principal de l'application - version optimisée
+// Script principal de l'application - version simplifiée sans spinner
 (function() {
     'use strict';
 
@@ -15,58 +15,6 @@
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
-    }
-
-    // Variable pour suivre l'état du spinner
-    let spinnerVisible = false;
-    let spinnerTimeout = null;
-
-    // Fonction pour afficher/masquer le spinner de chargement
-    function toggleLoadingSpinner(show) {
-        // Annuler tout timeout précédent
-        if (spinnerTimeout) {
-            clearTimeout(spinnerTimeout);
-            spinnerTimeout = null;
-        }
-
-        // Ne pas afficher le spinner s'il est déjà visible
-        if (spinnerVisible === show) return;
-
-        let spinner = document.getElementById('loading-spinner');
-        if (!spinner && show) {
-            const spinnerHtml = `
-                <div id="loading-spinner" class="position-fixed top-50 start-50 translate-middle" style="z-index: 9999; display: none; pointer-events: none;">
-                    <div class="d-flex flex-column align-items-center bg-dark bg-opacity-75 p-4 rounded">
-                        <div class="spinner-border text-light mb-3" role="status" style="width: 3rem; height: 3rem;">
-                            <span class="visually-hidden">Chargement...</span>
-                        </div>
-                        <div class="text-light fw-bold">Chargement en cours...</div>
-                    </div>
-                </div>`;
-            document.body.insertAdjacentHTML('beforeend', spinnerHtml);
-            spinner = document.getElementById('loading-spinner');
-        }
-
-        if (!spinner) return;
-
-        spinnerVisible = show;
-
-        if (show) {
-            spinner.style.display = 'flex';
-            spinner.style.opacity = '1';
-            spinner.style.pointerEvents = 'none';
-            // Auto-hide après 5 secondes max pour éviter le blocage
-            spinnerTimeout = setTimeout(() => {
-                toggleLoadingSpinner(false);
-            }, 5000);
-        } else {
-            spinner.style.opacity = '0';
-            setTimeout(() => {
-                if (spinner && !spinnerVisible) {
-                    spinner.style.display = 'none';
-                }
-            }, 200);
-        }
     }
 
     // Initialize DataTables if available
@@ -332,56 +280,6 @@
         }
     }
 
-    // Gestion des clics simplifié avec meilleure gestion des exceptions
-    document.addEventListener('click', function(e) {
-        const clickable = e.target.closest('a[href], button, input[type="submit"], .btn');
-
-        if (clickable && !spinnerVisible) {
-            const hasException = clickable.hasAttribute('data-no-loading') ||
-                                clickable.hasAttribute('data-bs-toggle') ||
-                                clickable.hasAttribute('data-bs-dismiss') ||
-                                clickable.classList.contains('navbar-toggler') ||
-                                clickable.classList.contains('dropdown-toggle') ||
-                                clickable.closest('.dropdown-menu');
-
-            if (!hasException) {
-                const href = clickable.getAttribute('href');
-                const isSubmitButton = clickable.type === 'submit';
-                const isFormButton = clickable.tagName === 'BUTTON' && clickable.closest('form');
-
-                // Seulement pour les vraies navigations et soumissions de formulaires
-                if ((href && href !== '#' && !href.startsWith('javascript:') && !href.startsWith('mailto:')) || 
-                    isSubmitButton || isFormButton) {
-                    
-                    // Délai réduit pour un meilleur UX
-                    setTimeout(() => {
-                        if (!spinnerVisible) {
-                            toggleLoadingSpinner(true);
-                        }
-                    }, 50);
-                }
-            }
-        }
-    });
-
-    // Gestion des soumissions de formulaires avec auto-hide amélioré
-    document.addEventListener('submit', function(e) {
-        const form = e.target;
-        if (form && !form.hasAttribute('data-no-loading') && !spinnerVisible) {
-            toggleLoadingSpinner(true);
-            
-            // Écouter la fin du chargement de la page pour masquer le spinner
-            const hideSpinner = () => {
-                toggleLoadingSpinner(false);
-                window.removeEventListener('load', hideSpinner);
-                document.removeEventListener('DOMContentLoaded', hideSpinner);
-            };
-            
-            window.addEventListener('load', hideSpinner);
-            document.addEventListener('DOMContentLoaded', hideSpinner);
-        }
-    });
-
     // Gestion des formulaires d'exercices
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('exercise-form');
@@ -546,36 +444,6 @@
         initializeAccountSelect();
     });
 
-    // Fonction pour nettoyer le spinner en cas de problème
-    function forceHideSpinner() {
-        spinnerVisible = false;
-        if (spinnerTimeout) {
-            clearTimeout(spinnerTimeout);
-            spinnerTimeout = null;
-        }
-        const spinner = document.getElementById('loading-spinner');
-        if (spinner) {
-            spinner.style.display = 'none';
-            spinner.style.opacity = '0';
-        }
-    }
-
-    // Nettoyer le spinner lors du chargement complet de la page
-    window.addEventListener('load', function() {
-        setTimeout(forceHideSpinner, 1000);
-    });
-
-    // Nettoyer le spinner si la page reste inactive (au cas où)
-    document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible' && spinnerVisible) {
-            setTimeout(forceHideSpinner, 500);
-        }
-    });
-
-    // Exposer les fonctions essentielles
-    window.toggleLoadingSpinner = toggleLoadingSpinner;
-    window.forceHideSpinner = forceHideSpinner;
-
-    console.log('📱 Script principal app.js chargé (version corrigée)');
+    console.log('📱 Script principal app.js chargé (version simplifiée)');
 
 })();
