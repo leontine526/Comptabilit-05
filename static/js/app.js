@@ -254,7 +254,7 @@
         });
     }
 
-    // Fonction pour afficher le message de chargement des exercices
+    // Message de chargement simplifié sans spinner
     function showLoadingMessage() {
         console.log('Affichage du message de chargement...');
 
@@ -266,17 +266,12 @@
         const exerciseForm = document.getElementById('exercise-form');
         if (exerciseForm) {
             const loadingMsg = document.createElement('div');
-            loadingMsg.className = 'alert alert-info mt-3 d-flex align-items-center';
+            loadingMsg.className = 'alert alert-info mt-3';
             loadingMsg.id = 'loading-message';
-            loadingMsg.innerHTML = `
-                <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-                <span>🔄 Résolution en cours... Veuillez patienter.</span>
-            `;
+            loadingMsg.innerHTML = `<span>🔄 Résolution en cours... Veuillez patienter.</span>`;
 
             exerciseForm.parentNode.insertBefore(loadingMsg, exerciseForm.nextSibling);
             console.log('Message de chargement affiché');
-        } else {
-            console.warn('Formulaire d\'exercice non trouvé');
         }
     }
 
@@ -298,8 +293,7 @@
 
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Résolution...';
+                    submitBtn.innerHTML = '🔄 Résolution...';
                 }
 
                 console.log('Formulaire soumis avec succès');

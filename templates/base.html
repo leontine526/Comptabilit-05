@@ -268,14 +268,14 @@
         {% endwith %}
     </div>
 
-    <!-- Indicateur de chargement initial -->
-    <div id="initial-loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 10000; background: #0B4471; transition: opacity 0.3s ease;">
+    <!-- Indicateur de chargement initial - masqué par défaut -->
+    <div id="initial-loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 10000; background: #0B4471; display: none;">
         <div class="text-center text-white">
-            <div class="spinner-border mb-3" role="status" style="width: 3rem; height: 3rem; border-color: #ffffff transparent #ffffff transparent;">
+            <div class="spinner-border mb-3" role="status" style="width: 2rem; height: 2rem;">
                 <span class="visually-hidden">Chargement...</span>
             </div>
-            <h4 class="fw-bold mb-2">SmartOHADA</h4>
-            <p class="mb-0 small">Chargement en cours...</p>
+            <h5 class="fw-bold mb-1">SmartOHADA</h5>
+            <p class="mb-0 small">Chargement...</p>
         </div>
     </div>
 
@@ -492,30 +492,34 @@
     {% block scripts %}{% endblock %}
 
     <script>
-    // Fonction pour masquer l'écran de chargement
+    // Fonction pour masquer l'écran de chargement IMMÉDIATEMENT
     function hideLoadingScreen() {
         const initialLoading = document.getElementById('initial-loading');
-        if (initialLoading && initialLoading.style.display !== 'none') {
-            console.log('🎯 Masquage de l\'écran de chargement');
-            initialLoading.style.opacity = '0';
-            setTimeout(() => {
-                initialLoading.style.display = 'none';
-            }, 300);
+        if (initialLoading) {
+            console.log('🎯 Suppression immédiate de l\'écran de chargement');
+            initialLoading.remove(); // Suppression complète au lieu de juste le cacher
         }
     }
 
-    // Masquer dès que le DOM est prêt (plus rapide)
+    // Masquer IMMÉDIATEMENT sans attendre
+    hideLoadingScreen();
+
+    // Double sécurité - masquer dès que possible
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', hideLoadingScreen);
     } else {
-        hideLoadingScreen();
+        // Le DOM est déjà prêt, masquer immédiatement
+        setTimeout(hideLoadingScreen, 100);
     }
 
-    // Sécurité : masquer après 1.5 secondes maximum
-    setTimeout(hideLoadingScreen, 1500);
-
-    // Masquer aussi au chargement complet
-    window.addEventListener('load', hideLoadingScreen);
+    // Triple sécurité : suppression forcée après 500ms maximum
+    setTimeout(() => {
+        const loadingEl = document.getElementById('initial-loading');
+        if (loadingEl) {
+            console.log('🚨 Suppression forcée de l\'écran de chargement');
+            loadingEl.remove();
+        }
+    }, 500);
 
     // Ajouter une classe au body selon la taille de l'écran
     document.addEventListener('DOMContentLoaded', function() {
